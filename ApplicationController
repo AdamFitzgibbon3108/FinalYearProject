@@ -1,0 +1,22 @@
+package com.example.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+
+@RestController // Use RestController to indicate that this class will return data directly.
+public class ApplicationController {
+    
+	//Home Page//
+    @GetMapping("/home") // This maps GET requests to "/home"
+    public String hello() {
+        return "Hello From Spring"; // Return a string response
+    }
+    
+    //Welcome Page// 
+    @GetMapping("/welcome")
+    public String Welcome() {
+    	return "welcomepage";
+    }
+     
+}
