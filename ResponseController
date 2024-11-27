@@ -1,0 +1,108 @@
+package com.example.controller;
+
+import com.example.model.Response;
+import com.example.repository.ResponseRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/responses")
+public class ResponseController {
+
+    @Autowired
+    private ResponseRepository responseRepository;
+
+    /**
+     * Get all responses.
+     *
+     * @return List of all responses
+     */
+    @GetMapping
+    public ResponseEntity<List<Response>> getAllResponses() {
+        List<Response> responses = responseRepository.findAll();
+        return new ResponseEntity<>(responses, HttpStatus.OK);
+    }
+
+    /**
+     * Get responses by user ID.
+     *
+     * @param userId User ID
+     * @return List of responses for the given user
+     */
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Response>> getResponsesByUserId(@PathVariable Long userId) {
+        List<Response> responses = responseRepository.findByUserId(userId);
+        if (responses.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(responses, HttpStatus.OK);
+    }
+
+    /**
+     * Get responses by question ID.
+     *
+     * @param questionId Question ID
+     * @return List of responses for the given question
+     */
+    @GetMapping("/question/{questionId}")
+    public ResponseEntity<List<Response>> getResponsesByQuestionId(@PathVariable Long questionId) {
+        List<Response> responses = responseRepository.findAll().stream()
+                .filter(response -> response.getQuestionId().equals(questionId))
+                .toList();
+        if (responses.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(responses, HttpStatus.OK);
+    }
+
+    /**
+     * Create a new response.
+     *
+     * @param response Response object
+     * @return The created response
+     */
+    @PostMapping
+    public ResponseEntity<Response> createResponse(@RequestBody Response response) {
+        response.setTimestamp(java.time.LocalDateTime.now()); // Set the current timestamp
+        Response savedResponse = responseRepository.save(response);
+        return new ResponseEntity<>(savedResponse, HttpStatus.CREATED);
+    }
+
+    /**
+     * Update an existing response by ID.
+     *
+     * @param id       Response ID
+     * @param response Updated response data
+     * @return The updated response
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Response> updateResponse(@PathVariable Long id, @RequestBody Response response) {
+        return responseRepository.findById(id).map(existingResponse -> {
+            existingResponse.setAnswer(response.getAnswer());
+            existingResponse.setScore(response.getScore());
+            existingResponse.setTimestamp(java.time.LocalDateTime.now());
+            Response updatedResponse = responseRepository.save(existingResponse);
+            return new ResponseEntity<>(updatedResponse, HttpStatus.OK);
+        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    /**
+     * Delete a response by ID.
+     *
+     * @param id Response ID
+     * @return HTTP status indicating the result of the operation
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteResponse(@PathVariable Long id) {
+        if (responseRepository.existsById(id)) {
+            responseRepository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+}
+
