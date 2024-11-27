@@ -5,5 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
-    List<Question> findByRole(String role);  // Customize as needed
+
+    // Example method to find questions by difficulty
+    List<Question> findByDifficulty(String difficulty);
+
+    // Example method to find questions by control category
+    List<Question> findByControlCategory(String controlCategory);
+
+    // You can add more custom queries based on your needs
 }
