@@ -1,0 +1,26 @@
+package com.example.controller;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class DashboardController {
+
+    // Display the dashboard page after successful login
+    @GetMapping("/dashboard")
+    public String showDashboard(Model model) {
+        // Get the username of the logged-in user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();  // This gets the username of the logged-in user
+
+        // Add the username to the model, so it can be displayed in the dashboard
+        model.addAttribute("username", username);
+        model.addAttribute("welcomeMessage", "Welcome to your Dashboard!");
+
+        // Return the view name, which is 'dashboard.html'
+        return "dashboard"; // Render dashboard.html
+    }
+}
