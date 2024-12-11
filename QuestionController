@@ -4,7 +4,6 @@ import com.example.model.Question;
 import com.example.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -18,66 +17,6 @@ public class QuestionController {
         this.questionService = questionService;
     }
 
-    /**
-     * Get all questions.
-     *
-     * @return List of all questions
-     */
-    @GetMapping
-    public List<Question> getAllQuestions() {
-        return questionService.getAllQuestions();
-    }
-
-    /**
-     * Create a new question.
-     *
-     * @param question the question to create
-     * @return the created question
-     */
-    @PostMapping
-    public Question createQuestion(@RequestBody Question question) {
-        return questionService.createQuestion(question);
-    }
-
-    /**
-     * Update an existing question.
-     *
-     * @param id       the ID of the question to update
-     * @param question the new question data
-     * @return the updated question
-     */
-    @PutMapping("/{id}")
-    public Question updateQuestion(@PathVariable Long id, @RequestBody Question question) {
-        return questionService.updateQuestion(id, question);
-    }
-
-    /**
-     * Delete a question by ID.
-     *
-     * @param id the ID of the question to delete
-     */
-    @DeleteMapping("/{id}")
-    public void deleteQuestion(@PathVariable Long id) {
-        questionService.deleteQuestion(id);
-    }
-
-    /**
-     * Get questions by difficulty.
-     *
-     * @param difficulty the difficulty level to filter questions by
-     * @return List of questions matching the given difficulty
-     */
-    @GetMapping("/difficulty/{difficulty}")
-    public List<Question> getQuestionsByDifficulty(@PathVariable String difficulty) {
-        return questionService.getQuestionsByDifficulty(difficulty);
-    }
-
-    /**
-     * Get questions by control category.
-     *
-     * @param controlCategory the control category to filter questions by
-     * @return List of questions matching the given control category
-     */
     @GetMapping("/category/{controlCategory}")
     public List<Question> getQuestionsByControlCategory(@PathVariable String controlCategory) {
         return questionService.getQuestionsByControlCategory(controlCategory);
