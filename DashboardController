@@ -5,22 +5,38 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/dashboard")
 public class DashboardController {
 
-    // Display the dashboard page after successful login
-    @GetMapping("/dashboard")
+    /**
+     * Display the main dashboard page after successful login.
+     *
+     * @param model Model to add attributes for the view.
+     * @return Name of the dashboard template.
+     */
+    @GetMapping
     public String showDashboard(Model model) {
         // Get the username of the logged-in user
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();  // This gets the username of the logged-in user
 
-        // Add the username to the model, so it can be displayed in the dashboard
+        // Add attributes to the model for the view
         model.addAttribute("username", username);
         model.addAttribute("welcomeMessage", "Welcome to your Dashboard!");
 
-        // Return the view name, which is 'dashboard.html'
         return "dashboard"; // Render dashboard.html
+    }
+
+    /**
+     * Display the security questionnaire page.
+     *
+     * @return Name of the questionnaire template.
+     */
+    @GetMapping("/questionnaire")
+    public String showQuestionnaire() {
+        return "questionnaire"; // Render questionnaire.html
     }
 }
