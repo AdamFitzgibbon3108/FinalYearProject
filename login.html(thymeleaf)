@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login | ThreatLens</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Basic reset and font setup */
         body, html {
             margin: 0;
             padding: 0;
@@ -15,114 +14,185 @@
             align-items: center;
             justify-content: center;
             font-family: 'Roboto', sans-serif;
-            background-color: #f0f2f5;
-            position: relative;
+            background: radial-gradient(ellipse at center, #141e30, #243b55), url('/images/cybersecurity-grid.png');
+            background-size: cover, contain;
+            background-blend-mode: overlay;
+            color: #ffffff;
         }
-        /* App title styling */
+
         .app-title {
             position: absolute;
             top: 20px;
             left: 20px;
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 700;
-            color: #007bff;
+            color: #58a6ff;
             text-decoration: none;
         }
-        /* Centered form container */
+
         .container {
-            width: 100%;
-            max-width: 400px;
-            background-color: #ffffff;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 960px;
+            background: rgba(20, 30, 48, 0.9);
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
+
         h2 {
             margin-bottom: 1.5rem;
-            font-weight: 500;
-            color: #333;
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: #58a6ff;
         }
+
+        p.subtitle {
+            margin-top: -1rem;
+            margin-bottom: 2rem; /* Increased space below subtitle */
+            font-size: 1.2rem;
+            color: #a0aec0;
+            font-weight: 500;
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem; /* Increased gap between fields */
+        }
+
         .form-group {
-            margin-bottom: 1.5rem;
+            flex: 1;
+            margin-bottom: 2rem; /* Added bottom spacing for better separation */
             text-align: left;
         }
+
         label {
             display: block;
             font-size: 0.9rem;
-            color: #555;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #cbd5e0;
         }
+
         input[type="text"], input[type="password"] {
             width: 100%;
-            padding: 0.8rem;
-            margin-top: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 1rem;
+            border: 1px solid #3b4961;
+            border-radius: 10px;
             font-size: 1rem;
+            background-color: #1e293b;
+            color: #ffffff;
+            transition: all 0.3s ease;
         }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 10px rgba(88, 166, 255, 0.6);
+        }
+
         button {
             width: 100%;
-            padding: 0.8rem;
-            background-color: #007bff;
+            padding: 1rem;
+            background: linear-gradient(135deg, #58a6ff, #1e90ff);
             border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 1rem;
-            font-weight: bold;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 700;
             cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
+
         button:hover {
-            background-color: #0056b3;
+            background: linear-gradient(135deg, #1e90ff, #58a6ff);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(88, 166, 255, 0.4);
         }
+
         .footer {
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
+            margin-top: 2rem;
+            font-size: 1rem;
+            color: #a0aec0;
         }
+
         .footer a {
-            color: #007bff;
+            color: #58a6ff;
             text-decoration: none;
+            font-weight: 500;
         }
+
         .footer a:hover {
             text-decoration: underline;
         }
-        .error {
-            color: #d9534f;
+
+        .error, .success {
             margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: center;
+            font-weight: 500;
         }
+
+        .error {
+            background-color: rgba(221, 82, 82, 0.2);
+            color: #e53e3e;
+        }
+
         .success {
-            color: #5cb85c;
-            margin-top: 1rem;
+            background-color: rgba(72, 187, 120, 0.2);
+            color: #38a169;
+        }
+
+        .brand-logo {
+            width: 80px;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
         }
     </style>
 </head>
 <body>
     <!-- App Title in the top-left corner -->
     <a href="/" class="app-title">ThreatLens</a>
-    
+
     <div class="container">
-        <h2>Login to Your Account</h2>
+        <!-- Optional Logo -->
+        <img src="/images/logo.png" alt="Logo" class="brand-logo" th:src="@{/images/logo.png}">
+
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Log in to access your account</p>
+
         <form th:action="@{/login}" method="post">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required placeholder="Enter your username" />
+            <div class="form-row">
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Enter your username">
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your password" />
-            </div>
+
+            <!-- Login Button -->
             <button type="submit">Login</button>
-            
-            <!-- Error message when login fails -->
+
+            <!-- Error Message -->
             <div th:if="${param.error}" class="error">
-                <p>Invalid username or password. Please try again.</p>
+                Invalid username or password. Please try again.
             </div>
-            
-            <!-- Success message after logout -->
+
+            <!-- Success Message -->
             <div th:if="${param.logout}" class="success">
-                <p>You have been logged out successfully.</p>
+                You have been logged out successfully.
             </div>
         </form>
-        
+
         <!-- Link to registration page -->
         <div class="footer">
             <p>Don't have an account? <a href="/register">Register here</a></p>
