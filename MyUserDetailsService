@@ -27,11 +27,7 @@ public class MyUserDetailsService implements UserDetailsService {
         // Build UserDetails object
         UserBuilder builder = org.springframework.security.core.userdetails.User.withUsername(username);
         builder.password(user.getPassword());
-
-        // Assuming role is stored as a String in the User entity
-        // If you have multiple roles, make sure to handle that accordingly
-        String[] roles = new String[]{user.getRole()}; // Modify this if you have multiple roles
-        builder.roles(roles);
+        builder.roles(user.getRole()); // Assuming role is a single string
 
         return builder.build();
     }
