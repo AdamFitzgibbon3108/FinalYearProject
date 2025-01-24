@@ -33,9 +33,8 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/login?logout=true") // Redirect to login page with logout success message
                 .permitAll()
             )
-            .csrf().disable(); // Disable CSRF for simplicity, but enable it if needed in production.
+            .csrf().disable(); // Disable CSRF for simplicity in development; enable it in production
 
         return http.build();
     }
 }
-
