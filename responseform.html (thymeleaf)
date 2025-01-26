@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Submit Response</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <h1>Submit Response</h1>
+    <form th:action="@{/responses}" method="post">
+        <div>
+            <label for="question">Select Question:</label>
+            <select id="question" name="questionId">
+                <option th:each="question : ${questions}" th:value="${question.id}" th:text="${question.questionText}">
+                </option>
+            </select>
+        </div>
+        <div>
+            <label for="answer">Your Answer:</label>
+            <textarea id="answer" name="answer"></textarea>
+        </div>
+        <div>
+            <label for="score">Score:</label>
+            <input type="number" id="score" name="score" min="0" max="10">
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+    <a th:href="@{/dashboard}">Back to Dashboard</a>
+</body>
+</html>
