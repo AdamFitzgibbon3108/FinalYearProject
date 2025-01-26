@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Questionnaire</title>
+    <link rel="stylesheet" href="/path/to/your/styles.css">
+</head>
+<body>
+    <h1>Security Questionnaire</h1>
+    <form action="/dashboard/responses/submit" method="post">
+        <div id="questionnaire">
+            <!-- Iterate through the questions -->
+            <ul>
+                <!-- This uses Thymeleaf syntax -->
+                <li th:each="question : ${questions}">
+                    <!-- Display the question -->
+                    <div>
+                        <strong th:text="${question['question']}"></strong>
+                    </div>
+                    <!-- Display the options -->
+                    <div th:each="option : ${question['options']}">
+                        <label>
+                            <input type="radio" th:name="'question' + ${questionStat.index}" th:value="${option}">
+                            <span th:text="${option}"></span>
+                        </label>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <button type="submit">Submit Responses</button>
+    </form>
+</body>
+</html>
