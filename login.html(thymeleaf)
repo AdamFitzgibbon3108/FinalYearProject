@@ -49,7 +49,7 @@
 
         p.subtitle {
             margin-top: -1rem;
-            margin-bottom: 2rem; /* Increased space below subtitle */
+            margin-bottom: 2rem;
             font-size: 1.2rem;
             color: #a0aec0;
             font-weight: 500;
@@ -58,12 +58,12 @@
         .form-row {
             display: flex;
             justify-content: space-between;
-            gap: 2rem; /* Increased gap between fields */
+            gap: 2rem;
         }
 
         .form-group {
             flex: 1;
-            margin-bottom: 2rem; /* Added bottom spacing for better separation */
+            margin-bottom: 2rem;
             text-align: left;
         }
 
@@ -145,22 +145,13 @@
             background-color: rgba(72, 187, 120, 0.2);
             color: #38a169;
         }
-
-        .brand-logo {
-            width: 80px;
-            margin-bottom: 2rem;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
-        }
     </style>
 </head>
 <body>
-    <!-- App Title in the top-left corner -->
+    <!-- App Title -->
     <a href="/" class="app-title">ThreatLens</a>
 
     <div class="container">
-        <!-- Optional Logo -->
-        <img src="/images/logo.png" alt="Logo" class="brand-logo" th:src="@{/images/logo.png}">
-
         <h2>Welcome Back</h2>
         <p class="subtitle">Log in to access your account</p>
 
