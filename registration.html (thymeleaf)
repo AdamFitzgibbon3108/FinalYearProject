@@ -138,22 +138,13 @@
             background-color: rgba(72, 187, 120, 0.2);
             color: #38a169;
         }
-
-        .brand-logo {
-            width: 80px;
-            margin-bottom: 2rem;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
-        }
     </style>
 </head>
 <body>
-    <!-- App Title in the top-left corner -->
+    <!-- App Title -->
     <a href="/" class="app-title">ThreatLens</a>
 
     <div class="container">
-        <!-- Optional Logo -->
-        <img src="/images/logo.png" alt="Logo" class="brand-logo" th:src="@{/images/logo.png}">
-
         <h2>Create Your Account</h2>
         <form th:action="@{/register}" method="post">
             <div class="form-group">
@@ -185,4 +176,3 @@
     </div>
 </body>
 </html>
-
