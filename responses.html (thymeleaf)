@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Your Responses</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 90%;
+            margin: 0 auto 20px auto;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        td {
+            color: #555;
+        }
+
+        .timestamp {
+            color: #777;
+            font-size: 12px;
+        }
+
+        .back-link {
+            display: block;
+            margin: 20px auto;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 200px;
+            text-transform: uppercase;
+        }
+
+        .back-link:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            table {
+                width: 100%;
+            }
+
+            th, td {
+                font-size: 12px;
+            }
+
+            .back-link {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Responses</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Response ID</th>
+                <th>Question</th>
+                <th>Your Answer</th>
+                <th>Score</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="response, stat : ${responses}">
+                <td th:text="${response.id}"></td>
+                <td th:text="${response.question.questionText}"></td>
+                <td th:text="${response.answer}"></td>
+                <td th:text="${response.score}"></td>
+                <td>
+                    <span th:text="${#dates.format(response.timestamp, 'yyyy-MM-dd HH:mm:ss')}" class="timestamp"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <a th:href="@{/dashboard}" class="back-link">Back to Dashboard</a>
+</body>
+</html>
