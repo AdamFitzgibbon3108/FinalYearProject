@@ -5,7 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
+import jakarta.persistence.OneToMany;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -18,6 +19,9 @@ public class User {
     private String username;
     private String password;
     private String role;
+
+    @OneToMany(mappedBy = "user")  // This maps the 'user' field in the Response class
+    private List<Response> responses;  // List of Responses for each User
 
     // Getters and Setters
     public Long getId() {
@@ -51,5 +55,12 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
-}
 
+    public List<Response> getResponses() {
+        return responses;
+    }
+
+    public void setResponses(List<Response> responses) {
+        this.responses = responses;
+    }
+}
