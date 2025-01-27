@@ -20,12 +20,17 @@ public class ScoringService {
     }
 
 	public void saveResponses(Map<String, String> responses) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	public int calculateScore(Map<String, String> responses) {
-		// TODO Auto-generated method stub
+		
 		return 0;
+	}
+
+	public void saveResponses(String username, Map<String, String> responses, int score) {
+	
+		
 	}
 }
