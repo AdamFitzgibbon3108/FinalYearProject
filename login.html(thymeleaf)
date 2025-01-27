@@ -10,9 +10,6 @@
             margin: 0;
             padding: 0;
             height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-family: 'Roboto', sans-serif;
             background: radial-gradient(ellipse at center, #141e30, #243b55), url('/images/cybersecurity-grid.png');
             background-size: cover, contain;
@@ -24,23 +21,25 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 700;
             color: #58a6ff;
             text-decoration: none;
         }
 
         .container {
-            width: 90%;
-            max-width: 960px;
-            background: rgba(20, 30, 48, 0.9);
-            padding: 3rem;
+            width: 70%;
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(20, 30, 48, 0.95);
+            padding: 3rem 4rem;
             border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            text-align: left;
         }
 
         h2 {
+            text-align: center;
             margin-bottom: 1.5rem;
             font-weight: 700;
             font-size: 2.5rem;
@@ -48,6 +47,7 @@
         }
 
         p.subtitle {
+            text-align: center;
             margin-top: -1rem;
             margin-bottom: 2rem;
             font-size: 1.2rem;
@@ -55,21 +55,13 @@
             font-weight: 500;
         }
 
-        .form-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 2rem;
-        }
-
         .form-group {
-            flex: 1;
-            margin-bottom: 2rem;
-            text-align: left;
+            margin-bottom: 1.5rem;
         }
 
         label {
             display: block;
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
             color: #cbd5e0;
@@ -112,6 +104,7 @@
         }
 
         .footer {
+            text-align: center;
             margin-top: 2rem;
             font-size: 1rem;
             color: #a0aec0;
@@ -156,35 +149,25 @@
         <p class="subtitle">Log in to access your account</p>
 
         <form th:action="@{/login}" method="post">
-            <div class="form-row">
-                <!-- Username Field -->
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required placeholder="Enter your username">
-                </div>
-
-                <!-- Password Field -->
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required placeholder="Enter your password">
-                </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
             </div>
 
-            <!-- Login Button -->
             <button type="submit">Login</button>
 
-            <!-- Error Message -->
             <div th:if="${param.error}" class="error">
                 Invalid username or password. Please try again.
             </div>
-
-            <!-- Success Message -->
             <div th:if="${param.logout}" class="success">
                 You have been logged out successfully.
             </div>
         </form>
 
-        <!-- Link to registration page -->
         <div class="footer">
             <p>Don't have an account? <a href="/register">Register here</a></p>
         </div>
