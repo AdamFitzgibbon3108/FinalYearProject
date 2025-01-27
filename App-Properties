@@ -1,9 +1,10 @@
 # Server Configuration
-server.port=8086
+server.port=8014
 logging.level.root=INFO
+logging.level.com.example=DEBUG
 
 # MySQL Database Configuration
-spring.datasource.url=jdbc:mysql://localhost:3306/security_assessment?useSSL=false&serverTimezone=UTC
+spring.datasource.url=jdbc:mysql://localhost:3306/security_assessment?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
 spring.datasource.username=root
 spring.datasource.password=root
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
