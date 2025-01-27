@@ -1,109 +1,163 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>User Profile</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <title>User Profile | ThreatLens</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Add inline styles or extend existing styles.css for consistency */
-        body {
-            font-family: Arial, sans-serif;
+        /* General styles */
+        body, html {
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
+            font-family: 'Roboto', sans-serif;
+            background: radial-gradient(ellipse at center, #141e30, #243b55), url('/images/cybersecurity-grid.png');
+            background-size: cover, contain;
+            background-blend-mode: overlay;
+            color: #ffffff;
         }
 
-        h1, h2 {
-            color: #444;
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: rgba(20, 30, 48, 0.9);
+            padding: 2rem 3rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
             text-align: center;
+            font-size: 2.5rem;
+            color: #58a6ff;
+            margin-bottom: 1rem;
         }
 
-        .profile-container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        h2 {
+            font-size: 1.8rem;
+            color: #58a6ff;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-section {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
 
         .profile-details {
-            margin-bottom: 10px;
+            flex: 1;
         }
 
-        label {
+        .profile-details p {
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+        }
+
+        .profile-details label {
             font-weight: bold;
-            margin-right: 10px;
+            color: #a0aec0;
+        }
+
+        .profile-details span {
+            color: #ffffff;
+        }
+
+        .profile-actions {
+            text-align: center;
         }
 
         .button {
             display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #58a6ff, #1e90ff);
             color: white;
             text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background 0.3s ease, transform 0.2s ease;
             margin: 10px 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .button:hover {
-            background-color: #0056b3;
+            background: linear-gradient(135deg, #1e90ff, #58a6ff);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(88, 166, 255, 0.4);
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 2rem 0;
         }
 
         .recent-activity {
-            margin-top: 20px;
+            margin-top: 2rem;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
         }
 
         th, td {
+            padding: 12px 15px;
             text-align: left;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
+            color: #d0d7de;
         }
 
         th {
-            background-color: #f4f4f4;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 1rem;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        tr:hover {
+            background: rgba(88, 166, 255, 0.1);
         }
 
         .no-activity {
             text-align: center;
-            color: #777;
-            font-style: italic;
+            font-size: 1.2rem;
+            color: #a0aec0;
+            margin-top: 1rem;
         }
 
         .logout {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 2rem;
         }
     </style>
 </head>
 <body>
-    <div class="profile-container">
+    <div class="container">
         <h1>User Profile</h1>
 
         <!-- Profile Details -->
-        <div class="profile-details">
-            <label>Username:</label>
-            <span th:text="${user.username}"></span>
-        </div>
-        <div class="profile-details">
-            <label>Role:</label>
-            <span th:text="${user.role}"></span>
-        </div>
+        <div class="profile-section">
+            <div class="profile-details">
+                <p>
+                    <label>Username:</label>
+                    <span th:text="${user.username}"></span>
+                </p>
+                <p>
+                    <label>Role:</label>
+                    <span th:text="${user.role}"></span>
+                </p>
+            </div>
 
-        <hr/>
-
-        <!-- Action Buttons -->
-        <div class="profile-actions">
-            <h2>Actions</h2>
-            <a th:href="@{/profile/edit}" class="button">Edit Profile</a>
-            <a th:href="@{/dashboard}" class="button">Back to Dashboard</a>
+            <!-- Action Buttons -->
+            <div class="profile-actions">
+                <a th:href="@{/profile/edit}" class="button">Edit Profile</a>
+                <a th:href="@{/dashboard}" class="button">Back to Dashboard</a>
+            </div>
         </div>
 
         <hr/>
@@ -139,4 +193,3 @@
     </div>
 </body>
 </html>
-
