@@ -1,5 +1,7 @@
 package com.example.model;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,12 +18,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String username;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
     private String role;
 
-    @OneToMany(mappedBy = "user")  // This maps the 'user' field in the Response class
-    private List<Response> responses;  // List of Responses for each User
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Response> responses;
 
     // Getters and Setters
     public Long getId() {
@@ -64,3 +71,4 @@ public class User {
         this.responses = responses;
     }
 }
+
