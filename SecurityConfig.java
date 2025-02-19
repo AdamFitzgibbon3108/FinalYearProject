@@ -19,21 +19,23 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll() // Allow login and register pages without authentication
+                .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll() // Allow login & register pages
+                .requestMatchers("/survey").permitAll()  // ✅ Allow GET /survey
+                .requestMatchers("/survey/submit").permitAll()  // ✅ Allow POST /survey/submit
                 .anyRequest().authenticated() // Protect all other routes
             )
             .formLogin(form -> form
-                .loginPage("/login") // Custom login page
-                .defaultSuccessUrl("/dashboard", true) // Redirect to dashboard after successful login
-                .failureUrl("/login?error=true") // Redirect to login page with error on failure
+                .loginPage("/login")
+                .defaultSuccessUrl("/dashboard", true)
+                .failureUrl("/login?error=true")
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutUrl("/logout") // Define the logout URL
-                .logoutSuccessUrl("/login?logout=true") // Redirect to login page with logout success message
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
                 .permitAll()
             )
-            .csrf().disable(); // Disable CSRF for simplicity in development; enable it in production
+            .csrf().disable(); // Disable CSRF for testing (Enable in production)
 
         return http.build();
     }

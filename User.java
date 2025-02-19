@@ -1,17 +1,10 @@
 package com.example.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users") // Ensure table name matches MySQL
 public class User {
 
     @Id
@@ -27,8 +20,25 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean surveyCompleted = false;
+
+    @Column(nullable = true)
+    private String recommendedSecurityCategory;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Response> responses;
+    private List<SurveyResponse> surveyResponses;
+
+    // Constructors
+    public User() {}
+
+    public User(String username, String password, String role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.surveyCompleted = false;
+        this.recommendedSecurityCategory = null;
+    }
 
     // Getters and Setters
     public Long getId() {
@@ -63,12 +73,27 @@ public class User {
         this.role = role;
     }
 
-    public List<Response> getResponses() {
-        return responses;
+    public boolean isSurveyCompleted() {
+        return surveyCompleted;
     }
 
-    public void setResponses(List<Response> responses) {
-        this.responses = responses;
+    public void setSurveyCompleted(boolean surveyCompleted) {
+        this.surveyCompleted = surveyCompleted;
+    }
+
+    public String getRecommendedSecurityCategory() {
+        return recommendedSecurityCategory;
+    }
+
+    public void setRecommendedSecurityCategory(String recommendedSecurityCategory) {
+        this.recommendedSecurityCategory = recommendedSecurityCategory;
+    }
+
+    public List<SurveyResponse> getSurveyResponses() {
+        return surveyResponses;
+    }
+
+    public void setSurveyResponses(List<SurveyResponse> surveyResponses) {
+        this.surveyResponses = surveyResponses;
     }
 }
-

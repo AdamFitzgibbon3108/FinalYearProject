@@ -36,3 +36,4 @@ public class RegistrationService {
         return userRepository.save(user);
     }
 }
+

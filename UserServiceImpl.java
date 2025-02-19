@@ -20,18 +20,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<User> getUserById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
     public User createUser(User user) {
         return userRepository.save(user);
     }
 
     @Override
-    public User updateUser(Long id, User user) {
-        User existingUser = userRepository.findById(id)
+    public User updateUser(Long id, User userDetails) {
+        return userRepository.findById(id)
+                .map(user -> {
+                    user.setUsername(userDetails.getUsername());
+                    user.setPassword(userDetails.getPassword());
+                    user.setRole(userDetails.getRole());
+                    return userRepository.save(user);
+                })
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-        existingUser.setUsername(user.getUsername());
-        existingUser.setPassword(user.getPassword());
-        existingUser.setRole(user.getRole());
-        return userRepository.save(existingUser);
     }
 
     @Override
@@ -40,13 +47,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public Optional<User> findByUsername(String username) {
+        return Optional.ofNullable(userRepository.findByUsername(username));
     }
 
-	@Override
-	public User getUserById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public void markSurveyAsCompleted(Long userId, String recommendedCategory) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setSurveyCompleted(true);
+            user.setRecommendedSecurityCategory(recommendedCategory);
+            userRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+    }
 }

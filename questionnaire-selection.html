@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Questionnaire Selection</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Fetch roles dynamically
+            fetch("/questions/roles")  // ✅ Fixed API path
+                .then(response => response.json())
+                .then(data => {
+                    let roleDropdown = document.getElementById("selectedRole");
+                    roleDropdown.innerHTML = ""; // Clear existing options
+
+                    // Default option
+                    let defaultOption = document.createElement("option");
+                    defaultOption.value = "";
+                    defaultOption.textContent = "Select Role";
+                    defaultOption.disabled = true;
+                    defaultOption.selected = true;
+                    roleDropdown.appendChild(defaultOption);
+
+                    data.forEach(role => {
+                        let option = document.createElement("option");
+                        option.value = role;
+                        option.textContent = role;
+                        roleDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error fetching roles:", error));
+
+            // Fetch categories dynamically
+            fetch("/questions/categories")  // ✅ Fixed API path
+                .then(response => response.json())
+                .then(data => {
+                    let categoryDropdown = document.getElementById("selectedCategory");
+                    categoryDropdown.innerHTML = ""; // Clear existing options
+                    
+                    // Default option
+                    let defaultOption = document.createElement("option");
+                    defaultOption.value = "";
+                    defaultOption.textContent = "Select Category";
+                    defaultOption.disabled = true;
+                    defaultOption.selected = true;
+                    categoryDropdown.appendChild(defaultOption);
+
+                    // "None" option for role-based selection
+                    let noneOption = document.createElement("option");
+                    noneOption.value = "None";
+                    noneOption.textContent = "None (Role-Based Only)";
+                    categoryDropdown.appendChild(noneOption);
+
+                    data.forEach(category => {
+                        let option = document.createElement("option");
+                        option.value = category;
+                        option.textContent = category;
+                        categoryDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error fetching categories:", error));
+        });
+
+        function adjustFormAction(event) {
+            event.preventDefault(); // Prevent form submission
+
+            let categoryValue = document.getElementById("selectedCategory").value;
+            let roleValue = document.getElementById("selectedRole").value;
+
+            // Ensure user selects valid values
+            if (!roleValue) {
+                alert("Please select a role.");
+                return;
+            }
+            if (!categoryValue) {
+                alert("Please select a category.");
+                return;
+            }
+
+            // Redirect to appropriate URL
+            let url = categoryValue === "None"
+                ? `/questions/start-role-only?selectedRole=${encodeURIComponent(roleValue)}`
+                : `/questions/start?selectedRole=${encodeURIComponent(roleValue)}&selectedCategory=${encodeURIComponent(categoryValue)}`;
+
+            window.location.href = url;
+        }
+    </script>
+</head>
+<body>
+    <h1>Select Your Questionnaire</h1>
+
+    <!-- Role & Category-Based Selection -->
+    <form id="roleCategoryForm" method="get" onsubmit="adjustFormAction(event)">
+        <label for="selectedRole">Choose Your Role:</label>
+        <select name="selectedRole" id="selectedRole">
+            <option>Loading...</option> <!-- Placeholder -->
+        </select>
+
+        <label for="selectedCategory">Choose a Security Category:</label>
+        <select name="selectedCategory" id="selectedCategory">
+            <option>Loading...</option> <!-- Placeholder -->
+        </select>
+
+        <button type="submit">Generate Questionnaire</button>
+    </form>
+
+    <hr>
+
+    <!-- Manual Question Selection -->
+    <h2>Create Custom Questionnaire</h2>
+    <form th:action="@{/questionnaire/custom}" method="post">
+        <div th:each="question : ${allQuestions}">
+            <input type="checkbox" name="selectedQuestions" th:value="${question.id}">
+            <label th:text="${question.text}"></label><br>
+        </div>
+        <button type="submit">Create Custom Questionnaire</button>
+    </form>
+    
+    <hr>
+
+    <a href="/dashboard">Back to Dashboard</a>
+</body>
+</html>
+
+

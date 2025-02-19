@@ -22,7 +22,8 @@ public class ProfileController {
     public String viewProfile(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User user = userService.findByUsername(username);
+        User user = userService.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
         model.addAttribute("user", user);
         return "profile";
@@ -32,7 +33,8 @@ public class ProfileController {
     public String editProfile(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User user = userService.findByUsername(username);
+        User user = userService.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
         model.addAttribute("user", user);
         return "editProfile"; // Corresponds to editProfile.html
@@ -42,7 +44,8 @@ public class ProfileController {
     public String updateProfile(User updatedUser, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User currentUser = userService.findByUsername(username);
+        User currentUser = userService.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
         // Update user details
         currentUser.setPassword(updatedUser.getPassword()); // Assuming password can be updated

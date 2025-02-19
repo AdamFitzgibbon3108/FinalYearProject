@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Questionnaire</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: 'Roboto', sans-serif;
+            background: radial-gradient(ellipse at center, #141e30, #243b55), url('/images/cybersecurity-grid.png');
+            background-size: cover, contain;
+            background-blend-mode: overlay;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-title {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 960px;
+            margin: auto;
+            background: rgba(20, 30, 48, 0.9);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #58a6ff;
+            margin-bottom: 1.5rem;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 2rem;
+            text-align: left;
+            padding: 1rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        strong {
+            font-size: 1.2rem;
+            color: #ffffff;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1rem;
+            color: #cbd5e0;
+            cursor: pointer;
+        }
+
+        input[type="radio"] {
+            margin-right: 0.5rem;
+            accent-color: #58a6ff;
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #58a6ff, #1e90ff);
+            border: none;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin-top: 1.5rem;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #1e90ff, #58a6ff);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(88, 166, 255, 0.4);
+        }
+
+        .scrollable {
+            overflow-y: auto;
+            max-height: calc(80vh - 200px);
+        }
+
+        .option-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- App Title -->
+    <a href="/" class="app-title">ThreatLens</a>
+
+    <div class="container">
+        <h1>Tech Questionnaire</h1>
+
+        <form id="questionnaire-form">
+            <!-- Hidden fields to pass role and category -->
+            <input type="hidden" name="selectedRole" th:value="${selectedRole}" />
+            <input type="hidden" name="selectedCategory" th:value="${selectedCategory}" />
+
+            <div id="questionnaire" class="scrollable">
+                <ul>
+                    <li th:each="question, questionStat : ${questions}">
+                        <div>
+                            <strong th:text="${question.text}"></strong>
+                        </div>
+
+                        <!-- TRUE/FALSE Questions -->
+                        <div th:if="${question.questionType == T(com.example.model.QuestionType).TRUE_FALSE}">
+                            <div class="option-container">
+                                <label>
+                                    <input type="radio" th:name="'question_' + ${question.id}" th:value="True" required>
+                                    <span>True</span>
+                                </label>
+                                <label>
+                                    <input type="radio" th:name="'question_' + ${question.id}" th:value="False" required>
+                                    <span>False</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- MULTIPLE CHOICE Questions -->
+                        <div th:if="${question.questionType == T(com.example.model.QuestionType).MULTIPLE_CHOICE}">
+                            <div th:each="option : ${#strings.arraySplit(question.options, ',')}" class="option-container">
+                                <label>
+                                    <input type="radio" th:name="'question_' + ${question.id}" th:value="${option}" required>
+                                    <span th:text="${option}"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <button type="submit">Submit Responses</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("questionnaire-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            let formData = new FormData(this);
+            let jsonData = {};
+
+            formData.forEach((value, key) => {
+                jsonData[key] = value;
+            });
+
+            fetch("/api/questions/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(jsonData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to submit questionnaire.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                window.location.href = "/result"; // Redirect to result page
+            })
+            .catch(error => {
+                console.error("Error submitting questionnaire:", error);
+                alert("There was an issue submitting your responses. Please try again.");
+            });
+        });
+    </script>
+
+</body>
+</html>
+
+

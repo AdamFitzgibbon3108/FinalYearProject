@@ -1,15 +1,16 @@
 package com.example.service;
 
+import com.example.model.Question;
 import com.example.model.Response;
 import com.example.model.User;
-import com.example.model.Question;
+import com.example.repository.QuestionRepository;
 import com.example.repository.ResponseRepository;
 import com.example.repository.UserRepository;
-import com.example.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ResponseService {
@@ -18,37 +19,53 @@ public class ResponseService {
     private ResponseRepository responseRepository;
 
     @Autowired
-    private UserRepository userRepository;  // Add this to your service class
+    private UserRepository userRepository;
 
-    
     @Autowired
     private QuestionRepository questionRepository;
 
-    // Method to submit a response
-    public void submitResponse(Long questionId, Long userId, String answer, int score) {
-        // Retrieve the Question entity by its ID
+    /**
+     * Submits a response for a user and automatically assigns a score.
+     */
+    public Response submitResponse(Long questionId, Long userId, String answer) {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid question ID"));
 
-        // Retrieve the User entity by its ID
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
 
-        // Create a new Response entity
+        // Check if the answer is correct
+        boolean isCorrect = answer.equalsIgnoreCase(question.getCorrectAnswer());
+        int score = isCorrect ? question.getScore() : 0;  // Assign score based on correctness
+
         Response response = new Response();
-        response.setQuestion(question);  // Setting the whole Question entity
-        response.setUser(user);          // Set the User entity directly, not just userId
+        response.setQuestion(question);
+        response.setUser(user);
         response.setAnswer(answer);
         response.setScore(score);
-        response.setTimestamp(LocalDateTime.now());
+        response.setTimestamp(LocalDateTime.now()); // ✅ Keep timestamp
 
-        // Save the Response entity
-        responseRepository.save(response);  // Use the save method to store the response
+        return responseRepository.save(response);
     }
 
-
-    // Optionally, if you want to expose saveResponse for other uses:
+    /**
+     * Saves a response in the database.
+     */
     public Response saveResponse(Response response) {
-        return responseRepository.save(response); // This will save the response directly
+        return responseRepository.save(response);
+    }
+
+    /**
+     * Retrieves all responses by a user.
+     */
+    public List<Response> getResponsesByUser(Long userId) {
+        return responseRepository.findByUserId(userId);
+    }
+
+    /**
+     * Retrieves all responses for a given question.
+     */
+    public List<Response> getResponsesByQuestion(Long questionId) {
+        return responseRepository.findByQuestionId(questionId);
     }
 }

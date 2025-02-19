@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Questionnaires</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <h1>My Questionnaires</h1>
+    
+    <table border="1">
+        <tr>
+            <th>Questionnaire ID</th>
+            <th>Created At</th>
+            <th>View</th>
+        </tr>
+        <tr th:each="questionnaire : ${userQuestionnaires}">
+            <td th:text="${questionnaire.id}"></td>
+            <td th:text="${questionnaire.createdAt}"></td>
+            <td>
+                <a th:href="@{/questionnaire/view/{id}(id=${questionnaire.id})}">View</a>
+            </td>
+        </tr>
+    </table>
+
+    <a href="/dashboard">Back to Dashboard</a>
+</body>
+</html>

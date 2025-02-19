@@ -2,7 +2,6 @@ package com.example.model;
 
 import jakarta.persistence.*;
 
-
 @Entity
 @Table(name = "questions")
 public class Question {
@@ -11,111 +10,87 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    
-      
     @Column(name = "question_text", nullable = false)
-    private String questionText;
+    private String text;
 
-    
-    @Column(name = "control_category", nullable = false)
-    private String controlCategory;
+    @Column(name = "category")
+    private String category;
 
-  
-    @Column(name = "framework", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "control_category", referencedColumnName = "id")
+    private SecurityControl controlCategory;
+
+    @Column(name = "framework")
     private String framework;
 
- 
-    @Column(name = "difficulty", nullable = false)
+    @Column(name = "difficulty")
     private String difficulty;
 
     @Column(name = "score")
-    private int score;
+    private Integer score;
 
-    
-    @Column(name = "role", nullable = false) // Added the role column
-    private String role;  // New field for role
+    @Column(name = "role", nullable = false)
+    private String role;
 
-    // Default constructor
+    @Enumerated(EnumType.STRING)
+    @Column(name = "question_type", nullable = false)
+    private QuestionType questionType; // Enum: TRUE_FALSE, MULTIPLE_CHOICE
+
+    @Column(name = "correct_answer", nullable = false)
+    private String correctAnswer;
+
+    @Column(name = "options")
+    private String options; // Stored as comma-separated values for multiple-choice
+
+    // Constructors
     public Question() {}
 
-    // Constructor with parameters
-    public Question(String questionText, String controlCategory, String framework, String difficulty, int score, String role) {
-        this.questionText = questionText;
+    public Question(String text, String category, SecurityControl controlCategory, String framework,
+                    String difficulty, Integer score, String role, QuestionType questionType,
+                    String correctAnswer, String options) {
+        this.text = text;
+        this.category = category;
         this.controlCategory = controlCategory;
         this.framework = framework;
         this.difficulty = difficulty;
         this.score = score;
         this.role = role;
+        this.questionType = questionType;
+        this.correctAnswer = correctAnswer;
+        this.options = options;
     }
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getText() { return text; }
+    public void setText(String text) { this.text = text; }
 
-    public String getQuestionText() {
-        return questionText;
-    }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    public void setQuestionText(String questionText) {
-        this.questionText = questionText;
-    }
+    public SecurityControl getControlCategory() { return controlCategory; }
+    public void setControlCategory(SecurityControl controlCategory) { this.controlCategory = controlCategory; }
 
-    public String getControlCategory() {
-        return controlCategory;
-    }
+    public String getFramework() { return framework; }
+    public void setFramework(String framework) { this.framework = framework; }
 
-    public void setControlCategory(String controlCategory) {
-        this.controlCategory = controlCategory;
-    }
+    public String getDifficulty() { return difficulty; }
+    public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
 
-    public String getFramework() {
-        return framework;
-    }
+    public Integer getScore() { return score; }
+    public void setScore(Integer score) { this.score = score; }
 
-    public void setFramework(String framework) {
-        this.framework = framework;
-    }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
-    public String getDifficulty() {
-        return difficulty;
-    }
+    public QuestionType getQuestionType() { return questionType; }
+    public void setQuestionType(QuestionType questionType) { this.questionType = questionType; }
 
-    public void setDifficulty(String difficulty) {
-        this.difficulty = difficulty;
-    }
+    public String getCorrectAnswer() { return correctAnswer; }
+    public void setCorrectAnswer(String correctAnswer) { this.correctAnswer = correctAnswer; }
 
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    // toString() method for debugging and logging
-    @Override
-    public String toString() {
-        return "Question{" +
-                "id=" + id +
-                ", questionText='" + questionText + '\'' +
-                ", controlCategory='" + controlCategory + '\'' +
-                ", framework='" + framework + '\'' +
-                ", difficulty='" + difficulty + '\'' +
-                ", score=" + score +
-                ", role='" + role + '\'' +
-                '}';
-    }
+    public String getOptions() { return options; }
+    public void setOptions(String options) { this.options = options; }
 }

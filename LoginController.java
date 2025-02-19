@@ -12,3 +12,5 @@ public class LoginController {
         return "login"; // This renders login.html
     }
 }
+
+
