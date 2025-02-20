@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,93 +10,73 @@
 
     <h2 class="text-center">Security Survey</h2>
 
-    <div id="surveyContainer" class="mt-4"></div>
+    <form id="surveyForm">
+        <div id="surveyContainer" class="mt-4">
+            <!-- ✅ Thymeleaf Loop to Render Questions -->
+            <div th:each="question : ${questions}" class="mb-3">
+                <label class="form-label" th:text="${question.questionText}"></label>
+                <input type="text" class="form-control survey-input" th:id="'question-' + ${question.id}" placeholder="Your Answer">
+            </div>
+        </div>
 
-    <button id="submitSurvey" class="btn btn-primary mt-3">Submit Survey</button>
+        <button type="button" id="submitSurvey" class="btn btn-primary mt-3">Submit Survey</button>
+    </form>
 
     <div id="responseMessage" class="mt-3"></div>
 
+    <div id="recommendationContainer" class="mt-4 text-center" style="display: none;">
+        <h4>Recommended Security Category:</h4>
+        <p id="recommendationText" class="alert alert-info"></p>
+    </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            fetchSurveyQuestions();
-        });
-
-        function fetchSurveyQuestions() {
-            fetch("/survey")  // ✅ Using relative URL
-                .then(response => response.json())
-                .then(data => {
-                    const surveyContainer = document.getElementById("surveyContainer");
-                    surveyContainer.innerHTML = "";
-
-                    if (data.length === 0) {
-                        surveyContainer.innerHTML = `<p class="text-center text-warning">No survey questions available.</p>`;
-                        return;
-                    }
-
-                    data.forEach(question => {
-                        const div = document.createElement("div");
-                        div.classList.add("mb-3");
-                        div.innerHTML = `
-                            <label class="form-label">${question.questionText}</label>
-                            <input type="text" class="form-control" id="question-${question.id}" placeholder="Your Answer">
-                        `;
-                        surveyContainer.appendChild(div);
-                    });
-                })
-                .catch(error => {
-                    console.error("Error fetching survey questions:", error);
-                    document.getElementById("surveyContainer").innerHTML = `<div class="alert alert-danger">Failed to load questions.</div>`;
-                });
-        }
-
         document.getElementById("submitSurvey").addEventListener("click", function () {
-            const userId = getUserId();  // ✅ Dynamically fetch user ID
-
-            if (!userId) {
-                alert("User ID is missing. Please log in.");
-                return;
-            }
-
             const responses = [];
-            document.querySelectorAll("input").forEach(input => {
+            let allAnswered = true;
+
+            document.querySelectorAll(".survey-input").forEach(input => {
                 const questionId = input.id.split("-")[1];
+                const answer = input.value.trim();
+
+                if (!answer) {
+                    allAnswered = false;
+                }
+
                 responses.push({
                     question: { id: questionId },
-                    response: input.value.trim()
+                    response: answer
                 });
             });
 
-            fetch(`/survey/submit?userId=${userId}`, {
+            if (!allAnswered) {
+                alert("⚠️ Please answer all questions before submitting.");
+                return;
+            }
+
+            fetch(`/survey/submit`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(responses)
             })
-            .then(response => {
-                if (!response.ok) throw new Error("Survey submission failed");
-                return response.text();
-            })
+            .then(response => response.json())
             .then(data => {
-                document.getElementById("responseMessage").innerHTML = `<div class="alert alert-success">${data}</div>`;
-                
-                // ✅ Redirect to questionnaire selection page after 2 seconds
+                document.getElementById("responseMessage").innerHTML = `<div class="alert alert-success">Survey submitted successfully.</div>`;
+
+                if (data.recommendedCategory) {
+                    document.getElementById("recommendationText").textContent = data.recommendedCategory;
+                    document.getElementById("recommendationContainer").style.display = "block";
+                }
+
                 setTimeout(() => {
                     window.location.href = "/questionnaire/selection";
-                }, 2000);
+                }, 5000);
             })
             .catch(error => {
-                document.getElementById("responseMessage").innerHTML = `<div class="alert alert-danger">Error submitting survey</div>`;
-                console.error("Error submitting survey:", error);
+                document.getElementById("responseMessage").innerHTML = `<div class="alert alert-danger">Error submitting survey.</div>`;
+                console.error("❌ Error submitting survey:", error);
             });
         });
-
-        function getUserId() {
-            // TODO: Replace with actual session or backend logic
-            return 44;  // Replace this with dynamic user fetching logic
-        }
     </script>
 
 </body>
 </html>
-
-
-

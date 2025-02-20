@@ -5,14 +5,33 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Fetch roles dynamically
-            fetch("/questions/roles")  // ✅ Fixed API path
+            fetchUserRecommendation();
+            fetchRoles();
+            fetchCategories();
+        });
+
+        function fetchUserRecommendation() {
+            fetch("/survey/recommendation")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.recommendedCategory) {
+                        document.getElementById("recommendedCategory").textContent = data.recommendedCategory;
+                    } else {
+                        document.getElementById("recommendedCategory").textContent = "No recommendation available";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching recommendation:", error);
+                    document.getElementById("recommendedCategory").textContent = "Error fetching recommendation";
+                });
+        }
+
+        function fetchRoles() {
+            fetch("/questions/roles")
                 .then(response => response.json())
                 .then(data => {
                     let roleDropdown = document.getElementById("selectedRole");
-                    roleDropdown.innerHTML = ""; // Clear existing options
-
-                    // Default option
+                    roleDropdown.innerHTML = "";
                     let defaultOption = document.createElement("option");
                     defaultOption.value = "";
                     defaultOption.textContent = "Select Role";
@@ -28,15 +47,14 @@
                     });
                 })
                 .catch(error => console.error("Error fetching roles:", error));
+        }
 
-            // Fetch categories dynamically
-            fetch("/questions/categories")  // ✅ Fixed API path
+        function fetchCategories() {
+            fetch("/questions/categories")
                 .then(response => response.json())
                 .then(data => {
                     let categoryDropdown = document.getElementById("selectedCategory");
-                    categoryDropdown.innerHTML = ""; // Clear existing options
-                    
-                    // Default option
+                    categoryDropdown.innerHTML = "";
                     let defaultOption = document.createElement("option");
                     defaultOption.value = "";
                     defaultOption.textContent = "Select Category";
@@ -44,7 +62,6 @@
                     defaultOption.selected = true;
                     categoryDropdown.appendChild(defaultOption);
 
-                    // "None" option for role-based selection
                     let noneOption = document.createElement("option");
                     noneOption.value = "None";
                     noneOption.textContent = "None (Role-Based Only)";
@@ -58,25 +75,23 @@
                     });
                 })
                 .catch(error => console.error("Error fetching categories:", error));
-        });
+        }
 
         function adjustFormAction(event) {
-            event.preventDefault(); // Prevent form submission
-
+            event.preventDefault();
             let categoryValue = document.getElementById("selectedCategory").value;
             let roleValue = document.getElementById("selectedRole").value;
 
-            // Ensure user selects valid values
             if (!roleValue) {
                 alert("Please select a role.");
                 return;
             }
+
             if (!categoryValue) {
                 alert("Please select a category.");
                 return;
             }
 
-            // Redirect to appropriate URL
             let url = categoryValue === "None"
                 ? `/questions/start-role-only?selectedRole=${encodeURIComponent(roleValue)}`
                 : `/questions/start?selectedRole=${encodeURIComponent(roleValue)}&selectedCategory=${encodeURIComponent(categoryValue)}`;
@@ -84,20 +99,50 @@
             window.location.href = url;
         }
     </script>
+    <script>
+    function adjustFormAction(event) {
+        event.preventDefault();
+        let categoryValue = document.getElementById("selectedCategory").value;
+        let roleValue = document.getElementById("selectedRole").value;
+
+        console.log("Selected Role:", roleValue);
+        console.log("Selected Category:", categoryValue);
+
+        if (!roleValue) {
+            alert("Please select a role.");
+            return;
+        }
+        if (!categoryValue) {
+            alert("Please select a category.");
+            return;
+        }
+
+        let url = categoryValue === "None"
+            ? `/questions/start-role-only?selectedRole=${encodeURIComponent(roleValue)}`
+            : `/questions/start?selectedRole=${encodeURIComponent(roleValue)}&selectedCategory=${encodeURIComponent(categoryValue)}`;
+
+        console.log("Redirecting to URL:", url);
+        window.location.href = url;
+    }
+</script>
+    
 </head>
 <body>
     <h1>Select Your Questionnaire</h1>
 
-    <!-- Role & Category-Based Selection -->
+    <div>
+        <h2>Recommended Security Category: <span id="recommendedCategory">Loading...</span></h2>
+    </div>
+
     <form id="roleCategoryForm" method="get" onsubmit="adjustFormAction(event)">
         <label for="selectedRole">Choose Your Role:</label>
         <select name="selectedRole" id="selectedRole">
-            <option>Loading...</option> <!-- Placeholder -->
+            <option>Loading...</option>
         </select>
 
         <label for="selectedCategory">Choose a Security Category:</label>
         <select name="selectedCategory" id="selectedCategory">
-            <option>Loading...</option> <!-- Placeholder -->
+            <option>Loading...</option>
         </select>
 
         <button type="submit">Generate Questionnaire</button>
@@ -105,7 +150,6 @@
 
     <hr>
 
-    <!-- Manual Question Selection -->
     <h2>Create Custom Questionnaire</h2>
     <form th:action="@{/questionnaire/custom}" method="post">
         <div th:each="question : ${allQuestions}">
@@ -114,11 +158,9 @@
         </div>
         <button type="submit">Create Custom Questionnaire</button>
     </form>
-    
+
     <hr>
 
     <a href="/dashboard">Back to Dashboard</a>
 </body>
 </html>
-
-

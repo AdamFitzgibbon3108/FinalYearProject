@@ -134,74 +134,56 @@
     </div>
 
     <div class="container">
-        <!-- Welcome Section -->
         <div class="welcome">
             <p>Welcome back, <span th:text="${username}"></span>!</p>
             <p>Select an action to get started:</p>
         </div>
 
-        <!-- Actions Section -->
         <div class="actions">
-            <!-- Tech Questionnaire -->
             <div class="action-card">
-                <h3>Tech Questionnaire</h3>
-                <p>Test your all-round computing knowledge and see how you score.</p>
+                <h3>Security Survey</h3>
+                <p>Answer a few questions and receive your recommended security category.</p>
                 <a th:href="@{/survey/page}">
-                    <button>Start Tech Trivia Questionnaire</button>
-                </a>
+    <button>Start Tech Trivia Questionnaire</button>
+</a>
             </div>
 
-            <!-- Profile Section -->
             <div class="action-card">
-                <h3>View Profile</h3>
-                <p>Manage your account and view recent activity.</p>
-                <a th:href="@{/profile}">
+                <h3>Profile</h3>
+                <p>Manage your account settings and preferences.</p>
+                <a th:href="@{/editprofile}">
                     <button>Go to Profile</button>
                 </a>
             </div>
 
-            <!-- Graphs/Reports -->
             <div class="action-card">
                 <h3>Real-Time Insights</h3>
-                <p>Visualize your risk score trends and security metrics.</p>
-                <a th:href="@{/dashboard/reports}">
+                <p>Analyze your security trends and risk assessments.</p>
+                <a href="/dashboard/reports">
                     <button>View Reports</button>
                 </a>
             </div>
 
-            <!-- Gamification -->
-            <div class="action-card">
-                <h3>Challenges & Rewards</h3>
-                <p>Complete challenges, earn badges, and climb the leaderboard.</p>
-                <a th:href="@{/dashboard/challenges}">
-                    <button>View Challenges</button>
-                </a>
-            </div>
-
-            <!-- Training Programs -->
             <div class="action-card">
                 <h3>Training Programs</h3>
-                <p>Access personalized security training to bridge skill gaps.</p>
-                <a th:href="@{/training}">
-                    <button>View Training Options</button>
+                <p>Access security courses and skill-building modules.</p>
+                <a href="/training">
+                    <button>View Training</button>
                 </a>
             </div>
 
-            <!-- Real-Time Alerts -->
             <div class="action-card">
-                <h3>Real-Time Alerts</h3>
-                <p>Stay informed with the latest cybersecurity threats and updates.</p>
-                <a th:href="@{/alerts}">
+                <h3>Threat Alerts</h3>
+                <p>Stay informed with the latest cybersecurity warnings.</p>
+                <a href="/alerts">
                     <button>View Alerts</button>
                 </a>
             </div>
         </div>
 
-        <!-- Logout Section -->
         <div class="logout">
             <p><a href="/logout">Logout</a></p>
         </div>
     </div>
 </body>
 </html>
-

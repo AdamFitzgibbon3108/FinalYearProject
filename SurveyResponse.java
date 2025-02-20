@@ -9,7 +9,7 @@ public class SurveyResponse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = true) // ✅ User is now optional
     private User user;
 
     @ManyToOne
@@ -20,8 +20,7 @@ public class SurveyResponse {
     // Constructors
     public SurveyResponse() {}
 
-    public SurveyResponse(User user, SurveyQuestion question, String response) {
-        this.user = user;
+    public SurveyResponse(SurveyQuestion question, String response) {
         this.question = question;
         this.response = response;
     }
@@ -29,9 +28,6 @@ public class SurveyResponse {
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
 
     public SurveyQuestion getQuestion() { return question; }
     public void setQuestion(SurveyQuestion question) { this.question = question; }
