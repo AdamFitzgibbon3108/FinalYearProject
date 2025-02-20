@@ -5,28 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Security Survey</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background: radial-gradient(circle at center, #141e30, #243b55), url('/images/cybersecurity-grid.png');
+            background-size: cover, contain;
+            background-blend-mode: overlay;
+            color: #ffffff;
+        }
+
+        .header {
+            background: rgba(20, 30, 48, 0.95);
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #58a6ff;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #58a6ff;
+        }
+
+        .container-box {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(20, 30, 48, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .label-text {
+            font-size: 1.2rem;
+            color: #cbd5e0;
+        }
+
+        input {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid #58a6ff;
+            color: #ffffff;
+            padding: 0.8rem;
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 0.5rem;
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+
+        .recommendation-box {
+            background: rgba(88, 166, 255, 0.2);
+            padding: 10px;
+            border-left: 4px solid #58a6ff;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .btn-custom {
+            padding: 0.8rem 1.2rem;
+            background: linear-gradient(135deg, #58a6ff, #1e90ff);
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .btn-custom:hover {
+            background: linear-gradient(135deg, #1e90ff, #58a6ff);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(88, 166, 255, 0.4);
+        }
+    </style>
 </head>
-<body class="container mt-4">
+<body>
+    <div class="header">
+        <h1>Security Survey</h1>
+    </div>
 
-    <h2 class="text-center">Security Survey</h2>
-
-    <form id="surveyForm">
-        <div id="surveyContainer" class="mt-4">
-            <!-- ✅ Thymeleaf Loop to Render Questions -->
-            <div th:each="question : ${questions}" class="mb-3">
-                <label class="form-label" th:text="${question.questionText}"></label>
-                <input type="text" class="form-control survey-input" th:id="'question-' + ${question.id}" placeholder="Your Answer">
+    <div class="container-box">
+        <form id="surveyForm">
+            <div id="surveyContainer" class="mt-4">
+                <!-- ✅ Thymeleaf Loop to Render Questions -->
+                <div th:each="question : ${questions}" class="mb-3">
+                    <label class="label-text" th:text="${question.questionText}"></label>
+                    <input type="text" class="form-control survey-input" th:id="'question-' + ${question.id}" placeholder="Your Answer">
+                </div>
             </div>
-        </div>
 
-        <button type="button" id="submitSurvey" class="btn btn-primary mt-3">Submit Survey</button>
-    </form>
+            <button type="button" id="submitSurvey" class="btn-custom mt-3">Submit Survey</button>
+        </form>
+    </div>
 
-    <div id="responseMessage" class="mt-3"></div>
-
-    <div id="recommendationContainer" class="mt-4 text-center" style="display: none;">
+    <div class="container-box recommendation-box text-center" id="recommendationContainer" style="display: none;">
         <h4>Recommended Security Category:</h4>
         <p id="recommendationText" class="alert alert-info"></p>
+    </div>
+
+    <div class="container-box text-center">
+        <a href="/dashboard" class="btn-custom">Back to Dashboard</a>
     </div>
 
     <script>
@@ -60,23 +149,19 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById("responseMessage").innerHTML = `<div class="alert alert-success">Survey submitted successfully.</div>`;
-
-                if (data.recommendedCategory) {
-                    document.getElementById("recommendationText").textContent = data.recommendedCategory;
-                    document.getElementById("recommendationContainer").style.display = "block";
-                }
+                document.getElementById("recommendationContainer").style.display = "block";
+                document.getElementById("recommendationText").textContent = data.recommendedCategory;
 
                 setTimeout(() => {
                     window.location.href = "/questionnaire/selection";
                 }, 5000);
             })
             .catch(error => {
-                document.getElementById("responseMessage").innerHTML = `<div class="alert alert-danger">Error submitting survey.</div>`;
+                document.getElementById("recommendationContainer").style.display = "block";
+                document.getElementById("recommendationText").textContent = "Error submitting survey.";
                 console.error("❌ Error submitting survey:", error);
             });
         });
     </script>
-
 </body>
 </html>

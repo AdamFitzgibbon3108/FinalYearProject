@@ -7,9 +7,7 @@ import com.example.repository.SurveyResponseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Service
@@ -46,10 +44,12 @@ public class SurveyService {
             }
 
             String answer = response.getResponse().toLowerCase();
-            String category = mapResponseToCategory(answer);
+            Set<String> matchedCategories = mapResponseToCategories(answer);
 
-            logger.info("Mapped response [" + answer + "] to category: " + category);
-            categoryScores.put(category, categoryScores.getOrDefault(category, 0) + 1);
+            for (String category : matchedCategories) {
+                logger.info("Mapped response [" + answer + "] to category: " + category);
+                categoryScores.put(category, categoryScores.getOrDefault(category, 0) + 1);
+            }
         }
 
         return categoryScores.entrySet().stream()
@@ -69,25 +69,37 @@ public class SurveyService {
         logger.info("Survey responses saved successfully.");
     }
 
-    // Maps responses to specific security categories
-    private String mapResponseToCategory(String response) {
-        Map<String, String> categoryMap = new HashMap<>();
-        categoryMap.put("firewalls", "Network Security");
-        categoryMap.put("vpn", "Privacy");
-        categoryMap.put("two-factor authentication", "Authentication");
-        categoryMap.put("mfa", "Authentication");
-        categoryMap.put("password manager", "Secure Development");
-        categoryMap.put("data encryption", "Cryptography");
-        categoryMap.put("malware protection", "Malware Analysis");
-        categoryMap.put("incident response", "Incident Response");
-        categoryMap.put("penetration testing", "Penetration Testing");
-        categoryMap.put("web security", "Web Security");
-        categoryMap.put("phishing", "Social Engineering");
-        categoryMap.put("ransomware", "Threat Detection");
-        categoryMap.put("security awareness", "Security Awareness");
+    // Maps responses to specific security categories (supports partial matching)
+    private Set<String> mapResponseToCategories(String response) {
+        Set<String> categories = new HashSet<>();
+        response = response.toLowerCase(); // ✅ Standardize case
 
-        return categoryMap.getOrDefault(response, "General Security Awareness");
+        // ✅ Define categories with broader keywords & synonyms
+        Map<String, List<String>> categoryMap = new HashMap<>();
+
+        categoryMap.put("Network Security", Arrays.asList("firewall", "ddos", "network", "packet sniffing", "intrusion"));
+        categoryMap.put("Privacy", Arrays.asList("vpn", "data privacy", "gdpr", "ccpa", "anonymous", "tracking"));
+        categoryMap.put("Authentication", Arrays.asList("2fa", "mfa", "otp", "password reset", "hacked login", "biometric", "social login"));
+        categoryMap.put("Secure Development", Arrays.asList("password manager", "secure coding", "owasp", "software security", "secure app"));
+        categoryMap.put("Cryptography", Arrays.asList("encryption", "hashing", "crypto", "rsa", "aes", "secure communication"));
+        categoryMap.put("Malware Analysis", Arrays.asList("malware", "virus", "trojan", "ransomware", "spyware", "rootkit"));
+        categoryMap.put("Incident Response", Arrays.asList("security breach", "forensics", "breach response", "incident report"));
+        categoryMap.put("Penetration Testing", Arrays.asList("pen testing", "ethical hacking", "security audit", "reconnaissance"));
+        categoryMap.put("Web Security", Arrays.asList("sql injection", "xss", "csrf", "clickjacking", "website security", "web hacking"));
+        categoryMap.put("Social Engineering", Arrays.asList("phishing", "scam", "vishing", "impersonation", "tailgating"));
+        categoryMap.put("Threat Intelligence", Arrays.asList("zero-day", "apt", "cyber espionage", "threat detection"));
+        categoryMap.put("Security Awareness", Arrays.asList("security awareness", "employee training", "security best practices"));
+        categoryMap.put("Identity Security", Arrays.asList("identity theft", "fraud", "impersonation", "fake identity", "stolen id"));
+
+        // ✅ Check if response contains any relevant words
+        for (Map.Entry<String, List<String>> entry : categoryMap.entrySet()) {
+            for (String keyword : entry.getValue()) {
+                if (response.contains(keyword)) {
+                    categories.add(entry.getKey());
+                }
+            }
+        }
+
+        return categories.isEmpty() ? Collections.singleton("General Security Awareness") : categories;
     }
 }
-
-
