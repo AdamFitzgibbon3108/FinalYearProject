@@ -21,6 +21,8 @@ public class SurveyService {
     @Autowired
     private SurveyResponseRepository responseRepository;
 
+    private final Map<String, String> userRecommendations = new HashMap<>(); // Temporary storage for recommendations
+
     // Fetch all survey questions
     public List<SurveyQuestion> getAllQuestions() {
         logger.info("Retrieving all survey questions...");
@@ -28,7 +30,7 @@ public class SurveyService {
     }
 
     // Process user responses and determine the recommended security category
-    public String analyzeResponses(List<SurveyResponse> responses) {
+    public String analyzeResponses(List<SurveyResponse> responses, String username) {
         logger.info("Analyzing responses to determine recommended category...");
 
         if (responses.isEmpty()) {
@@ -37,6 +39,7 @@ public class SurveyService {
         }
 
         Map<String, Integer> categoryScores = new HashMap<>();
+
         for (SurveyResponse response : responses) {
             if (response.getResponse() == null || response.getResponse().trim().isEmpty()) {
                 logger.warning("Empty response detected, skipping...");
@@ -52,10 +55,16 @@ public class SurveyService {
             }
         }
 
-        return categoryScores.entrySet().stream()
+        String recommendedCategory = categoryScores.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse("General Security Awareness");
+
+        // Store recommendation in memory (replace with DB if needed)
+        userRecommendations.put(username, recommendedCategory);
+
+        logger.info("Final recommended category: " + recommendedCategory);
+        return recommendedCategory;
     }
 
     // Save survey responses
@@ -67,6 +76,11 @@ public class SurveyService {
         }
         responseRepository.saveAll(responses);
         logger.info("Survey responses saved successfully.");
+    }
+
+    // Retrieve stored recommendation for a user
+    public String getUserRecommendation(String username) {
+        return userRecommendations.getOrDefault(username, "No recommendation available");
     }
 
     // Maps responses to specific security categories (supports partial matching)

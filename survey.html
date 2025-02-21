@@ -65,6 +65,7 @@
             border-left: 4px solid #58a6ff;
             text-align: center;
             font-weight: bold;
+            display: none;
         }
 
         .btn-custom {
@@ -88,6 +89,13 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(88, 166, 255, 0.4);
         }
+
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            font-size: 1rem;
+            color: #cbd5e0;
+        }
     </style>
 </head>
 <body>
@@ -106,10 +114,11 @@
             </div>
 
             <button type="button" id="submitSurvey" class="btn-custom mt-3">Submit Survey</button>
+            <p id="loadingIndicator" class="loading-indicator">Submitting survey, please wait...</p>
         </form>
     </div>
 
-    <div class="container-box recommendation-box text-center" id="recommendationContainer" style="display: none;">
+    <div class="container-box recommendation-box text-center" id="recommendationContainer">
         <h4>Recommended Security Category:</h4>
         <p id="recommendationText" class="alert alert-info"></p>
     </div>
@@ -142,6 +151,9 @@
                 return;
             }
 
+            // Show loading indicator
+            document.getElementById("loadingIndicator").style.display = "block";
+
             fetch(`/survey/submit`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -149,19 +161,41 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById("recommendationContainer").style.display = "block";
-                document.getElementById("recommendationText").textContent = data.recommendedCategory;
+                document.getElementById("loadingIndicator").style.display = "none";
 
+                if (data.recommendedCategory) {
+                    document.getElementById("recommendationContainer").style.display = "block";
+                    document.getElementById("recommendationText").textContent = data.recommendedCategory;
+
+                    // ✅ Store recommendation in localStorage for questionnaire-selection.html
+                    localStorage.setItem("recommendedCategory", data.recommendedCategory);
+                } else {
+                    document.getElementById("recommendationText").textContent = "No recommendation available";
+                }
+
+                // ✅ Redirect to questionnaire selection after 5 seconds
                 setTimeout(() => {
                     window.location.href = "/questionnaire/selection";
                 }, 5000);
             })
             .catch(error => {
+                document.getElementById("loadingIndicator").style.display = "none";
                 document.getElementById("recommendationContainer").style.display = "block";
                 document.getElementById("recommendationText").textContent = "Error submitting survey.";
                 console.error("❌ Error submitting survey:", error);
             });
         });
+
+        // ✅ Ensure recommendation is properly retrieved in questionnaire-selection.html
+        document.addEventListener("DOMContentLoaded", function () {
+            let storedRecommendation = localStorage.getItem("recommendedCategory");
+            if (storedRecommendation) {
+                document.getElementById("recommendationContainer").style.display = "block";
+                document.getElementById("recommendationText").textContent = storedRecommendation;
+            }
+        });
     </script>
 </body>
 </html>
+
+ 

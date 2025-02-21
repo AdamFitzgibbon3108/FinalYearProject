@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -40,10 +41,10 @@ public class SurveyController {
         return questions;
     }
 
-    // ✅ API to submit survey responses
+    // ✅ API to submit survey responses and store recommendation
     @PostMapping("/submit")
     @ResponseBody
-    public Map<String, String> submitSurveyResponses(@RequestBody List<SurveyResponse> responses) {
+    public Map<String, String> submitSurveyResponses(@RequestBody List<SurveyResponse> responses, Principal principal) {
         logger.info("Received survey responses: " + responses.size());
 
         if (responses.isEmpty()) {
@@ -51,11 +52,27 @@ public class SurveyController {
             return Map.of("error", "No survey responses provided.");
         }
 
+        // Save responses
         surveyService.saveSurveyResponses(responses);
         logger.info("Survey responses saved successfully.");
 
-        String recommendedCategory = surveyService.analyzeResponses(responses);
-        logger.info("Recommended Security Category: " + recommendedCategory);
+        // Analyze responses and store recommendation
+        String username = principal.getName();  // ✅ Get username from session
+        String recommendedCategory = surveyService.analyzeResponses(responses, username);
+        logger.info("Recommended Security Category for " + username + ": " + recommendedCategory);
+
+        return Map.of("recommendedCategory", recommendedCategory);
+    }
+
+    // ✅ API to retrieve stored recommendation for the current user
+    @GetMapping("/recommendation")
+    @ResponseBody
+    public Map<String, String> getUserRecommendation(Principal principal) {
+        String username = principal.getName();
+        logger.info("Fetching recommendation for user: " + username);
+
+        String recommendedCategory = surveyService.getUserRecommendation(username);
+        logger.info("Retrieved recommendation: " + recommendedCategory);
 
         return Map.of("recommendedCategory", recommendedCategory);
     }
