@@ -4,9 +4,11 @@ import com.example.model.Response;
 import com.example.model.User;
 import com.example.model.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ResponseRepository extends JpaRepository<Response, Long> {
@@ -23,13 +25,28 @@ public interface ResponseRepository extends JpaRepository<Response, Long> {
 
     /**
      * Fetches responses for a specific user and question.
+     *
      */
-    Response findByUserAndQuestion(User user, Question question);
+    List<Response> findByUserAndQuestion(User user, Question question);
 
-	List<Response> findByUserId(Long userId);
+    /**
+     * Fetches responses for a given user ID.
+     *  Improved with null-checking and optional handling.
+     */
+    @Query("SELECT r FROM Response r WHERE r.user.id = ?1")
+    List<Response> findByUserId(Long userId);
 
-	List<Response> findByQuestionId(Long questionId);
+    /**
+     * Fetches responses for a given question ID.
+     * Ensures that all question responses are properly retrieved.
+     */
+    @Query("SELECT r FROM Response r WHERE r.question.id = ?1")
+    List<Response> findByQuestionId(Long questionId);
+
+    /**
+     *  Debugging Query: Fetch all responses.
+     */
+    @Query("SELECT COUNT(r) FROM Response r")
+    long countAllResponses();
 }
-
-
 

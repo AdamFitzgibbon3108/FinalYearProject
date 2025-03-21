@@ -1,9 +1,8 @@
 package com.example.controller;
 
 import com.example.model.Question;
-import com.example.model.QuestionType;
-import com.example.model.Response;
 import com.example.model.User;
+import com.example.model.Response;
 import com.example.service.QuestionService;
 import com.example.repository.QuestionRepository;
 import com.example.repository.ResponseRepository;
@@ -12,13 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Controller  // ✅ Changed from @RestController to handle Thymeleaf views
+@Controller  // ✅ Ensure it's a Thymeleaf-compatible controller
 @RequestMapping("/questions")
 public class QuestionController {
 
@@ -35,12 +35,28 @@ public class QuestionController {
     private QuestionService questionService;
 
     /**
+     * Load Manage Questions Page
+     */
+    @GetMapping("/manage")
+    public String manageQuestions(Model model) {
+        model.addAttribute("questions", questionService.getAllQuestions());
+        return "manage-questions"; // ✅ Ensure `manage-questions.html` exists in `templates/`
+    }
+
+    /**
      * Fetch all unique roles from the database.
      */
     @GetMapping("/roles")
     @ResponseBody
     public List<String> getAllRoles() {
         return questionService.getAllRoles();
+    }
+    
+    @GetMapping("/questionnaire/custom")
+    public String customQuestionnaire(Model model) {
+        List<Question> allQuestions = questionService.getAllQuestions(); // Fetch all questions
+        model.addAttribute("questions", allQuestions); // Pass questions to view
+        return "custom-questionnaire"; // Make sure 'custom-questionnaire.html' exists in templates/
     }
 
     /**
@@ -73,7 +89,7 @@ public class QuestionController {
         model.addAttribute("selectedRole", selectedRole);
         model.addAttribute("selectedCategory", "None");
 
-        return "questionnaire"; // ✅ Ensure there's a `questionnaire.html` template in `templates/`
+        return "questionnaire"; // ✅ Ensure `questionnaire.html` exists in `templates/`
     }
 
     /**
@@ -90,20 +106,23 @@ public class QuestionController {
         model.addAttribute("selectedRole", selectedRole);
         model.addAttribute("selectedCategory", selectedCategory);
 
-        return "questionnaire"; // ✅ Ensure `questionnaire.html` exists in Thymeleaf templates
+        return "questionnaire"; // ✅ Ensure `questionnaire.html` exists in `templates/`
     }
 
     /**
      * Handles questionnaire submission.
      */
+    @Transactional
     @PostMapping("/submit")
     @ResponseBody
     public Map<String, String> submitQuestionnaire(@RequestBody Map<String, String> requestBody) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
+        System.out.println("🔍 Received submission from user: " + username);
+
         // Retrieve user
-        Optional<User> userOptional = Optional.ofNullable(userRepository.findByUsername(username));
+        Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isEmpty()) {
             return Collections.singletonMap("error", "User not found!");
         }
@@ -117,6 +136,8 @@ public class QuestionController {
             return Collections.singletonMap("error", "Missing role or category.");
         }
 
+        System.out.println("📌 Role: " + selectedRole + ", Category: " + selectedCategory);
+
         // Process user responses
         List<Response> savedResponses = new ArrayList<>();
 
@@ -128,37 +149,42 @@ public class QuestionController {
 
                     Optional<Question> questionOptional = questionRepository.findById(questionId);
                     if (questionOptional.isPresent()) {
+                        Question question = questionOptional.get();
+
+                        // Ensure category is properly set
+                        String category = (selectedCategory == null || selectedCategory.isEmpty()) ? question.getCategory() : selectedCategory;
+
                         Response response = new Response();
                         response.setUser(user);
-                        response.setQuestion(questionOptional.get());
+                        response.setQuestion(question);
                         response.setAnswer(answer);
                         response.setTimestamp(LocalDateTime.now());
                         response.setRole(selectedRole);
-                        response.setDifficulty(selectedCategory);
-                        response.setScore(0); // Placeholder, update later when scoring logic is added
+                        response.setCategory(category); 
+                        response.setScore(0); // Placeholder for scoring
 
-                        responseRepository.save(response);
-                        savedResponses.add(response);
+                        try {
+                            responseRepository.save(response);
+                            savedResponses.add(response);
+                            System.out.println("✅ Saved response for question " + questionId);
+                        } catch (Exception e) {
+                            System.out.println("❌ Error saving response: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        System.out.println("⚠️ Warning: Question ID " + questionId + " not found.");
                     }
                 } catch (NumberFormatException e) {
-                    System.out.println("Warning: Could not parse question ID: " + entry.getKey());
+                    System.out.println("❌ Error parsing question ID: " + entry.getKey());
                 }
             }
         }
 
-        return Collections.singletonMap("message", "Responses submitted successfully!");
-    }
+        // Debugging: Fetch responses from the DB to verify if they were saved
+        List<Response> allResponses = responseRepository.findByUser(user);
+        System.out.println("🔍 Total Responses in DB for user: " + allResponses.size());
 
-    /**
-     * Extracts multiple-choice options from the database safely.
-     */
-    private List<String> extractOptions(Question question) {
-        if (question.getQuestionType() == QuestionType.MULTIPLE_CHOICE) {
-            String optionsStr = question.getOptions();
-            if (optionsStr != null && !optionsStr.isEmpty()) {
-                return Arrays.asList(optionsStr.split(","));
-            }
-        }
-        return Collections.emptyList();
+        return Collections.singletonMap("message", "Responses submitted successfully!");
     }
 }

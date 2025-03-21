@@ -17,6 +17,10 @@ public class UserQuestionnaire {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "questionnaire_id", nullable = false) 
+    private Questionnaire questionnaire; 
+
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinTable(
         name = "user_questionnaire_questions",
@@ -31,8 +35,9 @@ public class UserQuestionnaire {
     // Constructors
     public UserQuestionnaire() {}
 
-    public UserQuestionnaire(User user, List<Question> selectedQuestions) {
+    public UserQuestionnaire(User user, Questionnaire questionnaire, List<Question> selectedQuestions) {
         this.user = user;
+        this.questionnaire = questionnaire;
         this.selectedQuestions = selectedQuestions;
         this.createdAt = LocalDateTime.now();
     }
@@ -54,6 +59,14 @@ public class UserQuestionnaire {
         this.user = user;
     }
 
+    public Questionnaire getQuestionnaire() {
+        return questionnaire;
+    }
+
+    public void setQuestionnaire(Questionnaire questionnaire) {
+        this.questionnaire = questionnaire;
+    }
+
     public List<Question> getSelectedQuestions() {
         return selectedQuestions;
     }
@@ -66,5 +79,6 @@ public class UserQuestionnaire {
         return createdAt;
     }
 }
+
 
 

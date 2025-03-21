@@ -59,7 +59,6 @@
             outline: none;
         }
 
-        /* ✅ Improved dropdown styling for better visibility */
         select option {
             background: rgba(20, 30, 48, 0.95);
             color: #ffffff;
@@ -105,7 +104,6 @@
             text-align: center;
         }
 
-        /* ✅ Styled custom questionnaire section */
         .questionnaire-list {
             max-height: 250px;
             overflow-y: auto;
@@ -132,7 +130,6 @@
             height: 18px;
             accent-color: #58a6ff;
         }
-
     </style>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -145,7 +142,11 @@
             fetch("/survey/recommendation")
                 .then(response => response.json())
                 .then(data => {
-                    let recommendationText = data.recommendedCategory || "No recommendation available";
+                    let recommendations = data.recommendedCategories || [];
+                    let recommendationText = recommendations.length > 0 
+                        ? recommendations.join(", ")  // Show multiple categories
+                        : "No recommendation available";
+
                     document.getElementById("recommendedCategory").textContent = recommendationText;
                 })
                 .catch(error => {
@@ -216,7 +217,7 @@
 
     <div class="container-box">
         <div class="recommendation-box">
-            <h2>Recommended Security Category: <span id="recommendedCategory" class="loading-text">Loading...</span></h2>
+            <h2>Recommended Security Categories: <span id="recommendedCategory" class="loading-text">Loading...</span></h2>
         </div>
 
         <form id="roleCategoryForm" method="get" onsubmit="adjustFormAction(event)">
@@ -246,6 +247,8 @@
             <button type="submit" class="btn-custom mt-3">Create Custom Questionnaire</button>
         </form>
     </div>
+    
+    
 
     <div class="container-box text-center">
         <a href="/dashboard" class="btn-custom">Back to Dashboard</a>

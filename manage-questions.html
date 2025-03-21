@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Questions | ThreatLens</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Questions</h1>
+        <a href="/admin/dashboard">Back to Dashboard</a>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Question Text</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="question : ${questions}">
+                    <td th:text="${question.id}"></td>
+                    <td th:text="${question.text}"></td>
+                    <td>
+                        <a th:href="@{/admin/questions/edit/{id}(id=${question.id})}">Edit</a> |
+                        <a th:href="@{/admin/questions/delete/{id}(id=${question.id})}" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <a href="/admin/questions/add">Add New Question</a>
+    </div>
+</body>
+</html>

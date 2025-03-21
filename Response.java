@@ -32,26 +32,23 @@ public class Response {
     private String role;
 
     @Column(nullable = false)
-    private String difficulty;
+    private String category;
 
-
-
-
-    // Default constructor
+    //  Default constructor
     public Response() {}
 
-    public Response(Question question, User user, String answer, int score, LocalDateTime timestamp, String role, String difficulty) {
+    //  Fixed constructor to properly initialize values
+    public Response(Question question, User user, String answer, int score, LocalDateTime timestamp, String role, String category) {
         this.question = question;
         this.user = user;
         this.answer = answer;
         this.score = score;
         this.timestamp = timestamp;
         this.role = role;
-        this.difficulty = difficulty;
-        
+        this.category = category != null ? category : "Unknown"; // Prevents null values
     }
 
-    // Getters and Setters
+    //  Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -67,14 +64,27 @@ public class Response {
     public int getScore() { return score; }
     public void setScore(int score) { this.score = score; }
 
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category != null ? category : "Unknown"; }
+
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
 
-    public String getDifficulty() { return difficulty; }
-    public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
-
+    //  Debugging method to print response details
+    @Override
+    public String toString() {
+        return "Response{" +
+                "id=" + id +
+                ", question=" + (question != null ? question.getId() : "null") +
+                ", user=" + (user != null ? user.getUsername() : "null") +
+                ", answer='" + answer + '\'' +
+                ", score=" + score +
+                ", timestamp=" + timestamp +
+                ", role='" + role + '\'' +
+                ", category='" + category + '\'' +
+                '}';
+    }
 }
-

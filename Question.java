@@ -13,6 +13,9 @@ public class Question {
     @Column(name = "question_text", nullable = false)
     private String text;
 
+    @Column(name = "question_text", insertable = false, updatable = false) // ✅ Prevents duplicate mapping issues
+    private String questionText;
+
     @Column(name = "category")
     private String category;
 
@@ -66,6 +69,9 @@ public class Question {
 
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }
+
+    public String getQuestionText() { return questionText; } // ✅ Read-only
+    public void setQuestionText(String questionText) { this.questionText = questionText; }
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }

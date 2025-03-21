@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Questionnaires | ThreatLens</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <h1>Manage Questionnaires</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="questionnaire : ${questionnaires}">
+                <td th:text="${questionnaire.id}"></td>
+                <td th:text="${questionnaire.title}"></td>
+                <td th:text="${questionnaire.description}"></td>
+                <td>
+                    <button th:onclick="|editQuestionnaire(${questionnaire.id})|">Edit</button>
+                    <button th:onclick="|deleteQuestionnaire(${questionnaire.id})|">Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function editQuestionnaire(id) {
+            window.location.href = '/questionnaires/edit/' + id;
+        }
+        function deleteQuestionnaire(id) {
+            fetch('/questionnaires/delete/' + id, { method: 'DELETE' })
+                .then(() => location.reload());
+        }
+    </script>
+</body>
+</html>
+

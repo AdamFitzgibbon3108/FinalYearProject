@@ -68,4 +68,11 @@ public class ResponseService {
     public List<Response> getResponsesByQuestion(Long questionId) {
         return responseRepository.findByQuestionId(questionId);
     }
+
+	public List<Response> getResponsesByUsername(String username) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
+
+
