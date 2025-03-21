@@ -1,12 +1,17 @@
 package com.example.service;
 
+import com.example.model.Role;
 import com.example.model.User;
 import com.example.repository.UserRepository;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
@@ -19,17 +24,20 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
+        // Properly retrieve user from Optional<User>
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        // Build UserDetails object
-        UserBuilder builder = org.springframework.security.core.userdetails.User.withUsername(username);
-        builder.password(user.getPassword());
-        builder.roles(user.getRole()); // Assuming role is a single string
+        // Extract role names as authorities (Spring Security requires "ROLE_" prefix)
+        Set<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                .collect(Collectors.toSet());
 
-        return builder.build();
+        //  Build UserDetails object
+        return org.springframework.security.core.userdetails.User.withUsername(username)
+                .password(user.getPassword())
+                .authorities(authorities)
+                .build();
     }
 }
 

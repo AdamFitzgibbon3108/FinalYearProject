@@ -129,7 +129,7 @@
                 <ul>
                     <li th:each="question, questionStat : ${questions}">
                         <div>
-                            <strong th:text="${question.text}"></strong>
+                            <strong th:text="${questionStat.index + 1} + '. ' + ${question.text}"></strong>
                         </div>
 
                         <!-- TRUE/FALSE Questions -->
@@ -170,11 +170,16 @@
             let formData = new FormData(this);
             let jsonData = {};
 
+            // Convert form data to JSON object
             formData.forEach((value, key) => {
                 jsonData[key] = value;
             });
 
-            fetch("/api/questions/submit", {
+            // Ensure role & category are present in the JSON before sending
+            jsonData["selectedRole"] = document.querySelector("input[name='selectedRole']").value;
+            jsonData["selectedCategory"] = document.querySelector("input[name='selectedCategory']").value;
+
+            fetch("/questions/submit", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -199,5 +204,7 @@
 
 </body>
 </html>
+
+
 
 

@@ -3,23 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Results</title>
+    <title>Quiz Submission</title>
 </head>
 <body>
-    <h1>Quiz Results</h1>
-    <p>Username: <strong th:text="${username}"></strong></p>
-    <p>Role: <strong th:text="${role}"></strong></p>
-    <h2>Your Score: <span th:text="${score}"></span></h2>
-
-    <h3>Questions and Correct Answers:</h3>
-    <div th:each="question : ${questions}">
-        <p>
-            <strong th:text="${question['question']}"></strong><br />
-            <em>Correct Answer: <span th:text="${question['correctAnswer']}"></span></em><br />
-            <em>Your Answer: <span th:text="${responses[question['question']]}"></span></em>
-        </p>
-    </div>
-
+    <h1>Quiz Submitted</h1>
+    
+    <p>Thank you for completing the quiz.</p>
+    <p>Our admin team will now review and mark your answers.</p>
+    
     <a href="/dashboard">Back to Dashboard</a>
 </body>
 </html>
+
+

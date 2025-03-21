@@ -1,9 +1,7 @@
 package com.example.service;
 
-import com.example.model.SurveyQuestion;
-import com.example.model.SurveyResponse;
-import com.example.repository.SurveyQuestionRepository;
-import com.example.repository.SurveyResponseRepository;
+import com.example.model.*;
+import com.example.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,92 +19,158 @@ public class SurveyService {
     @Autowired
     private SurveyResponseRepository responseRepository;
 
-    private final Map<String, String> userRecommendations = new HashMap<>(); // Temporary storage for recommendations
+    @Autowired
+    private UserRepository userRepository;
 
-    // Fetch all survey questions
+    @Autowired
+    private SurveyQuestionOptionsRepository optionsRepository;
+
+    private final Map<String, List<String>> userRecommendations = new HashMap<>();
+
+    /**
+     * Fetch all survey questions.
+     */
     public List<SurveyQuestion> getAllQuestions() {
         logger.info("Retrieving all survey questions...");
         return questionRepository.findAll();
     }
 
-    // Process user responses and determine the recommended security category
-    public String analyzeResponses(List<SurveyResponse> responses, String username) {
-        logger.info("Analyzing responses to determine recommended category...");
+    /**
+     * Save survey responses for a user.
+     */
+    public void saveSurveyResponses(List<SurveyResponse> responses, String username) {
+        logger.info("Saving survey responses for user: " + username);
 
-        if (responses.isEmpty()) {
-            logger.warning("No responses provided for analysis.");
-            return "General Security Awareness";
+        // Retrieve User
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()) {
+            logger.severe("User not found: " + username);
+            throw new RuntimeException("User not found: " + username);
         }
+        User user = userOptional.get();
 
-        Map<String, Integer> categoryScores = new HashMap<>();
+        List<SurveyResponse> validResponses = new ArrayList<>();
 
         for (SurveyResponse response : responses) {
-            if (response.getResponse() == null || response.getResponse().trim().isEmpty()) {
-                logger.warning("Empty response detected, skipping...");
+            if (response.getSurveyQuestion() == null || response.getSurveyQuestion().getId() == null) {
+                logger.warning("Skipping response: Missing Survey Question ID");
                 continue;
             }
 
-            String answer = response.getResponse().toLowerCase();
-            Set<String> matchedCategories = mapResponseToCategories(answer);
+            // Ensure question exists
+            Optional<SurveyQuestion> questionOpt = questionRepository.findById(response.getSurveyQuestion().getId());
+            if (questionOpt.isEmpty()) {
+                logger.warning("Skipping response: Invalid Survey Question ID " + response.getSurveyQuestion().getId());
+                continue;
+            }
+            response.setSurveyQuestion(questionOpt.get());
 
-            for (String category : matchedCategories) {
-                logger.info("Mapped response [" + answer + "] to category: " + category);
+            // Ensure selected option exists
+            if (response.getSelectedOption() == null || response.getSelectedOption().getId() == null) {
+                logger.warning("Skipping response: Missing Selected Option");
+                continue;
+            }
+
+            Optional<SurveyQuestionOptions> optionOpt = optionsRepository.findById(response.getSelectedOption().getId());
+            if (optionOpt.isEmpty()) {
+                logger.warning("Skipping response: Invalid Option ID " + response.getSelectedOption().getId());
+                continue;
+            }
+            response.setSelectedOption(optionOpt.get());
+
+            response.setUser(user);
+            validResponses.add(response);
+        }
+
+        // Save only valid responses
+        if (!validResponses.isEmpty()) {
+            responseRepository.saveAll(validResponses);
+            logger.info("Survey responses saved successfully for user: " + username);
+        } else {
+            logger.warning("No valid survey responses to save.");
+        }
+    }
+
+    /**
+     * Analyze responses and determine recommended security categories.
+     */
+    public List<String> analyzeResponses(String username) {
+        logger.info("Analyzing responses for user: " + username);
+
+        List<SurveyResponse> responses = responseRepository.findByUser_Username(username);
+        if (responses.isEmpty()) {
+            logger.warning("No responses found for user: " + username);
+            return List.of("General Security Awareness");
+        }
+
+        Map<String, Integer> categoryScores = new HashMap<>();
+        for (SurveyResponse response : responses) {
+            String answer = response.getSelectedOption().getOptionValue().toLowerCase();
+            Set<String> categories = mapResponseToCategories(answer);
+            for (String category : categories) {
                 categoryScores.put(category, categoryScores.getOrDefault(category, 0) + 1);
             }
         }
 
-        String recommendedCategory = categoryScores.entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse("General Security Awareness");
+        List<String> recommendations = getTopCategories(categoryScores);
+        logger.info("Generated recommendations for user: " + username + " -> " + recommendations);
 
-        // Store recommendation in memory (replace with DB if needed)
-        userRecommendations.put(username, recommendedCategory);
+        //  Store multiple recommendations as a comma-separated string in the database
+        updateUserRecommendations(username, recommendations);
 
-        logger.info("Final recommended category: " + recommendedCategory);
-        return recommendedCategory;
+        return recommendations;
     }
 
-    // Save survey responses
-    public void saveSurveyResponses(List<SurveyResponse> responses) {
-        logger.info("Saving survey responses...");
-        if (responses.isEmpty()) {
-            logger.warning("Attempted to save empty responses.");
-            return;
+    /**
+     *  Store multiple recommended security categories in the database.
+     */
+    public void updateUserRecommendations(String username, List<String> categories) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            String recommendationsString = String.join(",", categories);
+            user.setRecommendedSecurityCategory(recommendationsString);
+            userRepository.save(user);
+            logger.info("Updated recommended security categories for user: " + username + " -> " + recommendationsString);
+        } else {
+            logger.warning("Failed to update recommendations: User not found - " + username);
         }
-        responseRepository.saveAll(responses);
-        logger.info("Survey responses saved successfully.");
     }
 
-    // Retrieve stored recommendation for a user
-    public String getUserRecommendation(String username) {
-        return userRecommendations.getOrDefault(username, "No recommendation available");
+    /**
+     *  Retrieve stored recommendations from the database (multiple categories supported).
+     */
+    public List<String> getStoredUserRecommendations(String username) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isPresent()) {
+            String storedCategories = userOptional.get().getRecommendedSecurityCategory();
+            if (storedCategories != null && !storedCategories.isBlank()) {
+                return Arrays.asList(storedCategories.split(","));
+            }
+        }
+        return List.of("No recommendation available");
     }
 
-    // Maps responses to specific security categories (supports partial matching)
+    /**
+     * Maps responses to security categories.
+     */
     private Set<String> mapResponseToCategories(String response) {
-        Set<String> categories = new HashSet<>();
-        response = response.toLowerCase(); // ✅ Standardize case
-
-        // ✅ Define categories with broader keywords & synonyms
         Map<String, List<String>> categoryMap = new HashMap<>();
+        categoryMap.put("Network Security", List.of("firewall", "ddos", "network", "intrusion detection"));
+        categoryMap.put("Privacy", List.of("vpn", "data privacy", "gdpr", "tracking"));
+        categoryMap.put("Authentication", List.of("2fa", "password", "mfa", "otp", "biometric"));
+        categoryMap.put("Secure Development", List.of("secure coding", "owasp", "software security"));
+        categoryMap.put("Cryptography", List.of("encryption", "hashing", "rsa", "aes", "secure communication"));
+        categoryMap.put("Malware Analysis", List.of("malware", "virus", "trojan", "ransomware"));
+        categoryMap.put("Incident Response", List.of("security breach", "forensics", "breach response"));
+        categoryMap.put("Penetration Testing", List.of("pen testing", "ethical hacking", "security audit"));
+        categoryMap.put("Web Security", List.of("sql injection", "xss", "csrf", "clickjacking"));
+        categoryMap.put("Social Engineering", List.of("phishing", "scam", "impersonation"));
+        categoryMap.put("Threat Intelligence", List.of("zero-day", "cyber espionage", "threat detection"));
+        categoryMap.put("Security Awareness", List.of("security awareness", "employee training", "best practices"));
 
-        categoryMap.put("Network Security", Arrays.asList("firewall", "ddos", "network", "packet sniffing", "intrusion"));
-        categoryMap.put("Privacy", Arrays.asList("vpn", "data privacy", "gdpr", "ccpa", "anonymous", "tracking"));
-        categoryMap.put("Authentication", Arrays.asList("2fa", "mfa", "otp", "password reset", "hacked login", "biometric", "social login"));
-        categoryMap.put("Secure Development", Arrays.asList("password manager", "secure coding", "owasp", "software security", "secure app"));
-        categoryMap.put("Cryptography", Arrays.asList("encryption", "hashing", "crypto", "rsa", "aes", "secure communication"));
-        categoryMap.put("Malware Analysis", Arrays.asList("malware", "virus", "trojan", "ransomware", "spyware", "rootkit"));
-        categoryMap.put("Incident Response", Arrays.asList("security breach", "forensics", "breach response", "incident report"));
-        categoryMap.put("Penetration Testing", Arrays.asList("pen testing", "ethical hacking", "security audit", "reconnaissance"));
-        categoryMap.put("Web Security", Arrays.asList("sql injection", "xss", "csrf", "clickjacking", "website security", "web hacking"));
-        categoryMap.put("Social Engineering", Arrays.asList("phishing", "scam", "vishing", "impersonation", "tailgating"));
-        categoryMap.put("Threat Intelligence", Arrays.asList("zero-day", "apt", "cyber espionage", "threat detection"));
-        categoryMap.put("Security Awareness", Arrays.asList("security awareness", "employee training", "security best practices"));
-        categoryMap.put("Identity Security", Arrays.asList("identity theft", "fraud", "impersonation", "fake identity", "stolen id"));
-
-        // ✅ Check if response contains any relevant words
-        for (Map.Entry<String, List<String>> entry : categoryMap.entrySet()) {
+        Set<String> categories = new HashSet<>();
+        for (var entry : categoryMap.entrySet()) {
             for (String keyword : entry.getValue()) {
                 if (response.contains(keyword)) {
                     categories.add(entry.getKey());
@@ -114,6 +178,21 @@ public class SurveyService {
             }
         }
 
-        return categories.isEmpty() ? Collections.singleton("General Security Awareness") : categories;
+        return categories.isEmpty() ? Set.of("General Security Awareness") : categories;
+    }
+
+    /**
+     * Returns the top 3 scoring security categories.
+     */
+    private List<String> getTopCategories(Map<String, Integer> categoryScores) {
+        return categoryScores.entrySet().stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .limit(3)
+                .map(Map.Entry::getKey)
+                .toList();
     }
 }
+
+
+
+

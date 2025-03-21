@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | ThreatLens</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #0f172a, #1e293b);
+            color: white;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            width: 90%;
+            max-width: 1400px;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: rgba(51, 65, 85, 0.85);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 5px 5px 12px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+
+        .sidebar h2 {
+            color: #58a6ff;
+            font-weight: 600;
+            margin-bottom: 25px;
+            font-size: 22px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar ul li a {
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            background: rgba(37, 99, 235, 0.85);
+            padding: 14px;
+            border-radius: 10px;
+            justify-content: center;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar ul li a:hover {
+            background: #1d4ed8;
+            transform: translateY(-3px);
+        }
+
+        .logout {
+            background: rgba(255, 0, 0, 0.8) !important;
+        }
+
+        .logout:hover {
+            background: darkred !important;
+        }
+
+        /* Dashboard Content */
+        .dashboard {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Stats Section */
+        .stats-container {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .stats-card {
+            background: rgba(71, 85, 105, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            width: 250px;
+            height: 150px;
+            box-shadow: 5px 5px 12px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stats-card:hover {
+            transform: scale(1.08);
+        }
+
+        .stats-card i {
+            font-size: 35px;
+            color: #58a6ff;
+            margin-bottom: 10px;
+        }
+
+        .stats-card h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #58a6ff;
+        }
+
+        .stats-card p {
+            font-size: 26px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        /* Activity Log */
+        .activity-log {
+            margin-top: 40px;
+            background: rgba(51, 65, 85, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            box-shadow: 5px 5px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .activity-log h3 {
+            color: #58a6ff;
+            font-size: 20px;
+        }
+
+        .activity-log ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        .activity-log ul li {
+            background: rgba(71, 85, 105, 0.9);
+            padding: 14px;
+            margin: 5px 0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+            font-size: 16px;
+        }
+
+        .activity-log ul li i {
+            margin-right: 10px;
+            color: #58a6ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>ThreatLens</h2>
+            <ul>
+                <li><a href="/admin/users"><i class="fas fa-users"></i> Manage Users</a></li>
+                <li><a href="/admin/questions"><i class="fas fa-question-circle"></i> Manage Questions</a></li>
+                <li><a href="/admin/questionnaires"><i class="fas fa-file-alt"></i> Manage Questionnaires</a></li>
+                <li><a href="/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <div class="dashboard-header">
+                <h1>Welcome, <span th:text="${adminName}">Admin</span>!</h1>
+                <p>You have full access to manage the platform.</p>
+            </div>
+
+            <div class="stats-container">
+                <div class="stats-card">
+                    <i class="fas fa-user"></i>
+                    <h3>Total Users</h3>
+                    <p th:text="${totalUsers}">100</p>
+                </div>
+                <div class="stats-card">
+                    <i class="fas fa-user-check"></i>
+                    <h3>Active Users</h3>
+                    <p th:text="${activeUsers}">80</p>
+                </div>
+                <div class="stats-card">
+                    <i class="fas fa-user-clock"></i>
+                    <h3>Pending Approvals</h3>
+                    <p th:text="${pendingUsers}">5</p>
+                </div>
+            </div>
+
+            <div class="activity-log">
+                <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                <ul>
+                    <li th:each="log : ${activityLogs}">
+                        <i class="fas fa-bell"></i>
+                        <span th:text="${log}">Admin updated a questionnaire</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+

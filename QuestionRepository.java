@@ -17,6 +17,11 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findByRoleAndDifficulty(String role, String difficulty);
 
     /**
+     * Fetches questions by id's
+     */
+   
+
+    /**
      * Fetches all questions belonging to a given security control category.
      */
     List<Question> findByControlCategory(SecurityControl controlCategory);
