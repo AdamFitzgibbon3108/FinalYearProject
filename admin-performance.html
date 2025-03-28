@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin - User Performance</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #38bdf8;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px #0ea5e9;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .controls label {
+            font-weight: bold;
+        }
+
+        select, input[type="number"] {
+            padding: 8px;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            background-color: #1e293b;
+            color: #f8fafc;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        th {
+            background-color: #0f172a;
+            color: #38bdf8;
+            cursor: pointer;
+        }
+
+        tr:nth-child(even) {
+            background-color: #1e293b;
+        }
+
+        tr:hover {
+            background-color: #334155;
+        }
+
+        a {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .badge {
+            background-color: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-left: 6px;
+        }
+
+        .chart-section {
+            margin-top: 40px;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            th, td {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Cybersecurity - User Performance Overview</h1>
+
+    <div class="controls">
+        <div>
+            <label for="tierFilter">Performance Tier:</label>
+            <select id="tierFilter" onchange="filterTableByTier()">
+                <option value="">All</option>
+                <option value="top">Top Performers (≥ 8)</option>
+                <option value="medium">Medium (5-7.9)</option>
+                <option value="low">Low (< 5)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="performanceTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Username</th>
+                    <th onclick="sortTable(1)">Total Quizzes</th>
+                    <th onclick="sortTable(2)">Average Score</th>
+                    <th>View History</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="userPerf : ${performanceList}" 
+                    th:data-score="${userPerf.averageScore}">
+                    <td>
+                        <span th:text="${userPerf.username}">Username</span>
+                        <span class="badge" th:if="${userPerf.averageScore >= 8}">Top Performer</span>
+                    </td>
+                    <td th:text="${userPerf.totalQuizzes}">0</td>
+                    <td th:text="${#numbers.formatDecimal(userPerf.averageScore, 1, 2)}">0.0</td>
+                    <td>
+                        <a th:href="@{'/admin/performance/' + ${userPerf.userId}}">View</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="chart-section">
+        <canvas id="performanceChart" height="100"></canvas>
+    </div>
+
+    <a href="/admin/dashboard" class="back-link">⬅ Back to Admin Dashboard</a>
+
+    <script>
+        function sortTable(colIndex) {
+            const table = document.getElementById("performanceTable");
+            const rows = Array.from(table.rows).slice(1);
+            let asc = table.dataset.sortAsc !== 'true';
+
+            rows.sort((a, b) => {
+                const cellA = a.cells[colIndex].innerText;
+                const cellB = b.cells[colIndex].innerText;
+                return asc ? cellA.localeCompare(cellB, undefined, {numeric: true}) : cellB.localeCompare(cellA, undefined, {numeric: true});
+            });
+
+            rows.forEach(row => table.tBodies[0].appendChild(row));
+            table.dataset.sortAsc = asc;
+        }
+
+        function filterTableByTier() {
+            const tier = document.getElementById("tierFilter").value;
+            const rows = document.querySelectorAll("#performanceTable tbody tr");
+
+            rows.forEach(row => {
+                const score = parseFloat(row.dataset.score) || 0;
+                let show = true;
+
+                if (tier === "top") show = score >= 8;
+                else if (tier === "medium") show = score >= 5 && score < 8;
+                else if (tier === "low") show = score < 5;
+
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const labels = [];
+            const scores = [];
+
+            document.querySelectorAll("#performanceTable tbody tr").forEach(row => {
+                labels.push(row.cells[0].innerText.trim());
+                scores.push(parseFloat(row.cells[2].innerText.trim()));
+            });
+
+            new Chart(document.getElementById('performanceChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Score',
+                        data: scores,
+                        backgroundColor: 'rgba(56, 189, 248, 0.7)',
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: {
+                                color: '#f8fafc'
+                            },
+                            grid: {
+                                color: '#334155'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#f8fafc'
+                            },
+                            grid: {
+                                color: '#334155'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -44,7 +44,7 @@
             color: #cbd5e0;
         }
 
-        input {
+        select {
             background: rgba(255, 255, 255, 0.2);
             border: 1px solid #58a6ff;
             color: #ffffff;
@@ -54,7 +54,7 @@
             margin-top: 0.5rem;
         }
 
-        input:focus {
+        select:focus {
             background: rgba(255, 255, 255, 0.3);
             outline: none;
         }
@@ -106,10 +106,13 @@
     <div class="container-box">
         <form id="surveyForm">
             <div id="surveyContainer" class="mt-4">
-                <!-- ✅ Thymeleaf Loop to Render Questions -->
+                <!-- ✅ Thymeleaf Loop to Render Questions with Dropdowns -->
                 <div th:each="question : ${questions}" class="mb-3">
                     <label class="label-text" th:text="${question.questionText}"></label>
-                    <input type="text" class="form-control survey-input" th:id="'question-' + ${question.id}" placeholder="Your Answer">
+                    <select class="form-control survey-select" th:id="'question-' + ${question.id}">
+                        <option value="">-- Select an option --</option>
+                        <option th:each="option : ${question.options}" th:value="${option.id}" th:text="${option.optionValue}"></option>
+                    </select>
                 </div>
             </div>
 
@@ -118,84 +121,70 @@
         </form>
     </div>
 
-    <div class="container-box recommendation-box text-center" id="recommendationContainer">
-        <h4>Recommended Security Category:</h4>
-        <p id="recommendationText" class="alert alert-info"></p>
-    </div>
+<div class="container-box recommendation-box text-center" id="recommendationContainer" style="display: none;">
+    <h4>Recommended Security Categories:</h4>
+    <p id="recommendationText" class="alert alert-info"></p>
+</div>
+...
 
-    <div class="container-box text-center">
-        <a href="/dashboard" class="btn-custom">Back to Dashboard</a>
-    </div>
+<script>
+    document.getElementById("submitSurvey").addEventListener("click", function () {
+        const responses = [];
+        let allAnswered = true;
 
-    <script>
-        document.getElementById("submitSurvey").addEventListener("click", function () {
-            const responses = [];
-            let allAnswered = true;
+        document.querySelectorAll(".survey-select").forEach(select => {
+            const questionId = select.id.split("-")[1];
+            const selectedOptionId = select.value.trim();
 
-            document.querySelectorAll(".survey-input").forEach(input => {
-                const questionId = input.id.split("-")[1];
-                const answer = input.value.trim();
-
-                if (!answer) {
-                    allAnswered = false;
-                }
-
-                responses.push({
-                    question: { id: questionId },
-                    response: answer
-                });
-            });
-
-            if (!allAnswered) {
-                alert("⚠️ Please answer all questions before submitting.");
-                return;
+            if (!selectedOptionId) {
+                allAnswered = false;
             }
 
-            // Show loading indicator
-            document.getElementById("loadingIndicator").style.display = "block";
-
-            fetch(`/survey/submit`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(responses)
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("loadingIndicator").style.display = "none";
-
-                if (data.recommendedCategory) {
-                    document.getElementById("recommendationContainer").style.display = "block";
-                    document.getElementById("recommendationText").textContent = data.recommendedCategory;
-
-                    // ✅ Store recommendation in localStorage for questionnaire-selection.html
-                    localStorage.setItem("recommendedCategory", data.recommendedCategory);
-                } else {
-                    document.getElementById("recommendationText").textContent = "No recommendation available";
-                }
-
-                // ✅ Redirect to questionnaire selection after 5 seconds
-                setTimeout(() => {
-                    window.location.href = "/questionnaire/selection";
-                }, 5000);
-            })
-            .catch(error => {
-                document.getElementById("loadingIndicator").style.display = "none";
-                document.getElementById("recommendationContainer").style.display = "block";
-                document.getElementById("recommendationText").textContent = "Error submitting survey.";
-                console.error("❌ Error submitting survey:", error);
+            responses.push({
+                surveyQuestion: { id: questionId },
+                selectedOption: { id: selectedOptionId }
             });
         });
 
-        // ✅ Ensure recommendation is properly retrieved in questionnaire-selection.html
-        document.addEventListener("DOMContentLoaded", function () {
-            let storedRecommendation = localStorage.getItem("recommendedCategory");
-            if (storedRecommendation) {
+        if (!allAnswered) {
+            alert("⚠️ Please select an answer for all questions before submitting.");
+            return;
+        }
+
+        document.getElementById("loadingIndicator").style.display = "block";
+
+        fetch(`/survey/submit`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(responses)
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("loadingIndicator").style.display = "none";
+
+            if (data.recommendedCategories) {
                 document.getElementById("recommendationContainer").style.display = "block";
-                document.getElementById("recommendationText").textContent = storedRecommendation;
+                document.getElementById("recommendationText").textContent = data.recommendedCategories.join(", ");
+
+                // ✅ Store for next page if needed
+                localStorage.setItem("recommendedCategories", JSON.stringify(data.recommendedCategories));
+            } else {
+                document.getElementById("recommendationText").textContent = "No recommendation available";
             }
+
+            setTimeout(() => {
+                window.location.href = "/questionnaire/selection";
+            }, 5000);
+        })
+        .catch(error => {
+            document.getElementById("loadingIndicator").style.display = "none";
+            document.getElementById("recommendationContainer").style.display = "block";
+            document.getElementById("recommendationText").textContent = "Error submitting survey.";
+            console.error("❌ Error submitting survey:", error);
         });
-    </script>
+    });
+
+    //  REMOVED auto-show of stored recommendation on page load
+</script>
 </body>
 </html>
-
- 

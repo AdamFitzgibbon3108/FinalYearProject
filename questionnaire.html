@@ -111,6 +111,17 @@
             flex-direction: column;
             gap: 10px;
         }
+
+        .citation-link {
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            display: block;
+            color: #58a6ff;
+        }
+
+        .citation-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -120,8 +131,8 @@
     <div class="container">
         <h1>Tech Questionnaire</h1>
 
-        <form id="questionnaire-form">
-            <!-- Hidden fields to pass role and category -->
+        <form th:action="@{/questions/submit}" method="post">
+            <!-- Hidden fields -->
             <input type="hidden" name="selectedRole" th:value="${selectedRole}" />
             <input type="hidden" name="selectedCategory" th:value="${selectedCategory}" />
 
@@ -129,28 +140,35 @@
                 <ul>
                     <li th:each="question, questionStat : ${questions}">
                         <div>
-                            <strong th:text="${question.text}"></strong>
+                            <strong th:text="${questionStat.index + 1} + '. ' + ${question.text}"></strong>
+                            
+                            <!-- Citation Source -->
+                            <div th:if="${question.citationUrl}">
+                                <a th:href="${question.citationUrl}" class="citation-link" target="_blank">
+                                    Source: <span th:text="${question.framework}"></span>
+                                </a>
+                            </div>
                         </div>
 
-                        <!-- TRUE/FALSE Questions -->
+                        <!-- TRUE/FALSE -->
                         <div th:if="${question.questionType == T(com.example.model.QuestionType).TRUE_FALSE}">
                             <div class="option-container">
                                 <label>
-                                    <input type="radio" th:name="'question_' + ${question.id}" th:value="True" required>
+                                    <input type="radio" th:name="'question_' + ${question.id}" value="True" required />
                                     <span>True</span>
                                 </label>
                                 <label>
-                                    <input type="radio" th:name="'question_' + ${question.id}" th:value="False" required>
+                                    <input type="radio" th:name="'question_' + ${question.id}" value="False" required />
                                     <span>False</span>
                                 </label>
                             </div>
                         </div>
 
-                        <!-- MULTIPLE CHOICE Questions -->
+                        <!-- MULTIPLE CHOICE -->
                         <div th:if="${question.questionType == T(com.example.model.QuestionType).MULTIPLE_CHOICE}">
                             <div th:each="option : ${#strings.arraySplit(question.options, ',')}" class="option-container">
                                 <label>
-                                    <input type="radio" th:name="'question_' + ${question.id}" th:value="${option}" required>
+                                    <input type="radio" th:name="'question_' + ${question.id}" th:value="${option}" required />
                                     <span th:text="${option}"></span>
                                 </label>
                             </div>
@@ -162,42 +180,5 @@
             <button type="submit">Submit Responses</button>
         </form>
     </div>
-
-    <script>
-        document.getElementById("questionnaire-form").addEventListener("submit", function(event) {
-            event.preventDefault(); // Prevent default form submission
-
-            let formData = new FormData(this);
-            let jsonData = {};
-
-            formData.forEach((value, key) => {
-                jsonData[key] = value;
-            });
-
-            fetch("/api/questions/submit", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(jsonData)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Failed to submit questionnaire.");
-                }
-                return response.json();
-            })
-            .then(data => {
-                window.location.href = "/result"; // Redirect to result page
-            })
-            .catch(error => {
-                console.error("Error submitting questionnaire:", error);
-                alert("There was an issue submitting your responses. Please try again.");
-            });
-        });
-    </script>
-
 </body>
 </html>
-
-

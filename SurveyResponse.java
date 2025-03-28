@@ -3,35 +3,47 @@ package com.example.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "survey_response")
 public class SurveyResponse {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = true) // ✅ User is now optional
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    private SurveyQuestion question;
+    @JoinColumn(name = "survey_question_id", nullable = false)
+    private SurveyQuestion surveyQuestion;
 
-    private String response; // User's answer
+    @ManyToOne
+    @JoinColumn(name = "survey_question_option_id", nullable = false)
+    private SurveyQuestionOptions selectedOption;
 
-    // Constructors
     public SurveyResponse() {}
 
-    public SurveyResponse(SurveyQuestion question, String response) {
-        this.question = question;
-        this.response = response;
+    public SurveyResponse(User user, SurveyQuestion surveyQuestion, SurveyQuestionOptions selectedOption) {
+        this.user = user;
+        this.surveyQuestion = surveyQuestion;
+        this.selectedOption = selectedOption;
+    }
+
+    public String getResponse() {
+        return selectedOption != null ? selectedOption.getOptionValue() : "Unknown";
     }
 
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public SurveyQuestion getQuestion() { return question; }
-    public void setQuestion(SurveyQuestion question) { this.question = question; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 
-    public String getResponse() { return response; }
-    public void setResponse(String response) { this.response = response; }
+    public SurveyQuestion getSurveyQuestion() { return surveyQuestion; }
+    public void setSurveyQuestion(SurveyQuestion surveyQuestion) { this.surveyQuestion = surveyQuestion; }
+
+    public SurveyQuestionOptions getSelectedOption() { return selectedOption; }
+    public void setSelectedOption(SurveyQuestionOptions selectedOption) { this.selectedOption = selectedOption; }
 }

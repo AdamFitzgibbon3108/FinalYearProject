@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Banned Users</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+</head>
+<body class="bg-dark text-white">
+
+<div class="container py-5">
+    <h2 class="mb-4 text-danger"><i class="bi bi-slash-circle"></i> Banned Users</h2>
+
+    <!-- Banned Users Table -->
+    <table class="table table-striped table-dark table-bordered align-middle">
+        <thead class="table-secondary text-dark">
+        <tr>
+            <th>Username</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${bannedUsers}">
+            <td th:text="${user.username}"></td>
+            <td>
+                <button class="btn btn-outline-success btn-sm"
+                        th:attr="data-username=${user.username}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#confirmUnbanModal"
+                        onclick="prepareUnban(this)">
+                    Unban
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <hr class="border-secondary my-5"/>
+
+    <h3 class="mb-3 text-success"><i class="bi bi-people"></i> Active Users</h3>
+
+    <!-- Active Users Table -->
+    <table class="table table-hover table-bordered table-light align-middle">
+        <thead class="table-secondary">
+        <tr>
+            <th>Username</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${activeUsers}">
+            <td th:text="${user.username}"></td>
+            <td>
+                <button class="btn btn-outline-danger btn-sm"
+                        th:attr="data-username=${user.username}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#confirmBanModal"
+                        onclick="prepareBan(this)">
+                    Ban
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a th:href="@{/admin/dashboard}" class="btn btn-secondary mt-4">← Back to Dashboard</a>
+</div>
+
+<!-- Ban Modal -->
+<div class="modal fade" id="confirmBanModal" tabindex="-1" aria-labelledby="confirmBanModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmBanModalLabel">Confirm Ban</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/admin/toggle-ban}" method="post">
+                <div class="modal-body">
+                    <p>Are you sure you want to ban <strong id="banUserDisplay"></strong>?</p>
+                    <input type="hidden" name="username" id="banUsername">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger">Yes, Ban</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Unban Modal -->
+<div class="modal fade" id="confirmUnbanModal" tabindex="-1" aria-labelledby="confirmUnbanModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmUnbanModalLabel">Confirm Unban</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/admin/toggle-ban}" method="post">
+                <div class="modal-body">
+                    <p>Are you sure you want to unban <strong id="unbanUserDisplay"></strong>?</p>
+                    <input type="hidden" name="username" id="unbanUsername">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Yes, Unban</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    function prepareBan(button) {
+        const username = button.getAttribute("data-username");
+        document.getElementById("banUserDisplay").innerText = username;
+        document.getElementById("banUsername").value = username;
+    }
+
+    function prepareUnban(button) {
+        const username = button.getAttribute("data-username");
+        document.getElementById("unbanUserDisplay").innerText = username;
+        document.getElementById("unbanUsername").value = username;
+    }
+</script>
+
+</body>
+</html>

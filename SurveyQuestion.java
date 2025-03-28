@@ -4,23 +4,26 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
+@Table(name = "survey_question")
 public class SurveyQuestion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "question_text", nullable = false)
     private String questionText;
     
-    @ElementCollection
-    private List<String> options; // Multiple-choice options
-    
+    @Column(name = "answer_type", nullable = false)
     private String answerType; // "text" or "multiple_choice"
+
+    @OneToMany(mappedBy = "surveyQuestion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<SurveyQuestionOptions> options; // Predefined multiple-choice options
 
     // Constructors
     public SurveyQuestion() {}
 
-    public SurveyQuestion(String questionText, List<String> options, String answerType) {
+    public SurveyQuestion(String questionText, List<SurveyQuestionOptions> options, String answerType) {
         this.questionText = questionText;
         this.options = options;
         this.answerType = answerType;
@@ -33,10 +36,10 @@ public class SurveyQuestion {
     public String getQuestionText() { return questionText; }
     public void setQuestionText(String questionText) { this.questionText = questionText; }
 
-    public List<String> getOptions() { return options; }
-    public void setOptions(List<String> options) { this.options = options; }
-
     public String getAnswerType() { return answerType; }
     public void setAnswerType(String answerType) { this.answerType = answerType; }
+
+    public List<SurveyQuestionOptions> getOptions() { return options; }
+    public void setOptions(List<SurveyQuestionOptions> options) { this.options = options; }
 }
 
