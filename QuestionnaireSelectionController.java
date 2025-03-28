@@ -39,21 +39,16 @@ public class QuestionnaireSelectionController {
     public String generateRoleBasedQuiz(@RequestParam("selectedRole") String role,
                                         @RequestParam("selectedCategory") String category,
                                         Model model) {
-        // Debugging logs
         System.out.println("📌 Received Role: " + role);
         System.out.println("📌 Received Category: " + category);
-        
 
         List<Question> questions = questionService.getQuestionsByRoleAndCategory(role, category);
-        
-        // Debugging if questions are fetched
-        if (questions.isEmpty()) {
+
+        if (questions == null || questions.isEmpty()) {
             System.out.println("⚠️ No questions found for Role: " + role + " and Category: " + category);
-        } else {
-            System.out.println("✅ Questions retrieved: " + questions.size());
-            for (Question q : questions) {
-                System.out.println("   - " + q.getText());  // Display question text
-            }
+            model.addAttribute("errorMessage", "No questions available for the selected role and category.");
+            model.addAttribute("questions", null);
+            return "questionnaire";
         }
 
         model.addAttribute("questions", questions);
@@ -67,15 +62,36 @@ public class QuestionnaireSelectionController {
      * Create a custom questionnaire with manually selected questions.
      */
     @PostMapping("/custom")
-    public String createCustomQuestionnaire(@RequestParam List<Long> selectedQuestions, Model model) {
+    public String createCustomQuestionnaire(@RequestParam(value = "selectedQuestions", required = false) List<Long> selectedQuestionIds,
+                                            Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
-        UserQuestionnaire userQuestionnaire = userQuestionnaireService.createUserQuestionnaire(username, selectedQuestions);
-        model.addAttribute("questions", userQuestionnaire.getSelectedQuestions());
-        model.addAttribute("custom", true); // Helps in UI to differentiate custom questionnaire
+        System.out.println("📌 User " + username + " is creating a custom questionnaire.");
+
+        if (selectedQuestionIds == null || selectedQuestionIds.isEmpty()) {
+            System.out.println("⚠️ No questions selected!");
+            model.addAttribute("errorMessage", "Please select at least one question.");
+            return "questionnaire-selection";
+        }
+
+        // Fetch selected questions from database
+        List<Question> selectedQuestions = questionService.getQuestionsByIds(selectedQuestionIds);
+
+        if (selectedQuestions.isEmpty()) {
+            System.out.println("⚠️ No valid questions retrieved from the database.");
+            model.addAttribute("errorMessage", "Invalid question selection. Please try again.");
+            return "questionnaire-selection";
+        }
+
+        System.out.println("✅ Successfully retrieved " + selectedQuestions.size() + " questions for the custom questionnaire.");
+
+        //  Use the 2-parameter version of createUserQuestionnaire
+        UserQuestionnaire userQuestionnaire = userQuestionnaireService.createUserQuestionnaire(username, selectedQuestionIds);
+
+        model.addAttribute("questions", selectedQuestions);
+        model.addAttribute("custom", true);
 
         return "questionnaire";
     }
 }
-

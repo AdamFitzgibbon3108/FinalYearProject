@@ -1,11 +1,21 @@
 package com.example.repository;
 
 import com.example.model.SurveyResponse;
-import com.example.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
+@Repository
 public interface SurveyResponseRepository extends JpaRepository<SurveyResponse, Long> {
-    List<SurveyResponse> findByUser(User user);
+
+    //  Fetch all responses for a given user
+    List<SurveyResponse> findByUser_Username(String username);
+
+    // ✅ New method to check if the user already submitted any survey response
+    boolean existsByUserUsername(String username);
 }
+
+
+
 

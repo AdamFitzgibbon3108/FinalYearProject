@@ -13,6 +13,9 @@ public class SecurityControl {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
+    @Column(name = "category_group")
+    private String categoryGroup;
+
     // Constructors
     public SecurityControl() {}
 
@@ -35,5 +38,13 @@ public class SecurityControl {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCategoryGroup() {
+        return categoryGroup;
+    }
+
+    public void setCategoryGroup(String categoryGroup) {
+        this.categoryGroup = categoryGroup;
     }
 }

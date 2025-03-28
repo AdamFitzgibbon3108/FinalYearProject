@@ -10,8 +10,14 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "citation_url")
+    private String citationUrl;
+    
     @Column(name = "question_text", nullable = false)
     private String text;
+
+    @Column(name = "question_text", insertable = false, updatable = false) //  Prevents duplicate mapping issues
+    private String questionText;
 
     @Column(name = "category")
     private String category;
@@ -67,6 +73,9 @@ public class Question {
     public String getText() { return text; }
     public void setText(String text) { this.text = text; }
 
+    public String getQuestionText() { return questionText; } // ✅ Read-only
+    public void setQuestionText(String questionText) { this.questionText = questionText; }
+
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
@@ -90,7 +99,10 @@ public class Question {
 
     public String getCorrectAnswer() { return correctAnswer; }
     public void setCorrectAnswer(String correctAnswer) { this.correctAnswer = correctAnswer; }
-
+    
+    public String getCitationUrl() {return citationUrl;}
+    public void setCitationUrl(String citationUrl) {this.citationUrl = citationUrl;}
+    
     public String getOptions() { return options; }
     public void setOptions(String options) { this.options = options; }
 }

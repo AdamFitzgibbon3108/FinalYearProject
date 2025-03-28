@@ -1,8 +1,10 @@
 package com.example.controller;
 
+import com.example.model.Questionnaire;
 import com.example.model.User;
 import com.example.model.UserQuestionnaire;
 import com.example.service.UserQuestionnaireService;
+import com.example.repository.QuestionnaireRepository;
 import com.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -19,6 +21,10 @@ public class UserQuestionnaireController {
 
     @Autowired
     private UserQuestionnaireService userQuestionnaireService;
+    
+    @Autowired
+    private QuestionnaireRepository questionnaireRepository;
+
 
     @Autowired
     private UserRepository userRepository;
@@ -27,22 +33,28 @@ public class UserQuestionnaireController {
      * Create a new questionnaire for the authenticated user.
      */
     @PostMapping("/create")
-    public UserQuestionnaire createUserQuestionnaire(@RequestParam(required = false) List<Long> selectedQuestions) {
+    public UserQuestionnaire createUserQuestionnaire(
+        @RequestParam(required = false) List<Long> selectedQuestions,
+        @RequestParam Long questionnaireId
+    ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found!");
-        }
 
-        // Ensure selectedQuestions is not null (avoid NullPointerException)
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found!"));
+
         if (selectedQuestions == null) {
             selectedQuestions = Collections.emptyList();
         }
-        
+
+        //  Fetch the questionnaire object from the DB
+        Questionnaire questionnaire = questionnaireRepository.findById(questionnaireId)
+                .orElseThrow(() -> new IllegalArgumentException("Questionnaire not found!"));
+
+        //  Call updated service method
         return userQuestionnaireService.createUserQuestionnaire(username, selectedQuestions);
     }
+
 
     /**
      * Add a question to a user's questionnaire.

@@ -10,7 +10,7 @@
             margin: 0;
             padding: 0;
             height: 100vh;
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             background: radial-gradient(circle at center, #141e30, #243b55), url('/images/cybersecurity-grid.png');
             background-size: cover, contain;
             background-blend-mode: overlay;
@@ -31,57 +31,64 @@
         }
 
         .container-box {
-            max-width: 800px;
+            max-width: 850px;
             margin: 2rem auto;
             padding: 2rem;
             background: rgba(20, 30, 48, 0.95);
             border-radius: 15px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
         }
 
-        .label-text {
+        .recommendation-box {
+            background: linear-gradient(135deg, #1e3a8a, #1e90ff);
+            padding: 15px;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            margin-bottom: 1.5rem;
+        }
+
+        label {
             font-size: 1.2rem;
             color: #cbd5e0;
+            display: block;
+            margin-top: 1rem;
+            text-align: left;
         }
 
         select, button {
-            background: rgba(255, 255, 255, 0.2);
+            background: #1f2b3a;
             border: 1px solid #58a6ff;
             color: #ffffff;
             padding: 0.8rem;
             width: 100%;
             border-radius: 5px;
             font-size: 1rem;
+            margin-top: 0.5rem;
+            transition: background 0.3s ease;
         }
 
         select:focus, button:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: #2c3e50;
             outline: none;
         }
 
-        /* ✅ Improved dropdown styling for better visibility */
         select option {
-            background: rgba(20, 30, 48, 0.95);
+            background: #1f2b3a;
             color: #ffffff;
-            padding: 10px;
         }
 
         select option:hover {
-            background: #58a6ff;
-            color: #000000;
-        }
-
-        .recommendation-box {
-            background: rgba(88, 166, 255, 0.2);
-            padding: 10px;
-            border-left: 4px solid #58a6ff;
-            font-weight: bold;
-            text-align: center;
-            font-size: 1.2rem;
+            background-color: #58a6ff;
+            color: #000;
         }
 
         .btn-custom {
-            padding: 0.8rem 1.2rem;
+            padding: 0.9rem 1.5rem;
             background: linear-gradient(135deg, #58a6ff, #1e90ff);
             border: none;
             border-radius: 8px;
@@ -91,6 +98,7 @@
             cursor: pointer;
             transition: background 0.3s ease, transform 0.2s ease;
             width: 100%;
+            margin-top: 1rem;
         }
 
         .btn-custom:hover {
@@ -99,13 +107,6 @@
             box-shadow: 0 6px 12px rgba(88, 166, 255, 0.4);
         }
 
-        .loading-text {
-            font-size: 1rem;
-            color: #cbd5e0;
-            text-align: center;
-        }
-
-        /* ✅ Styled custom questionnaire section */
         .questionnaire-list {
             max-height: 250px;
             overflow-y: auto;
@@ -113,6 +114,7 @@
             border: 1px solid #58a6ff;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
+            text-align: left;
         }
 
         .question-item {
@@ -132,25 +134,27 @@
             height: 18px;
             accent-color: #58a6ff;
         }
-
     </style>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             fetchUserRecommendation();
             fetchRoles();
-            fetchCategories();
+            fetchGroupedCategories();
         });
 
         function fetchUserRecommendation() {
             fetch("/survey/recommendation")
                 .then(response => response.json())
                 .then(data => {
-                    let recommendationText = data.recommendedCategory || "No recommendation available";
-                    document.getElementById("recommendedCategory").textContent = recommendationText;
+                    let recommendations = data.recommendedCategories || [];
+                    document.getElementById("recommendedCategory").textContent = recommendations.length > 0
+                        ? recommendations.join(", ")
+                        : "No recommendation available";
                 })
                 .catch(error => {
                     console.error("Error fetching recommendation:", error);
-                    document.getElementById("recommendedCategory").textContent = "Error fetching recommendation";
+                    document.getElementById("recommendedCategory").textContent = "Error loading recommendation";
                 });
         }
 
@@ -161,17 +165,32 @@
                 .catch(error => console.error("Error fetching roles:", error));
         }
 
-        function fetchCategories() {
-            fetch("/questions/categories")
+        function fetchGroupedCategories() {
+            fetch("/questions/grouped-categories")
                 .then(response => response.json())
-                .then(data => populateDropdown("selectedCategory", ["None", ...data], "Select Category"))
-                .catch(error => console.error("Error fetching categories:", error));
+                .then(data => {
+                    const groupDropdown = document.getElementById("categoryGroup");
+                    groupDropdown.innerHTML = '<option value="" disabled selected>Select Category Group</option>';
+                    Object.keys(data).forEach(group => {
+                        const opt = document.createElement("option");
+                        opt.value = group;
+                        opt.textContent = group;
+                        groupDropdown.appendChild(opt);
+                    });
+
+                    groupDropdown.onchange = () => {
+                        const selectedGroup = groupDropdown.value;
+                        const categories = data[selectedGroup];
+                        populateDropdown("selectedCategory", categories, "Select Specific Category");
+                    };
+                })
+                .catch(error => console.error("Error fetching grouped categories:", error));
         }
 
         function populateDropdown(elementId, options, defaultText) {
-            let dropdown = document.getElementById(elementId);
+            const dropdown = document.getElementById(elementId);
             dropdown.innerHTML = "";
-            let defaultOption = document.createElement("option");
+            const defaultOption = document.createElement("option");
             defaultOption.value = "";
             defaultOption.textContent = defaultText;
             defaultOption.disabled = true;
@@ -179,7 +198,7 @@
             dropdown.appendChild(defaultOption);
 
             options.forEach(option => {
-                let opt = document.createElement("option");
+                const opt = document.createElement("option");
                 opt.value = option;
                 opt.textContent = option;
                 dropdown.appendChild(opt);
@@ -188,49 +207,38 @@
 
         function adjustFormAction(event) {
             event.preventDefault();
-            let categoryValue = document.getElementById("selectedCategory").value;
-            let roleValue = document.getElementById("selectedRole").value;
+            const roleValue = document.getElementById("selectedRole").value;
+            const categoryValue = document.getElementById("selectedCategory").value;
 
-            if (!roleValue) {
-                alert("Please select a role.");
-                return;
-            }
+            if (!roleValue) return alert("Please select a role.");
+            if (!categoryValue) return alert("Please select a category.");
 
-            if (!categoryValue) {
-                alert("Please select a category.");
-                return;
-            }
-
-            let url = categoryValue === "None"
-                ? `/questions/start-role-only?selectedRole=${encodeURIComponent(roleValue)}`
-                : `/questions/start?selectedRole=${encodeURIComponent(roleValue)}&selectedCategory=${encodeURIComponent(categoryValue)}`;
-
+            const url = `/questions/start?selectedRole=${encodeURIComponent(roleValue)}&selectedCategory=${encodeURIComponent(categoryValue)}`;
             window.location.href = url;
         }
     </script>
 </head>
 <body>
     <div class="header">
-        <h1>Select Your Questionnaire</h1>
+        <h1>Select Your Security Questionnaire</h1>
     </div>
 
     <div class="container-box">
         <div class="recommendation-box">
-            <h2>Recommended Security Category: <span id="recommendedCategory" class="loading-text">Loading...</span></h2>
+            <h2>Recommended Security Categories: <span id="recommendedCategory">Loading...</span></h2>
         </div>
 
         <form id="roleCategoryForm" method="get" onsubmit="adjustFormAction(event)">
-            <label for="selectedRole" class="label-text">Choose Your Role:</label>
-            <select name="selectedRole" id="selectedRole">
-                <option>Loading...</option>
-            </select>
+            <label for="selectedRole">Choose Your Role:</label>
+            <select name="selectedRole" id="selectedRole"></select>
 
-            <label for="selectedCategory" class="label-text">Choose a Security Category:</label>
-            <select name="selectedCategory" id="selectedCategory">
-                <option>Loading...</option>
-            </select>
+            <label for="categoryGroup">Choose a High-Level Category:</label>
+            <select id="categoryGroup"></select>
 
-            <button type="submit" class="btn-custom mt-3">Generate Questionnaire</button>
+            <label for="selectedCategory">Choose a Security Subcategory:</label>
+            <select name="selectedCategory" id="selectedCategory"></select>
+
+            <button type="submit" class="btn-custom">Generate Questionnaire</button>
         </form>
     </div>
 
@@ -243,12 +251,9 @@
                     <label th:text="${question.text}"></label>
                 </div>
             </div>
-            <button type="submit" class="btn-custom mt-3">Create Custom Questionnaire</button>
+            <button type="submit" class="btn-custom">Create Custom Questionnaire</button>
         </form>
-    </div>
-
-    <div class="container-box text-center">
-        <a href="/dashboard" class="btn-custom">Back to Dashboard</a>
     </div>
 </body>
 </html>
+

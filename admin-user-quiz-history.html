@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Quiz History</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #1e40af;
+            margin-bottom: 30px;
+        }
+
+        .table-wrapper {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #1e3a8a;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        tr:hover {
+            background-color: #e0f2fe;
+        }
+
+        a {
+            color: #1d4ed8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .no-data {
+            text-align: center;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 2px dashed #94a3b8;
+            border-radius: 12px;
+            color: #475569;
+        }
+
+        .back-link {
+            margin-top: 30px;
+            display: inline-block;
+        }
+
+        .badge {
+            background-color: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-left: 6px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quiz History for <span th:text="${user.username}">Username</span></h1>
+
+    <div th:if="${#lists.isEmpty(results)}" class="no-data">
+        <p>No quizzes have been completed by this user yet.</p>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(results)}" class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Role</th>
+                    <th>Score</th>
+                    <th>Total Questions</th>
+                    <th>Completed At</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="result : ${results}">
+                    <td th:text="${result.category}">Category</td>
+                    <td th:text="${result.role}">Role</td>
+                    <td>
+                        <span th:text="${result.totalScore}">0</span>
+                        <span class="badge" th:if="${result.totalScore >= 8}">Excellent</span>
+                    </td>
+                    <td th:text="${result.totalQuestions}">0</td>
+                    <td th:text="${#temporals.format(result.completedAt, 'yyyy-MM-dd HH:mm')}">Date</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a href="/admin/performance" class="back-link">⬅ Back to Performance List</a>
+</body>
+</html>
+

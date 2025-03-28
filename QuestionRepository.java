@@ -17,6 +17,11 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findByRoleAndDifficulty(String role, String difficulty);
 
     /**
+     * Fetches questions by id's
+     */
+   
+
+    /**
      * Fetches all questions belonging to a given security control category.
      */
     List<Question> findByControlCategory(SecurityControl controlCategory);
@@ -49,6 +54,10 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     @Query("SELECT DISTINCT q.role FROM Question q")
     List<String> findDistinctRoles();
 
+    
+    List<Question> findByQuestionTextContainingIgnoreCase(String keyword);
+    
+    
     /**
      * Fetches distinct categories from the questions table.
      */

@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.model.Question;
+import com.example.model.Questionnaire;
 import com.example.model.User;
 import com.example.model.UserQuestionnaire;
 import com.example.repository.QuestionRepository;
@@ -30,10 +31,9 @@ public class UserQuestionnaireService {
      * Creates a new User Questionnaire for a specific user by username, with selected questions.
      */
     public UserQuestionnaire createUserQuestionnaire(String username, List<Long> selectedQuestionIds) {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found with username: " + username);
-        }
+        // ✅ Fix: Properly retrieve user from Optional<User>
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
 
         // Retrieve questions from IDs
         List<Question> selectedQuestions = questionRepository.findAllById(selectedQuestionIds);
@@ -41,6 +41,7 @@ public class UserQuestionnaireService {
         UserQuestionnaire userQuestionnaire = new UserQuestionnaire();
         userQuestionnaire.setUser(user);
         userQuestionnaire.setSelectedQuestions(selectedQuestions); // Store selected questions
+       
 
         return userQuestionnaireRepository.save(userQuestionnaire);
     }
@@ -49,10 +50,10 @@ public class UserQuestionnaireService {
      * Retrieves all questionnaires for a given user by username.
      */
     public List<UserQuestionnaire> getUserQuestionnaires(String username) {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found with username: " + username);
-        }
+        // ✅ Fix: Properly retrieve user from Optional<User>
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
+
         return userQuestionnaireRepository.findByUserId(user.getId());
     }
 
@@ -103,6 +104,4 @@ public class UserQuestionnaireService {
         return userQuestionnaireRepository.findById(questionnaireId);
     }
 }
-
-
 
