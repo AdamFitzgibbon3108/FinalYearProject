@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:inline="javascript">
+<head>
+    <title>User Performance</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #0f172a, #1e293b);
+            color: #f8fafc;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #3b82f6;
+            margin-bottom: 40px;
+            font-size: 2.6rem;
+            text-align: center;
+        }
+
+        .grid {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .stats-box {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            padding: 20px;
+            width: 230px;
+            text-align: center;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+            transition: transform 0.2s ease;
+        }
+
+        .stats-box:hover {
+            transform: scale(1.03);
+        }
+
+        .stats-box h2 {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .stats-box p {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .chart-wrapper {
+            max-width: 600px;
+            margin: 40px auto 30px auto;
+        }
+
+        .chart-section {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        canvas {
+            background-color: #f1f5f9;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .links a {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 18px;
+            font-weight: bold;
+            text-decoration: none;
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 8px;
+        }
+
+        .links a:hover {
+            background-color: #2563eb;
+        }
+
+        .no-data {
+            text-align: center;
+            margin-top: 60px;
+            font-size: 18px;
+            color: #cbd5e1;
+        }
+
+        .banner {
+            background: #1d4ed8;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+            margin: 30px auto 10px auto;
+            width: fit-content;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .subheading {
+            text-align: center;
+            font-size: 1.4rem;
+            color: #cbd5e1;
+            margin-top: 50px;
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+<h1>Your Performance Summary</h1>
+
+<div th:if="${performance.totalQuizzes > 0}">
+    <div class="grid">
+        <div class="stats-box">
+            <h2>Total Quizzes Taken</h2>
+            <p th:text="${performance.totalQuizzes}">0</p>
+        </div>
+        <div class="stats-box">
+            <h2>Average Score</h2>
+            <p th:text="${#numbers.formatDecimal(performance.averageScore, 1, 2)}">0.00</p>
+        </div>
+        <div class="stats-box">
+            <h2>Best Score</h2>
+            <p th:text="${performance.bestScore}">0</p>
+        </div>
+        <div class="stats-box">
+            <h2>Latest Score</h2>
+            <p th:text="${performance.latestScore}">0</p>
+        </div>
+    </div>
+
+    <!-- Additional Insight Widgets -->
+<div class="grid">
+    <div class="stats-box">
+        <h2>Top Category</h2>
+        <p th:text="${performance.topCategory}">-</p>
+    </div>
+</div>
+
+    <div class="banner">
+        Great work! Keep going to improve your skills even more!
+    </div>
+
+    <!-- Score Chart -->
+    <div class="chart-wrapper">
+        <div class="chart-section">
+            <h2 style="text-align:center; color:#cbd5e1;">Your Average Quiz Score</h2>
+            <canvas id="overallScoreChart"></canvas>
+        </div>
+    </div>
+
+    <div class="links">
+        <a href="/user/quiz-history">📄 View Detailed Quiz History</a>
+        <a href="/dashboard">⬅ Back to Dashboard</a>
+    </div>
+</div>
+
+<div class="no-data" th:if="${performance.totalQuizzes == 0}">
+    <p>You haven't taken any quizzes yet. Once you complete a few, your performance summary will appear here!</p>
+    <div class="links">
+        <a href="/dashboard">⬅ Back to Dashboard</a>
+    </div>
+</div>
+
+<script th:if="${performance.totalQuizzes > 0}">
+    /*<![CDATA[*/
+    const averageScore = [[${performance.averageScore}]];
+
+    document.addEventListener("DOMContentLoaded", function () {
+        new Chart(document.getElementById('overallScoreChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Average Score'],
+                datasets: [{
+                    label: 'Average Quiz Score',
+                    data: [averageScore],
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: 10,
+                        title: {
+                            display: true,
+                            text: 'Score'
+                        }
+                    }
+                }
+            }
+        });
+    });
+    /*]]>*/
+</script>
+</body>
+</html>
+
+
+
+
+
+
+

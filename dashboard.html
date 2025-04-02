@@ -2,160 +2,157 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ThreatLens Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        body, html {
+        body {
             margin: 0;
-            padding: 0;
-            height: 100vh;
             font-family: 'Roboto', sans-serif;
-            background: radial-gradient(circle at center, #141e30, #243b55), url('/images/cybersecurity-grid.png');
-            background-size: cover, contain;
-            background-blend-mode: overlay;
-            color: #ffffff;
+            background: #0f172a;
+            color: #f1f5f9;
+            overflow-x: hidden;
         }
 
-        .header {
-            background: rgba(20, 30, 48, 0.95);
+        header {
+            background-color: #1e293b;
             padding: 1.5rem;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            border-bottom: 2px solid #58a6ff;
+            border-bottom: 2px solid #3b82f6;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            animation: fadeInDown 0.8s ease-in-out;
         }
 
-        .header h1 {
+        header h1 {
             margin: 0;
-            font-size: 2.8rem;
-            color: #58a6ff;
+            font-size: 2.6rem;
+            color: #3b82f6;
         }
 
-        .header p {
-            margin-top: 0.5rem;
-            font-size: 1.2rem;
-            color: #cbd5e0;
+        header p {
+            margin-top: 0.4rem;
+            color: #cbd5e1;
+            font-size: 1rem;
         }
 
         .container {
             max-width: 1200px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: rgba(20, 30, 48, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-            text-align: center;
+            margin: 40px auto;
+            padding: 0 20px;
         }
 
         .welcome {
             text-align: center;
             margin-bottom: 2rem;
+            animation: fadeIn 1s ease-in;
         }
 
         .welcome p {
-            font-size: 1.4rem;
-            color: #cbd5e0;
-        }
-
-        .primary-card {
-            background: linear-gradient(135deg, #1e3a8a, #1e90ff);
-            padding: 2rem;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-            margin-bottom: 2rem;
-        }
-
-        .primary-card h2 {
-            margin: 0;
-            font-size: 2rem;
-            color: #ffffff;
-        }
-
-        .primary-card p {
-            margin: 1rem 0;
             font-size: 1.2rem;
-            color: #e2e8f0;
         }
 
-        .primary-card button {
-            padding: 1rem 1.5rem;
-            background: linear-gradient(135deg, #ffffff, #cbd5e0);
+        .main-cta {
+            background: linear-gradient(to right, #3b82f6, #2563eb);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 24px rgba(59, 130, 246, 0.3);
+            animation: fadeInUp 0.9s ease;
+        }
+
+        .main-cta h2 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .main-cta p {
+            font-size: 1.1rem;
+            color: #e0f2fe;
+        }
+
+        .main-cta a button {
+            background-color: white;
+            color: #1e3a8a;
+            font-weight: 600;
+            font-size: 1.05rem;
             border: none;
             border-radius: 8px;
-            color: #1e3a8a;
-            font-size: 1.2rem;
-            font-weight: 700;
+            padding: 0.8rem 1.6rem;
+            margin-top: 1rem;
             cursor: pointer;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .primary-card button:hover {
-            background: #ffffff;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(255, 255, 255, 0.4);
+        .main-cta a button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 255, 255, 0.2);
         }
 
-        .actions {
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            justify-content: center;
-            margin-top: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.6rem;
+            margin-bottom: 4rem;
+            animation: fadeIn 1.2s ease-in-out;
         }
 
-        .action-card {
-            background: rgba(40, 50, 70, 0.9);
-            padding: 1.5rem;
-            border-radius: 15px;
+        .card {
+            background: #1e293b;
+            padding: 2rem;
+            border-radius: 14px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
             text-align: center;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .action-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
         }
 
-        .action-card h3 {
-            margin: 0;
-            font-size: 1.4rem;
-            color: #58a6ff;
+        .card i {
+            font-size: 2.5rem;
+            color: #3b82f6;
+            margin-bottom: 1rem;
         }
 
-        .action-card p {
-            margin: 1rem 0;
+        .card h3 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            color: #60a5fa;
+        }
+
+        .card p {
             font-size: 1rem;
-            color: #cbd5e0;
+            color: #cbd5e1;
+            margin: 1rem 0 1.5rem;
         }
 
-        .action-card button {
-            padding: 0.8rem 1.2rem;
-            background: linear-gradient(135deg, #58a6ff, #1e90ff);
+        .card button {
+            background: #3b82f6;
+            color: white;
             border: none;
-            border-radius: 8px;
-            color: #ffffff;
+            padding: 0.7rem 1.2rem;
             font-size: 1rem;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
         }
 
-        .action-card button:hover {
-            background: linear-gradient(135deg, #1e90ff, #58a6ff);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(88, 166, 255, 0.4);
+        .card button:hover {
+            background-color: #2563eb;
         }
 
         .logout {
             text-align: center;
-            margin-top: 3rem;
+            margin-top: 2rem;
         }
 
         .logout a {
-            color: #58a6ff;
-            font-size: 1.1rem;
+            color: #60a5fa;
             text-decoration: none;
         }
 
@@ -163,69 +160,83 @@
             text-decoration: underline;
         }
 
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>ThreatLens Dashboard</h1>
-        <p>Stay updated with real-time security insights and take control of your cybersecurity journey.</p>
+<header>
+    <h1>ThreatLens Dashboard</h1>
+    <p>Explore your cybersecurity posture and stay ahead of risks.</p>
+</header>
+
+<div class="container">
+    <div class="welcome">
+        <p>Welcome back, <span th:text="${username}">User</span> 👋</p>
+        <p>Let’s make your security smarter today.</p>
     </div>
 
-    <div class="container">
-        <div class="welcome">
-            <p>Welcome back, <span th:text="${username}"></span>!</p>
-            <p>What would you like to do today?</p>
+    <div class="main-cta">
+        <h2>Take a New Security Questionnaire</h2>
+        <p>Assess your knowledge in current threat domains tailored to your role.</p>
+        <a th:href="@{/survey/page}"><button>Begin Questionnaire</button></a>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <i class="ph ph-user"></i>
+            <h3>Manage Profile</h3>
+            <p>Update your account, password, and preferences.</p>
+            <a th:href="@{/editprofile}"><button>Profile Settings</button></a>
         </div>
 
-        <!-- Security Knowledge Questionnaire (Larger and Dominant Section) -->
-        <div class="primary-card">
-            <h2>Undertake a Security Knowledge Questionnaire</h2>
-            <p>Test your knowledge across various cybersecurity domains and get tailored insights for your role and risk level.</p>
-            <a th:href="@{/survey/page}">
-                <button>Start Questionnaire</button>
-            </a>
+        <div class="card">
+            <i class="ph ph-chart-line"></i>
+            <h3>Performance Summary</h3>
+            <p>Track your best scores and quiz history.</p>
+            <a th:href="@{/user/performance}"><button>My Performance</button></a>
         </div>
 
-        <!-- Other Dashboard Features -->
-        <div class="actions">
-            <div class="action-card">
-                <h3>Profile</h3>
-                <p>Manage your account settings, roles, and preferences.</p>
-                <a th:href="@{/editprofile}">
-                    <button>Go to Profile</button>
-                </a>
-            </div>
-
-            <div class="action-card">
-                <h3>Reports & Trends</h3>
-                <p>Visualize your progress and spot gaps in your security understanding.</p>
-                <a href="/dashboard/reports">
-                    <button>View Reports</button>
-                </a>
-            </div>
-
-            <div class="action-card">
-                <h3>Training Programs</h3>
-                <p>Access guided courses to sharpen your security awareness and skills.</p>
-                <a href="/training">
-                    <button>Explore Training</button>
-                </a>
-            </div>
-
-            <div class="action-card">
-                <h3>Threat Alerts</h3>
-                <p>Stay ahead with real-time updates on emerging cybersecurity threats.</p>
-                <a href="/alerts">
-                    <button>View Alerts</button>
-                </a>
-            </div>
+        <div class="card">
+            <i class="ph ph-graduation-cap"></i>
+            <h3>Security Training</h3>
+            <p>Sharpen your knowledge with guided programs.</p>
+            <a href="/training"><button>Launch Training</button></a>
         </div>
 
-        <div class="logout">
-            <p><a href="/logout">Logout</a></p>
+        <div class="card">
+            <i class="ph ph-bell"></i>
+            <h3>Threat Intelligence</h3>
+            <p>Stay updated with the latest vulnerabilities.</p>
+            <a href="/alerts"><button>Threat Alerts</button></a>
+        </div>
+
+        <div class="card">
+            <i class="ph ph-activity"></i>
+            <h3>Reports & Trends</h3>
+            <p>Analyze your strengths and learning gaps.</p>
+            <a href="/dashboard/reports"><button>View Reports</button></a>
         </div>
     </div>
+
+    <div class="logout">
+        <p><a href="/logout">Logout</a></p>
+    </div>
+</div>
 </body>
 </html>
+
 
 
