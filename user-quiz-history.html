@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Your Quiz History</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #0f172a, #1e293b);
+            color: #f8fafc;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.6rem;
+            color: #3b82f6;
+            margin-bottom: 40px;
+        }
+
+        .history-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: rgba(30, 41, 59, 0.75);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #3b82f6;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        tr {
+            background-color: rgba(15, 23, 42, 0.5);
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        tr:hover {
+            background-color: rgba(51, 65, 85, 0.6);
+        }
+
+        td {
+            border-bottom: 1px solid #334155;
+            font-size: 0.95rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .badge-low {
+            background-color: #ef4444;
+        }
+
+        .badge-mid {
+            background-color: #f59e0b;
+        }
+
+        .badge-high {
+            background-color: #10b981;
+        }
+
+        .no-results {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 1.2rem;
+            color: #cbd5e1;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link a {
+            text-decoration: none;
+            color: #3b82f6;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            th, td {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1>Your Quiz History</h1>
+
+<div class="history-wrapper" th:if="${results != null and !results.isEmpty()}">
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Role</th>
+                <th>Score</th>
+                <th>Total Questions</th>
+                <th>Completed At</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="result : ${results}">
+                <td th:text="${result.category}">Category</td>
+                <td th:text="${result.role}">Role</td>
+                <td>
+                    <span th:text="${result.totalScore}">0</span>
+                    <span class="badge badge-low" th:if="${result.totalScore < 5}">Needs Work</span>
+                    <span class="badge badge-mid" th:if="${result.totalScore >= 5 and result.totalScore < 8}">Good</span>
+                    <span class="badge badge-high" th:if="${result.totalScore >= 8}">Excellent</span>
+                </td>
+                <td th:text="${result.totalQuestions}">0</td>
+                <td th:text="${#temporals.format(result.completedAt, 'yyyy-MM-dd HH:mm')}">Date</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="no-results" th:if="${results == null or results.isEmpty()}">
+    You haven't completed any quizzes yet.
+</div>
+
+<div class="back-link">
+    <a href="/user/performance">⬅ Back to My Performance</a>
+</div>
+
+</body>
+</html>
+

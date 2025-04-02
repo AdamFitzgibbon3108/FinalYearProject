@@ -152,7 +152,7 @@ public class UserServiceImpl implements UserService {
         return performanceList;
     }
 
-    // 🚫 Ban user
+    //  Ban user
     @Override
     public void banUser(Long userId) {
         User user = userRepository.findById(userId)
@@ -186,7 +186,7 @@ public class UserServiceImpl implements UserService {
                 .orElse(false);
     }
 
-    // ✅ Add missing methods to match interface
+    //  Add missing methods to match interface
     @Override
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
