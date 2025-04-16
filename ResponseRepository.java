@@ -5,6 +5,7 @@ import com.example.model.User;
 import com.example.model.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -35,6 +36,14 @@ public interface ResponseRepository extends JpaRepository<Response, Long> {
      */
     @Query("SELECT r FROM Response r WHERE r.user.id = ?1")
     List<Response> findByUserId(Long userId);
+    
+    /**
+     * Fetches all responses linked to a specific QuizResult ID.
+     */
+    @Query("SELECT r FROM Response r WHERE r.quizResult.id = :quizResultId")
+    List<Response> findByQuizResultId(@Param("quizResultId") Long quizResultId);
+
+
 
     /**
      * Fetches responses for a given question ID.
@@ -42,7 +51,12 @@ public interface ResponseRepository extends JpaRepository<Response, Long> {
      */
     @Query("SELECT r FROM Response r WHERE r.question.id = ?1")
     List<Response> findByQuestionId(Long questionId);
+    
+    
+    @Query("SELECT r FROM Response r WHERE r.user.username = ?1")
+    List<Response> findByUserUsername(String username);
 
+   
     /**
      *  Debugging Query: Fetch all responses.
      */

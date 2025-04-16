@@ -242,16 +242,9 @@
         </form>
     </div>
 
-    <div class="container-box">
-        <h2>Create Custom Questionnaire</h2>
-        <form th:action="@{/questionnaire/custom}" method="post">
-            <div class="questionnaire-list">
-                <div th:each="question : ${allQuestions}" class="question-item">
-                    <input type="checkbox" class="checkbox" name="selectedQuestions" th:value="${question.id}">
-                    <label th:text="${question.text}"></label>
-                </div>
+
             </div>
-            <button type="submit" class="btn-custom">Create Custom Questionnaire</button>
+            
         </form>
     </div>
 </body>

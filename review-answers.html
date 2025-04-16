@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review My Answers</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px 20px;
+        }
+
+        .card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: #38bdf8;
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .info-bar {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .question-block {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #f1f5f9;
+        }
+
+        .answer {
+            font-size: 0.95rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .your-answer {
+            background-color: #334155;
+            color: #f8fafc;
+        }
+
+        .correct-answer {
+            background-color: #2563eb;
+            color: #ffffff;
+            font-style: italic;
+        }
+
+        .label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .scrollable {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .message-box {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 1.1rem;
+            color: #f8fafc;
+            background-color: #334155;
+            border-radius: 10px;
+        }
+
+        .top-nav {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .top-nav a {
+            color: #3b82f6;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+
+        .top-nav a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="top-nav">
+        <a th:if="${fromResultPage}" href="/result">⬅ Back to Results</a>
+        <a th:unless="${fromResultPage}" href="/user/quiz-history">⬅ Back to Quiz History</a>
+    </div>
+
+    <h1>Review My Answers</h1>
+
+    <div class="info-bar">
+        <strong>Category:</strong> <span th:text="${category}">Category</span> |
+        <strong>Role:</strong> <span th:text="${role}">Role</span> |
+        <strong>Score:</strong> <span th:text="${score}">0</span>/15
+    </div>
+
+    <!-- Conditional message if responses are empty -->
+    <div th:if="${#lists.isEmpty(responses)}" class="message-box">
+        <div th:if="${quizResult != null and quizResult.completedAt != null and quizResult.completedAt.isBefore(T(java.time.LocalDateTime).parse('2025-04-08T00:00:00'))}">
+            Answers for quizzes taken before April 8th, 2025 have been discontinued due to a platform update.
+        </div>
+        <div th:unless="${quizResult != null and quizResult.completedAt != null and quizResult.completedAt.isBefore(T(java.time.LocalDateTime).parse('2025-04-08T00:00:00'))}">
+            You haven't completed any answers for this quiz.
+        </div>
+    </div>
+
+    <div class="scrollable" th:if="${!#lists.isEmpty(responses)}">
+        <div th:each="response, stat : ${responses}" class="question-block">
+            <div class="question-text" th:text="${stat.index + 1} + '. ' + ${response.question.text}">Question text</div>
+
+            <div class="answer your-answer">
+                <span class="label">Your Answer:</span>
+                <span th:text="${response.selectedAnswer}">User Answer</span>
+            </div>
+
+            <div class="answer correct-answer">
+                <span class="label">Correct Answer:</span>
+                <span th:text="${response.correctAnswer}">Correct Answer</span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+

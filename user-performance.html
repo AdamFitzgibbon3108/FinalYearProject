@@ -11,30 +11,45 @@
             background: linear-gradient(to right, #0f172a, #1e293b);
             color: #f8fafc;
             margin: 0;
-            padding: 40px;
+            padding: 40px 20px;
+            animation: fadeInBody 1s ease-in-out;
+        }
+
+        @keyframes fadeInBody {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeInElement 1s ease-in-out;
+        }
+
+        @keyframes fadeInElement {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
             color: #3b82f6;
-            margin-bottom: 40px;
-            font-size: 2.6rem;
+            margin-bottom: 30px;
+            font-size: 2.4rem;
             text-align: center;
         }
 
         .grid {
             display: flex;
-            gap: 20px;
+            gap: 16px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .stats-box {
             background: #1e293b;
             border: 1px solid #334155;
             border-radius: 14px;
-            padding: 20px;
-            width: 230px;
+            padding: 18px;
+            width: 210px;
             text-align: center;
             box-shadow: 0 8px 18px rgba(0,0,0,0.25);
             transition: transform 0.2s ease;
@@ -47,7 +62,7 @@
         .stats-box h2 {
             font-size: 1rem;
             color: #94a3b8;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .stats-box p {
@@ -58,13 +73,13 @@
 
         .chart-wrapper {
             max-width: 600px;
-            margin: 40px auto 30px auto;
+            margin: 24px auto;
         }
 
         .chart-section {
             background: #1e293b;
             border-radius: 12px;
-            padding: 25px;
+            padding: 20px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
 
@@ -72,11 +87,12 @@
             background-color: #f1f5f9;
             border-radius: 10px;
             padding: 10px;
+            height: 260px !important;
         }
 
         .links {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .links a {
@@ -96,7 +112,7 @@
 
         .no-data {
             text-align: center;
-            margin-top: 60px;
+            margin-top: 40px;
             font-size: 18px;
             color: #cbd5e1;
         }
@@ -108,119 +124,95 @@
             color: white;
             font-size: 1.1rem;
             text-align: center;
-            margin: 30px auto 10px auto;
+            margin: 20px auto;
             width: fit-content;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
-
-        .subheading {
-            text-align: center;
-            font-size: 1.4rem;
-            color: #cbd5e1;
-            margin-top: 50px;
-            margin-bottom: 20px;
-        }
-
     </style>
 </head>
 <body>
-<h1>Your Performance Summary</h1>
+<h1 class="fade-in">Your Performance Summary</h1>
 
-<div th:if="${performance.totalQuizzes > 0}">
-    <div class="grid">
-        <div class="stats-box">
+<div th:if="${performance != null and performance.totalQuizzes > 0}">
+    <div class="grid fade-in">
+        <div class="stats-box" title="The total number of quizzes you've completed">
             <h2>Total Quizzes Taken</h2>
             <p th:text="${performance.totalQuizzes}">0</p>
         </div>
-        <div class="stats-box">
+        <div class="stats-box" title="Average score across all quizzes (0-10)">
             <h2>Average Score</h2>
             <p th:text="${#numbers.formatDecimal(performance.averageScore, 1, 2)}">0.00</p>
         </div>
-        <div class="stats-box">
+        <div class="stats-box" title="Your highest score achieved in any quiz">
             <h2>Best Score</h2>
             <p th:text="${performance.bestScore}">0</p>
         </div>
-        <div class="stats-box">
+        <div class="stats-box" title="Score from your most recent quiz">
             <h2>Latest Score</h2>
             <p th:text="${performance.latestScore}">0</p>
         </div>
+        <div class="stats-box" title="Category in which you've performed best">
+            <h2>Top Category</h2>
+            <p th:text="${performance.topCategory ?: '-'}">-</p>
+        </div>
     </div>
 
-    <!-- Additional Insight Widgets -->
-<div class="grid">
-    <div class="stats-box">
-        <h2>Top Category</h2>
-        <p th:text="${performance.topCategory}">-</p>
-    </div>
-</div>
-
-    <div class="banner">
+    <div class="banner fade-in">
         Great work! Keep going to improve your skills even more!
     </div>
 
-    <!-- Score Chart -->
-    <div class="chart-wrapper">
+    <div class="chart-wrapper fade-in">
         <div class="chart-section">
             <h2 style="text-align:center; color:#cbd5e1;">Your Average Quiz Score</h2>
             <canvas id="overallScoreChart"></canvas>
         </div>
     </div>
 
-    <div class="links">
+    <div class="links fade-in">
         <a href="/user/quiz-history">📄 View Detailed Quiz History</a>
         <a href="/dashboard">⬅ Back to Dashboard</a>
     </div>
 </div>
 
-<div class="no-data" th:if="${performance.totalQuizzes == 0}">
+<div class="no-data fade-in" th:if="${performance == null or performance.totalQuizzes == 0}">
     <p>You haven't taken any quizzes yet. Once you complete a few, your performance summary will appear here!</p>
     <div class="links">
         <a href="/dashboard">⬅ Back to Dashboard</a>
     </div>
 </div>
 
-<script th:if="${performance.totalQuizzes > 0}">
-    /*<![CDATA[*/
-    const averageScore = [[${performance.averageScore}]];
+<script th:if="${performance != null and performance.totalQuizzes > 0}">
+/*<![CDATA[*/
+const averageScore = [[${performance.averageScore}]];
 
-    document.addEventListener("DOMContentLoaded", function () {
-        new Chart(document.getElementById('overallScoreChart'), {
-            type: 'bar',
-            data: {
-                labels: ['Average Score'],
-                datasets: [{
-                    label: 'Average Quiz Score',
-                    data: [averageScore],
-                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                    borderRadius: 10
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { enabled: true }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        suggestedMax: 10,
-                        title: {
-                            display: true,
-                            text: 'Score'
-                        }
-                    }
-                }
+new Chart(document.getElementById('overallScoreChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Average Score'],
+        datasets: [{
+            label: 'Average Quiz Score',
+            data: [averageScore],
+            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+            borderRadius: 10
+        }]
+    },
+    options: {
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                suggestedMax: 10,
+                title: { display: true, text: 'Score' }
             }
-        });
-    });
-    /*]]>*/
+        }
+    }
+});
+/*]]>*/
 </script>
 </body>
 </html>
-
-
-
-
-
 
 

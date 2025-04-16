@@ -5,6 +5,8 @@ import dto.UserPerformanceDTO;
 import dto.UserQuizHistoryDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +22,7 @@ public class UserPerformanceController {
 
     private final UserPerformanceService userPerformanceService;
     private final ObjectMapper objectMapper;
+    private static final Logger logger = LoggerFactory.getLogger(UserPerformanceController.class);
 
     @Autowired
     public UserPerformanceController(UserPerformanceService userPerformanceService, ObjectMapper objectMapper) {
@@ -33,19 +36,18 @@ public class UserPerformanceController {
         String username = auth.getName();
 
         UserPerformanceDTO performance = userPerformanceService.getUserPerformance(username);
-        Map<String, Double> categoryScores = userPerformanceService.getAverageScorePerCategory(username);
-        Map<String, Integer> timelineScores = userPerformanceService.getScoreTimeline(username);
+        Map<String, Long> scoreBuckets = userPerformanceService.getScoreBucketDistribution(username);
 
         try {
-            String categoryScoresJson = objectMapper.writeValueAsString(categoryScores);
-            String timelineScoresJson = objectMapper.writeValueAsString(timelineScores);
+            String scoreBucketsJson = objectMapper.writeValueAsString(scoreBuckets);
+
+            logger.info("[{}] - Prepared score distribution chart data: {}", username, scoreBucketsJson);
 
             model.addAttribute("performance", performance);
-            model.addAttribute("categoryScoresJson", categoryScoresJson);
-            model.addAttribute("timelineScoresJson", timelineScoresJson);
+            model.addAttribute("scoreBucketsJson", scoreBucketsJson);
         } catch (JsonProcessingException e) {
-            model.addAttribute("categoryScoresJson", "{}");
-            model.addAttribute("timelineScoresJson", "{}");
+            logger.error("[{}] - Error converting score bucket data to JSON", username, e);
+            model.addAttribute("scoreBucketsJson", "{}");
         }
 
         return "user-performance";

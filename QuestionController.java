@@ -3,14 +3,15 @@ package com.example.controller;
 import com.example.model.Question;
 import com.example.model.QuizResult;
 import com.example.model.Response;
-import com.example.model.SecurityControl; // 🔹 NEW
+import com.example.model.SecurityControl;
 import com.example.model.User;
 import com.example.repository.QuestionRepository;
 import com.example.repository.QuizResultRepository;
 import com.example.repository.ResponseRepository;
 import com.example.repository.UserRepository;
+import com.example.repository.SecurityControlRepository;
 import com.example.service.QuestionService;
-import com.example.repository.SecurityControlRepository; // 🔹 NEW
+import com.example.service.ScoringService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -27,6 +28,9 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/questions")
 public class QuestionController {
+
+    @Autowired
+    private ScoringService scoringService;
 
     @Autowired
     private QuestionRepository questionRepository;
@@ -107,7 +111,7 @@ public class QuestionController {
         return "manage-questions";
     }
 
-    //  Get grouped categories
+    // Get grouped categories
     @GetMapping("/grouped-categories")
     @ResponseBody
     public Map<String, List<String>> getGroupedCategories() {
@@ -117,7 +121,7 @@ public class QuestionController {
                 .filter(control -> control.getCategoryGroup() != null)
                 .collect(Collectors.groupingBy(
                         SecurityControl::getCategoryGroup,
-                        TreeMap::new, // sorted by group name
+                        TreeMap::new,
                         Collectors.mapping(SecurityControl::getName, Collectors.toList())
                 ));
     }
@@ -188,8 +192,9 @@ public class QuestionController {
             return "result";
         }
 
-        List<Response> savedResponses = new ArrayList<>();
+        List<Response> responsesToSave = new ArrayList<>();
         int totalScore = 0;
+        int totalQuestions = 0;
 
         for (Map.Entry<String, String> entry : requestBody.entrySet()) {
             if (entry.getKey().startsWith("question_")) {
@@ -204,35 +209,55 @@ public class QuestionController {
 
                         int score = correctAnswer.trim().equalsIgnoreCase(answer.trim()) ? 1 : 0;
                         totalScore += score;
+                        totalQuestions++;
 
                         Response response = new Response();
                         response.setUser(user);
                         response.setQuestion(question);
-                        response.setAnswer(answer);
+                        response.setScore(score);
                         response.setTimestamp(LocalDateTime.now());
                         response.setRole(selectedRole);
                         response.setCategory(selectedCategory);
-                        response.setScore(score);
+                        response.setSelectedAnswer(answer);
+                        response.setCorrectAnswer(correctAnswer);
 
-                        responseRepository.save(response);
-                        savedResponses.add(response);
+                        responsesToSave.add(response);
                     }
                 } catch (NumberFormatException ignored) {}
             }
         }
 
-        if (!savedResponses.isEmpty()) {
-            QuizResult quizResult = new QuizResult(user, totalScore, savedResponses.size(), selectedCategory, selectedRole);
-            quizResultRepository.save(quizResult);
-        } else {
-            model.addAttribute("error", "No responses recorded.");
-            return "result";
+        double percentage = ((double) totalScore / totalQuestions) * 100.0;
+        boolean passed = percentage >= 80.0;
+
+        QuizResult result = new QuizResult();
+        result.setUser(user);
+        result.setTotalScore(totalScore);
+        result.setTotalQuestions(totalQuestions);
+        result.setCategory(selectedCategory);
+        result.setRole(selectedRole);
+        result.setCompletedAt(LocalDateTime.now());
+        result.setScorePercentage(percentage);
+        result.setPassed(passed);
+        quizResultRepository.saveAndFlush(result); // ensure ID is available
+
+        for (Response response : responsesToSave) {
+            response.setQuizResult(result); // link each response to the result
+            responseRepository.save(response);
         }
 
-        model.addAttribute("score", totalScore);
-        model.addAttribute("total", savedResponses.size());
+        String recommendation = scoringService.generateRecommendation(percentage);
+        String trainingProgram = scoringService.suggestTrainingProgram(percentage);
+
+        model.addAttribute("username", username);
         model.addAttribute("role", selectedRole);
         model.addAttribute("category", selectedCategory);
+        model.addAttribute("score", totalScore);
+        model.addAttribute("percentageScore", percentage);
+        model.addAttribute("passed", passed);
+        model.addAttribute("recommendation", recommendation);
+        model.addAttribute("trainingProgram", trainingProgram);
+        model.addAttribute("responses", responsesToSave);
 
         return "result";
     }

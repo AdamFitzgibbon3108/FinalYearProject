@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -29,12 +30,27 @@ public class UserQuizHistoryController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
 
-        // Retrieve all quiz results for the current user
         List<QuizResult> results = quizResultRepository.findByUserUsername(username);
 
         model.addAttribute("results", results);
         model.addAttribute("username", username);
-        return "user-quiz-history"; // Will resolve to templates/user-quiz-history.html
+        return "user-quiz-history";
+    }
+
+    //  View detailed answers for a quiz
+    @GetMapping("/user/quiz/{quizId}/answers")
+    public String reviewQuizAnswers(@PathVariable Long quizId, Model model) {
+        QuizResult quizResult = quizResultRepository.findByIdWithResponses(quizId).orElse(null);
+        if (quizResult == null) {
+            return "redirect:/user/quiz-history";
+        }
+
+        model.addAttribute("category", quizResult.getCategory());
+        model.addAttribute("role", quizResult.getRole());
+        model.addAttribute("score", quizResult.getTotalScore());
+        model.addAttribute("responses", quizResult.getResponses());
+
+        return "review-answers";
     }
 }
 

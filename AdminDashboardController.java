@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/admin")
@@ -180,7 +178,17 @@ public class AdminDashboardController {
         model.addAttribute("activeUsers", activeUsers);
         return "admin-banned-users";
     }
+
+    //  New Endpoint for Chart Data
+    @GetMapping("/api/questionnaires-taken-per-role")
+    @ResponseBody
+    public Map<String, Long> getQuestionnairesTakenPerRole() {
+        Map<String, Long> result = new HashMap<>();
+        result.put("Manager", quizResultService.countByRole("Manager"));
+        result.put("Analyst", quizResultService.countByRole("Analyst"));
+        result.put("Developer", quizResultService.countByRole("Developer"));
+        result.put("General", quizResultService.countByRole("General"));
+        return result;
+    }
 }
-
-
 
