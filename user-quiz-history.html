@@ -30,6 +30,21 @@
             backdrop-filter: blur(12px);
         }
 
+        .filter-bar {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+
+        select {
+            background-color: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #475569;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -83,6 +98,20 @@
             background-color: #10b981;
         }
 
+        .link-btn {
+            background-color: #3b82f6;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .link-btn:hover {
+            background-color: #2563eb;
+        }
+
         .no-results {
             text-align: center;
             margin-top: 40px;
@@ -92,7 +121,7 @@
 
         .back-link {
             text-align: center;
-            margin-top: 30px;
+            margin-bottom: 30px;
         }
 
         .back-link a {
@@ -115,37 +144,61 @@
             h1 {
                 font-size: 2rem;
             }
+
+            select {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
 
+<div class="back-link">
+    <a href="/user/performance">⬅ Back to My Performance</a>
+</div>
+
 <h1>Your Quiz History</h1>
 
 <div class="history-wrapper" th:if="${results != null and !results.isEmpty()}">
+    <div class="filter-bar">
+        <select id="scoreFilter" onchange="filterRows()">
+            <option value="all">Show All</option>
+            <option value="low">Low Score (0–4)</option>
+            <option value="mid">Medium Score (5–7)</option>
+            <option value="high">High Score (8–14)</option>
+            <option value="perfect">Perfect Score (15)</option>
+        </select>
+    </div>
+
     <table>
         <thead>
-            <tr>
-                <th>Category</th>
-                <th>Role</th>
-                <th>Score</th>
-                <th>Total Questions</th>
-                <th>Completed At</th>
-            </tr>
+        <tr>
+            <th>Category</th>
+            <th>Role</th>
+            <th>Score</th>
+            <th>Total Questions</th>
+            <th>Completed At</th>
+            <th>Review</th>
+        </tr>
         </thead>
         <tbody>
-            <tr th:each="result : ${results}">
-                <td th:text="${result.category}">Category</td>
-                <td th:text="${result.role}">Role</td>
-                <td>
-                    <span th:text="${result.totalScore}">0</span>
-                    <span class="badge badge-low" th:if="${result.totalScore < 5}">Needs Work</span>
-                    <span class="badge badge-mid" th:if="${result.totalScore >= 5 and result.totalScore < 8}">Good</span>
-                    <span class="badge badge-high" th:if="${result.totalScore >= 8}">Excellent</span>
-                </td>
-                <td th:text="${result.totalQuestions}">0</td>
-                <td th:text="${#temporals.format(result.completedAt, 'yyyy-MM-dd HH:mm')}">Date</td>
-            </tr>
+        <tr th:each="i : ${#numbers.sequence(results.size() - 1, 0)}"
+            th:with="result=${results[i]}"
+            th:class="'score-row score-' + ${result.totalScore}">
+            <td th:text="${result.category}">Category</td>
+            <td th:text="${result.role}">Role</td>
+            <td>
+                <span th:text="${result.totalScore}">0</span>
+                <span class="badge badge-low" th:if="${result.totalScore < 5}">Needs Work</span>
+                <span class="badge badge-mid" th:if="${result.totalScore >= 5 and result.totalScore < 8}">Good</span>
+                <span class="badge badge-high" th:if="${result.totalScore >= 8}">Excellent</span>
+            </td>
+            <td th:text="${result.totalQuestions}">0</td>
+            <td th:text="${#temporals.format(result.completedAt, 'yyyy-MM-dd HH:mm')}">Date</td>
+            <td>
+                <a th:href="@{/user/quiz/{id}/answers(id=${result.id})}" class="link-btn">View Answers</a>
+            </td>
+        </tr>
         </tbody>
     </table>
 </div>
@@ -154,10 +207,29 @@
     You haven't completed any quizzes yet.
 </div>
 
-<div class="back-link">
-    <a href="/user/performance">⬅ Back to My Performance</a>
-</div>
+<script>
+    function filterRows() {
+        const filter = document.getElementById("scoreFilter").value;
+        const rows = document.querySelectorAll(".score-row");
+
+        rows.forEach(row => {
+            const scoreMatch = row.className.match(/score-(\d+)/);
+            const score = scoreMatch ? parseInt(scoreMatch[1]) : 0;
+
+            let visible = true;
+            if (filter === "low") visible = score < 5;
+            else if (filter === "mid") visible = score >= 5 && score < 8;
+            else if (filter === "high") visible = score >= 8 && score < 15;
+            else if (filter === "perfect") visible = score === 15;
+
+            row.style.display = (filter === "all" || visible) ? "table-row" : "none";
+        });
+    }
+</script>
 
 </body>
 </html>
+
+
+
 

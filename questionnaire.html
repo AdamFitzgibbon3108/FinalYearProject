@@ -111,74 +111,56 @@
             flex-direction: column;
             gap: 10px;
         }
-
-        .citation-link {
-            font-size: 0.85rem;
-            margin-top: 0.3rem;
-            display: block;
-            color: #58a6ff;
-        }
-
-        .citation-link:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
-    <!-- App Title -->
-    <a href="/" class="app-title">ThreatLens</a>
+<a href="/" class="app-title">ThreatLens</a>
 
-    <div class="container">
-        <h1>Tech Questionnaire</h1>
+<div class="container">
+    <h1>Tech Questionnaire</h1>
 
-        <form th:action="@{/questions/submit}" method="post">
-            <!-- Hidden fields -->
-            <input type="hidden" name="selectedRole" th:value="${selectedRole}" />
-            <input type="hidden" name="selectedCategory" th:value="${selectedCategory}" />
+    <form th:action="@{/questions/submit}" method="post">
+        <!-- Hidden fields -->
+        <input type="hidden" name="selectedRole" th:value="${selectedRole}" />
+        <input type="hidden" name="selectedCategory" th:value="${selectedCategory}" />
 
-            <div id="questionnaire" class="scrollable">
-                <ul>
-                    <li th:each="question, questionStat : ${questions}">
-                        <div>
-                            <strong th:text="${questionStat.index + 1} + '. ' + ${question.text}"></strong>
-                            
-                            <!-- Citation Source -->
-                            <div th:if="${question.citationUrl}">
-                                <a th:href="${question.citationUrl}" class="citation-link" target="_blank">
-                                    Source: <span th:text="${question.framework}"></span>
-                                </a>
-                            </div>
+        <div id="questionnaire" class="scrollable">
+            <ul>
+                <li th:each="question, questionStat : ${questions}">
+                    <div>
+                        <strong th:text="${questionStat.index + 1} + '. ' + ${question.text}"></strong>
+                    </div>
+
+                    <!-- TRUE/FALSE -->
+                    <div th:if="${question.questionType?.name() == 'TRUE_FALSE'}">
+                        <div class="option-container">
+                            <label>
+                                <input type="radio" th:name="'question_' + ${question.id}" value="True" required />
+                                <span>True</span>
+                            </label>
+                            <label>
+                                <input type="radio" th:name="'question_' + ${question.id}" value="False" required />
+                                <span>False</span>
+                            </label>
                         </div>
+                    </div>
 
-                        <!-- TRUE/FALSE -->
-                        <div th:if="${question.questionType == T(com.example.model.QuestionType).TRUE_FALSE}">
-                            <div class="option-container">
-                                <label>
-                                    <input type="radio" th:name="'question_' + ${question.id}" value="True" required />
-                                    <span>True</span>
-                                </label>
-                                <label>
-                                    <input type="radio" th:name="'question_' + ${question.id}" value="False" required />
-                                    <span>False</span>
-                                </label>
-                            </div>
+                    <!-- MULTIPLE CHOICE -->
+                    <div th:if="${question.questionType?.name() == 'MULTIPLE_CHOICE'}">
+                        <div th:each="option : ${#strings.arraySplit(question.options, ',')}" class="option-container">
+                            <label>
+                                <input type="radio" th:name="'question_' + ${question.id}" th:value="${option}" required />
+                                <span th:text="${option}"></span>
+                            </label>
                         </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
 
-                        <!-- MULTIPLE CHOICE -->
-                        <div th:if="${question.questionType == T(com.example.model.QuestionType).MULTIPLE_CHOICE}">
-                            <div th:each="option : ${#strings.arraySplit(question.options, ',')}" class="option-container">
-                                <label>
-                                    <input type="radio" th:name="'question_' + ${question.id}" th:value="${option}" required />
-                                    <span th:text="${option}"></span>
-                                </label>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-            <button type="submit">Submit Responses</button>
-        </form>
-    </div>
+        <button type="submit">Submit Responses</button>
+    </form>
+</div>
 </body>
 </html>
+

@@ -6,11 +6,11 @@ import com.example.model.QuizResult;
 import com.example.model.User;
 import com.example.repository.QuizResultRepository;
 import com.example.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,6 +19,7 @@ public class UserPerformanceService {
 
     private final UserRepository userRepository;
     private final QuizResultRepository quizResultRepository;
+    private static final Logger logger = LoggerFactory.getLogger(UserPerformanceService.class);
 
     @Autowired
     public UserPerformanceService(UserRepository userRepository, QuizResultRepository quizResultRepository) {
@@ -78,7 +79,6 @@ public class UserPerformanceService {
         );
     }
 
-
     public List<UserQuizHistoryDTO> getUserQuizHistory(String username) {
         List<QuizResult> results = quizResultRepository.findByUserUsername(username);
         return results.stream().map(result -> new UserQuizHistoryDTO(
@@ -90,28 +90,16 @@ public class UserPerformanceService {
         )).collect(Collectors.toList());
     }
 
-    public Map<String, Double> getAverageScorePerCategory(String username) {
+    public Map<String, Long> getScoreBucketDistribution(String username) {
         List<QuizResult> results = quizResultRepository.findByUserUsername(username);
 
+        // Bucket scores into 10s (e.g., 0–9, 10–19, ..., 90–100)
         return results.stream()
-                .collect(Collectors.groupingBy(
-                        QuizResult::getCategory,
-                        Collectors.averagingDouble(QuizResult::getTotalScore)
-                ));
-    }
-
-    public Map<String, Integer> getScoreTimeline(String username) {
-        List<QuizResult> results = quizResultRepository.findByUserUsername(username);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        return results.stream()
-                .sorted(Comparator.comparing(QuizResult::getCompletedAt))
-                .collect(Collectors.toMap(
-                        r -> r.getCompletedAt().toLocalDate().format(formatter),
-                        QuizResult::getTotalScore,
-                        (existing, replacement) -> replacement,
-                        LinkedHashMap::new
-                ));
+                .map(r -> {
+                    int percentage = (r.getTotalQuestions() == 0) ? 0 : (int) Math.round((r.getTotalScore() * 100.0) / r.getTotalQuestions());
+                    int bucket = (percentage / 10) * 10;
+                    return bucket >= 100 ? "100" : bucket + "–" + (bucket + 9);
+                })
+                .collect(Collectors.groupingBy(bucket -> bucket, TreeMap::new, Collectors.counting()));
     }
 }

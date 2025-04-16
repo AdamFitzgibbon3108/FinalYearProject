@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
@@ -53,6 +54,7 @@
         .sidebar ul li a {
             display: flex;
             align-items: center;
+            gap: 10px;
             color: white;
             text-decoration: none;
             font-size: 16px;
@@ -116,6 +118,11 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            transition: transform 0.2s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-4px);
         }
 
         .stats-card i {
@@ -140,7 +147,7 @@
             margin-bottom: 30px;
             width: 100%;
             max-width: 600px;
-            background: rgba(30, 41, 59, 0.9);
+            background: linear-gradient(to bottom, rgba(30, 41, 59, 0.9), rgba(30, 41, 59, 0.8));
             padding: 25px;
             border-radius: 15px;
             box-shadow: 5px 5px 12px rgba(0, 0, 0, 0.4);
@@ -149,8 +156,14 @@
 
         .chart-section h3 {
             color: #58a6ff;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-size: 20px;
+        }
+
+        .total-label {
+            font-size: 16px;
+            margin-top: 10px;
+            color: #cbd5e1;
         }
 
         .activity-log {
@@ -235,6 +248,7 @@
         <div class="chart-section">
             <h3><i class="fas fa-chart-pie"></i> Questionnaires Taken per Role</h3>
             <canvas id="roleChart" width="400" height="300"></canvas>
+            <div id="totalTaken" class="total-label">Total Questionnaires: <span>—</span></div>
         </div>
 
         <div class="activity-log">
@@ -250,37 +264,61 @@
 </div>
 
 <script>
-    const ctx = document.getElementById('roleChart');
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['General', 'Developer', 'Analyst', 'Manager'],
-            datasets: [{
-                label: 'Questionnaires Taken',
-                data: [40, 25, 20, 15], // Replace with backend values
-                backgroundColor: ['#3b82f6', '#10b981', '#facc15', '#f87171'],
-                borderColor: '#1e293b',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        color: 'white',
-                        font: {
-                            size: 14,
-                            weight: 'bold'
+    fetch('/admin/api/questionnaires-taken-per-role')
+        .then(res => res.json())
+        .then(data => {
+            const ctx = document.getElementById('roleChart');
+            const values = [
+                data.General || 0,
+                data.Developer || 0,
+                data.Analyst || 0,
+                data.Manager || 0
+            ];
+            const total = values.reduce((sum, val) => sum + val, 0);
+            document.getElementById('totalTaken').querySelector('span').textContent = total;
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['General', 'Developer', 'Analyst', 'Manager'],
+                    datasets: [{
+                        label: 'Questionnaires Taken',
+                        data: values,
+                        backgroundColor: ['#3b82f6', '#10b981', '#facc15', '#f87171'],
+                        borderColor: '#1e293b',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'white',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    return `${label}: ${value} taken`;
+                                }
+                            }
                         }
                     }
                 }
-            }
-        }
-    });
+            });
+        });
 </script>
 </body>
 </html>
+
+
 
 
