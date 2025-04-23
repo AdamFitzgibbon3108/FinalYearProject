@@ -17,7 +17,7 @@
             text-align: center;
             font-size: 2.6rem;
             color: #3b82f6;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
 
         .history-wrapper {
@@ -32,8 +32,10 @@
 
         .filter-bar {
             display: flex;
-            justify-content: flex-start;
-            margin-bottom: 20px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
         }
 
         select {
@@ -43,6 +45,12 @@
             padding: 8px 12px;
             border-radius: 8px;
             font-size: 0.9rem;
+        }
+
+        .sort-hint {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 8px;
         }
 
         table {
@@ -62,6 +70,8 @@
             color: white;
             font-size: 1rem;
             font-weight: 600;
+            cursor: pointer;
+            user-select: none;
         }
 
         tr {
@@ -135,6 +145,11 @@
             text-decoration: underline;
         }
 
+        .sort-indicator {
+            font-size: 0.75rem;
+            margin-left: 6px;
+        }
+
         @media (max-width: 768px) {
             th, td {
                 padding: 10px;
@@ -168,16 +183,17 @@
             <option value="high">High Score (8–14)</option>
             <option value="perfect">Perfect Score (15)</option>
         </select>
+        <div class="sort-hint">Tip: Click on column headers to sort by Category, Role, Score, or Completed At.</div>
     </div>
 
-    <table>
+    <table id="historyTable">
         <thead>
         <tr>
-            <th>Category</th>
-            <th>Role</th>
-            <th>Score</th>
+            <th onclick="sortTable(0)">Category <span class="sort-indicator" id="sort0"></span></th>
+            <th onclick="sortTable(1)">Role <span class="sort-indicator" id="sort1"></span></th>
+            <th onclick="sortTable(2)">Score <span class="sort-indicator" id="sort2"></span></th>
             <th>Total Questions</th>
-            <th>Completed At</th>
+            <th onclick="sortTable(4)">Completed At <span class="sort-indicator" id="sort4"></span></th>
             <th>Review</th>
         </tr>
         </thead>
@@ -225,11 +241,35 @@
             row.style.display = (filter === "all" || visible) ? "table-row" : "none";
         });
     }
+
+    let sortDirections = {};
+
+    function sortTable(columnIndex) {
+        const table = document.getElementById("historyTable");
+        const tbody = table.tBodies[0];
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        const isAsc = !sortDirections[columnIndex];
+
+        rows.sort((a, b) => {
+            const aText = a.cells[columnIndex].innerText.trim();
+            const bText = b.cells[columnIndex].innerText.trim();
+
+            if (!isNaN(aText) && !isNaN(bText)) {
+                return isAsc ? aText - bText : bText - aText;
+            }
+
+            return isAsc ? aText.localeCompare(bText) : bText.localeCompare(aText);
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+        sortDirections[columnIndex] = isAsc;
+
+        // Reset all arrows
+        document.querySelectorAll(".sort-indicator").forEach(e => e.innerText = "");
+        document.getElementById("sort" + columnIndex).innerText = isAsc ? "▲" : "▼";
+    }
 </script>
 
 </body>
 </html>
-
-
-
 

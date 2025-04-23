@@ -26,14 +26,8 @@
         }
 
         @keyframes fadeSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
@@ -69,14 +63,8 @@
         }
 
         @keyframes popIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
         .widget h5 {
@@ -93,26 +81,13 @@
         }
 
         @keyframes bounceIn {
-            0% {
-                transform: scale(0.7);
-                opacity: 0;
-            }
-            60% {
-                transform: scale(1.1);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(0.7); opacity: 0; }
+            60% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
         }
 
-        .widget .passed {
-            color: #4ade80;
-        }
-
-        .widget .failed {
-            color: #f87171;
-        }
+        .widget .passed { color: #4ade80; }
+        .widget .failed { color: #f87171; }
 
         .subtext {
             color: #cbd5e1;
@@ -143,6 +118,37 @@
             background-color: #2563eb;
             transform: scale(1.05);
         }
+
+        .resource-list {
+            margin-top: 10px;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .resource-list li {
+            margin: 10px 0;
+            padding: 10px;
+            background: #334155;
+            border-radius: 8px;
+        }
+
+        .resource-list a {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+
+        .resource-list a:hover {
+            color: #3b82f6;
+        }
+
+        .highlight {
+            background-color: #1d4ed8;
+            padding: 6px 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: inline-block;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -155,7 +161,7 @@
     <div class="grid">
         <div class="widget">
             <h5>Your Score</h5>
-            <p th:text="'Your Score: ' + ${score} + ' / 15'">Your Score: 0 / 15</p>
+            <p th:text="'Your Score: ' + ${score} + ' / ' + ${totalQuestions}">Your Score</p>
         </div>
         <div class="widget">
             <h5>Status</h5>
@@ -166,24 +172,38 @@
 
     <div class="subtext mt-4">
         <p>
-            <strong>Recommendation:</strong>
+            <strong>Personalized Recommendation for this Category:</strong>
             <span th:if="${recommendations != null and !#strings.isEmpty(recommendations)}"
-                  th:text="${recommendations}">
-                Focus on improving your knowledge of security fundamentals.
-            </span>
+                  th:text="${recommendations}">General cybersecurity advice.</span>
             <span th:unless="${recommendations != null and !#strings.isEmpty(recommendations)}">
                 No specific recommendation available — keep learning and practicing securely.
             </span>
         </p>
-        <p><strong>Suggested Training:</strong> Cybersecurity Essentials Program</p>
+
+        <!-- Category-Specific Learning Resources -->
+        <th:block th:if="${resources != null and !resources.isEmpty()}">
+            <p class="highlight">Recommended Resources for <span th:text="${category}">Category</span></p>
+            <p><em>Total Resources Found: <span th:text="${#lists.size(resources)}">0</span></em></p>
+            <ul class="resource-list">
+                <li th:each="res : ${resources}">
+                    <a th:href="${res.url}" th:text="${res.title}" target="_blank">Training Link</a><br/>
+                    <small th:text="${res.url}"></small>
+                </li>
+            </ul>
+        </th:block>
+
+        <!-- Fallback -->
+        <th:block th:if="${resources == null or resources.isEmpty()}">
+            <p><strong>Suggested Training:</strong> Cybersecurity Essentials Program</p>
+            <p><em>[No resources available for this category]</em></p>
+        </th:block>
     </div>
 
-<div class="btn-container">
-    <a class="btn-custom" href="/dashboard">Back to Dashboard</a>
-    <a class="btn-custom" href="/user/performance">View Performance</a>
-    <a class="btn-custom" th:href="@{/result/review(fromResult=true)}">Review My Answers</a>
-</div>
-
+    <div class="btn-container">
+        <a class="btn-custom" href="/dashboard">Back to Dashboard</a>
+        <a class="btn-custom" href="/user/performance">View Performance</a>
+        <a class="btn-custom" th:href="@{/result/review(fromResult=true)}">Review My Answers</a>
+    </div>
 </div>
 </body>
 </html>

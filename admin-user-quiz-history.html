@@ -7,21 +7,45 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f1f5f9;
-            color: #1e293b;
+            background: linear-gradient(to right, #0f172a, #1e293b);
+            color: #f8fafc;
             padding: 40px;
         }
 
         h1 {
-            color: #1e40af;
-            margin-bottom: 30px;
+            color: #38bdf8;
+            margin-bottom: 10px;
+        }
+
+        .sort-tip {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .filter-bar input,
+        .filter-bar select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background-color: #1e293b;
+            color: #f8fafc;
+            font-size: 0.9rem;
         }
 
         .table-wrapper {
-            background: white;
+            background: rgba(30, 41, 59, 0.75);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(12px);
         }
 
         table {
@@ -30,75 +54,122 @@
         }
 
         th, td {
-            border-bottom: 1px solid #e2e8f0;
             padding: 14px 16px;
             text-align: center;
         }
 
         th {
-            background-color: #1e3a8a;
+            background-color: #3b82f6;
             color: white;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        td {
+            border-bottom: 1px solid #334155;
         }
 
         tr:nth-child(even) {
-            background-color: #f8fafc;
+            background-color: rgba(15, 23, 42, 0.5);
         }
 
         tr:hover {
-            background-color: #e0f2fe;
-        }
-
-        a {
-            color: #1d4ed8;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        a:hover {
-            text-decoration: underline;
+            background-color: rgba(51, 65, 85, 0.6);
         }
 
         .no-data {
             text-align: center;
             margin: 40px auto;
             padding: 20px;
-            background-color: #fff;
-            border: 2px dashed #94a3b8;
+            background-color: #1e293b;
+            border: 2px dashed #475569;
             border-radius: 12px;
-            color: #475569;
+            color: #94a3b8;
         }
 
         .back-link {
             margin-top: 30px;
             display: inline-block;
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
         }
 
         .badge {
-            background-color: #10b981;
-            color: white;
             padding: 4px 8px;
             border-radius: 8px;
             font-size: 12px;
+            margin-left: 6px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .badge-excellent {
+            background-color: #10b981;
+        }
+
+        .badge-okay {
+            background-color: #f59e0b;
+        }
+
+        .badge-bad {
+            background-color: #ef4444;
+        }
+
+        .link-btn {
+            background-color: #3b82f6;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .link-btn:hover {
+            background-color: #2563eb;
+        }
+
+        .sort-indicator {
+            font-size: 0.75rem;
             margin-left: 6px;
         }
     </style>
 </head>
 <body>
     <h1>Quiz History for <span th:text="${user.username}">Username</span></h1>
+    <div class="sort-tip">Tip: Click on column headers to sort. Use filters below to narrow results.</div>
 
     <div th:if="${#lists.isEmpty(results)}" class="no-data">
         <p>No quizzes have been completed by this user yet.</p>
     </div>
 
     <div th:unless="${#lists.isEmpty(results)}" class="table-wrapper">
-        <table>
+        <div class="filter-bar">
+            <input type="text" id="categoryFilter" placeholder="Filter by Category" onkeyup="applyFilters()">
+            <input type="text" id="roleFilter" placeholder="Filter by Role" onkeyup="applyFilters()">
+            <select id="scoreFilter" onchange="applyFilters()">
+                <option value="">All Scores</option>
+                <option value="excellent">Excellent (8–15)</option>
+                <option value="okay">Okay (5–7)</option>
+                <option value="bad">Needs Work (0–4)</option>
+            </select>
+            <input type="text" id="dateFilter" placeholder="Filter by Date (YYYY-MM-DD)" onkeyup="applyFilters()">
+        </div>
+
+        <table id="adminQuizTable">
             <thead>
                 <tr>
-                    <th>Category</th>
-                    <th>Role</th>
-                    <th>Score</th>
+                    <th onclick="sortTable(0)">Category <span class="sort-indicator" id="sort0"></span></th>
+                    <th onclick="sortTable(1)">Role <span class="sort-indicator" id="sort1"></span></th>
+                    <th onclick="sortTable(2)">Score <span class="sort-indicator" id="sort2"></span></th>
                     <th>Total Questions</th>
-                    <th>Completed At</th>
+                    <th onclick="sortTable(4)">Completed At <span class="sort-indicator" id="sort4"></span></th>
+                    <th>Review</th>
                 </tr>
             </thead>
             <tbody>
@@ -107,16 +178,82 @@
                     <td th:text="${result.role}">Role</td>
                     <td>
                         <span th:text="${result.totalScore}">0</span>
-                        <span class="badge" th:if="${result.totalScore >= 8}">Excellent</span>
+                        <span class="badge badge-excellent" th:if="${result.totalScore >= 8}">Excellent</span>
+                        <span class="badge badge-okay" th:if="${result.totalScore >= 5 and result.totalScore < 8}">Okay</span>
+                        <span class="badge badge-bad" th:if="${result.totalScore < 5}">Needs Work</span>
                     </td>
                     <td th:text="${result.totalQuestions}">0</td>
                     <td th:text="${#temporals.format(result.completedAt, 'yyyy-MM-dd HH:mm')}">Date</td>
+                    <td>
+                        <a th:href="@{/admin/user/{userId}/quiz/{quizId}/answers(userId=${user.id}, quizId=${result.id})}" class="link-btn">View Answers</a>
+                    </td>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <a href="/admin/performance" class="back-link">⬅ Back to Performance List</a>
+
+    <script>
+        let sortDirections = {};
+
+        function sortTable(columnIndex) {
+            const table = document.getElementById("adminQuizTable");
+            const tbody = table.tBodies[0];
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+            const isAsc = !sortDirections[columnIndex];
+
+            rows.sort((a, b) => {
+                const aText = a.cells[columnIndex].innerText.trim();
+                const bText = b.cells[columnIndex].innerText.trim();
+
+                if (!isNaN(aText) && !isNaN(bText)) {
+                    return isAsc ? aText - bText : bText - aText;
+                }
+
+                return isAsc ? aText.localeCompare(bText) : bText.localeCompare(aText);
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+            sortDirections[columnIndex] = isAsc;
+
+            document.querySelectorAll(".sort-indicator").forEach(e => e.innerText = "");
+            document.getElementById("sort" + columnIndex).innerText = isAsc ? "▲" : "▼";
+        }
+
+        function applyFilters() {
+            const category = document.getElementById("categoryFilter").value.toLowerCase();
+            const role = document.getElementById("roleFilter").value.toLowerCase();
+            const score = document.getElementById("scoreFilter").value;
+            const date = document.getElementById("dateFilter").value;
+
+            const rows = document.querySelectorAll("#adminQuizTable tbody tr");
+
+            rows.forEach(row => {
+                const cells = row.getElementsByTagName("td");
+
+                const categoryText = cells[0].innerText.toLowerCase();
+                const roleText = cells[1].innerText.toLowerCase();
+                const scoreValue = parseInt(cells[2].innerText);
+                const dateText = cells[4].innerText;
+
+                const scoreMatch =
+                    (score === "excellent" && scoreValue >= 8) ||
+                    (score === "okay" && scoreValue >= 5 && scoreValue < 8) ||
+                    (score === "bad" && scoreValue < 5) ||
+                    score === "";
+
+                const match = categoryText.includes(category) &&
+                              roleText.includes(role) &&
+                              dateText.includes(date) &&
+                              scoreMatch;
+
+                row.style.display = match ? "" : "none";
+            });
+        }
+    </script>
 </body>
 </html>
+
+
 

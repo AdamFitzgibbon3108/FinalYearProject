@@ -11,6 +11,9 @@ import org.springframework.stereotype.Repository;
 public interface SecurityControlRepository extends JpaRepository<SecurityControl, Long> {
     SecurityControl findByName(String name);
     
+    Optional<SecurityControl> findByNameIgnoreCase(String name);
+
+    
     Optional<SecurityControl> findById(Long id);
 
 }

@@ -29,10 +29,19 @@ public class SecurityControlService {
         return securityControlRepository.findAll();
     }
 
-    // Get a security control by name
-    public SecurityControl getSecurityControlByName(String name) {
-        return securityControlRepository.findByName(name);
+    // Case-insensitive + trimmed match for category name
+    public Optional<SecurityControl> findByNameIgnoreCase(String name) {
+        return securityControlRepository.findByNameIgnoreCase(name.trim());
     }
+
+    public void printAllControlNames() {
+        List<SecurityControl> controls = getAllSecurityControls();
+        System.out.println("[DEBUG] All available SecurityControl names:");
+        for (SecurityControl sc : controls) {
+            System.out.println(" - '" + sc.getName() + "'");
+        }
+    }
+
 
     // Delete a security control by ID
     public void deleteSecurityControl(Long id) {

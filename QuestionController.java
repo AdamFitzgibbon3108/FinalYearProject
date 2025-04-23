@@ -11,6 +11,7 @@ import com.example.repository.ResponseRepository;
 import com.example.repository.UserRepository;
 import com.example.repository.SecurityControlRepository;
 import com.example.service.QuestionService;
+import com.example.service.RecommendationService;
 import com.example.service.ScoringService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,10 @@ import java.util.stream.Collectors;
 @RequestMapping("/questions")
 public class QuestionController {
 
+	@Autowired
+	private RecommendationService recommendationService;
+
+	
     @Autowired
     private ScoringService scoringService;
 
@@ -246,7 +251,8 @@ public class QuestionController {
             responseRepository.save(response);
         }
 
-        String recommendation = scoringService.generateRecommendation(percentage);
+        String recommendation = recommendationService.getRandomRecommendation(selectedCategory);
+      
         String trainingProgram = scoringService.suggestTrainingProgram(percentage);
 
         model.addAttribute("username", username);
@@ -255,10 +261,10 @@ public class QuestionController {
         model.addAttribute("score", totalScore);
         model.addAttribute("percentageScore", percentage);
         model.addAttribute("passed", passed);
-        model.addAttribute("recommendation", recommendation);
         model.addAttribute("trainingProgram", trainingProgram);
         model.addAttribute("responses", responsesToSave);
+        model.addAttribute("recommendations", recommendation);
 
-        return "result";
+        return "redirect:/result";
     }
 }

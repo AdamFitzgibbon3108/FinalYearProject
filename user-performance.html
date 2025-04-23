@@ -30,33 +30,34 @@
         }
 
         h1 {
-            color: #3b82f6;
+            color: #38bdf8;
             margin-bottom: 30px;
-            font-size: 2.4rem;
+            font-size: 2.6rem;
             text-align: center;
         }
 
         .grid {
             display: flex;
-            gap: 16px;
+            gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .stats-box {
             background: #1e293b;
             border: 1px solid #334155;
-            border-radius: 14px;
-            padding: 18px;
-            width: 210px;
+            border-radius: 16px;
+            padding: 22px;
+            width: 220px;
             text-align: center;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.25);
-            transition: transform 0.2s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transition: all 0.25s ease;
         }
 
         .stats-box:hover {
-            transform: scale(1.03);
+            transform: scale(1.04);
+            border-color: #3b82f6;
         }
 
         .stats-box h2 {
@@ -66,48 +67,96 @@
         }
 
         .stats-box p {
-            font-size: 2rem;
+            font-size: 2.3rem;
             font-weight: bold;
             color: #ffffff;
         }
 
+        .section-heading {
+            text-align: center;
+            color: #f1f5f9;
+            font-size: 1.6rem;
+            margin-top: 60px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 10px;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         .chart-wrapper {
-            max-width: 600px;
-            margin: 24px auto;
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .chart-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
         }
 
         .chart-section {
             background: #1e293b;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            border-radius: 14px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            flex: 1 1 620px;
+            max-width: 680px;
+        }
+
+        .chart-section h2 {
+            text-align: center;
+            color: #cbd5e1;
+            font-size: 1.4rem;
+            margin-bottom: 6px;
+        }
+
+        .chart-section p {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        #overallScoreChart {
+            height: 300px !important;
+        }
+
+        #categoryAvgChart {
+            height: 500px !important;
         }
 
         canvas {
-            background-color: #f1f5f9;
-            border-radius: 10px;
+            background-color: transparent;
+            border-radius: 12px;
             padding: 10px;
-            height: 260px !important;
         }
 
         .links {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         .links a {
             display: inline-block;
-            margin: 10px;
-            padding: 10px 18px;
+            margin: 12px;
+            padding: 12px 22px;
             font-weight: bold;
             text-decoration: none;
             background-color: #3b82f6;
             color: white;
-            border-radius: 8px;
+            border-radius: 10px;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.2);
+            transition: all 0.25s ease;
         }
 
         .links a:hover {
             background-color: #2563eb;
+            transform: translateY(-2px);
         }
 
         .no-data {
@@ -119,14 +168,14 @@
 
         .banner {
             background: #1d4ed8;
-            padding: 15px 25px;
-            border-radius: 12px;
+            padding: 16px 28px;
+            border-radius: 14px;
             color: white;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             text-align: center;
             margin: 20px auto;
             width: fit-content;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -161,10 +210,20 @@
         Great work! Keep going to improve your skills even more!
     </div>
 
+    <div class="section-heading">📊 Visual Insights</div>
+
     <div class="chart-wrapper fade-in">
-        <div class="chart-section">
-            <h2 style="text-align:center; color:#cbd5e1;">Your Average Quiz Score</h2>
-            <canvas id="overallScoreChart"></canvas>
+        <div class="chart-grid">
+            <div class="chart-section">
+                <h2>Your Average Quiz Score</h2>
+                <canvas id="overallScoreChart"></canvas>
+            </div>
+
+            <div class="chart-section">
+                <h2>Top 10 Categories by Average Score</h2>
+                <p>Your best and worst areas are highlighted.</p>
+                <canvas id="categoryAvgChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -184,6 +243,26 @@
 <script th:if="${performance != null and performance.totalQuizzes > 0}">
 /*<![CDATA[*/
 const averageScore = [[${performance.averageScore}]];
+const rawCategoryScores = JSON.parse([[${avgCategoryScoresJson}]]);
+const categoryLabels = Object.keys(rawCategoryScores);
+const categoryValues = categoryLabels.map(label => rawCategoryScores[label]);
+
+const topCategories = categoryLabels
+    .map((label, i) => ({ label, score: categoryValues[i] }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
+
+const topLabels = topCategories.map(c => c.label);
+const topScores = topCategories.map(c => c.score);
+
+const maxIndex = topScores.indexOf(Math.max(...topScores));
+const minIndex = topScores.indexOf(Math.min(...topScores));
+
+const barColors = topScores.map((_, i) => {
+    if (i === maxIndex) return 'rgba(34,197,94,0.85)';  // green
+    if (i === minIndex) return 'rgba(239,68,68,0.85)';  // red
+    return 'rgba(251,191,36,0.85)';                     // yellow
+});
 
 new Chart(document.getElementById('overallScoreChart'), {
     type: 'bar',
@@ -197,22 +276,61 @@ new Chart(document.getElementById('overallScoreChart'), {
         }]
     },
     options: {
-        plugins: {
-            legend: { display: false },
-            tooltip: { enabled: true }
-        },
+        plugins: { legend: { display: false } },
         scales: {
             y: {
                 beginAtZero: true,
                 suggestedMax: 10,
-                title: { display: true, text: 'Score' }
+                title: { display: true, text: 'Score', color: '#f8fafc' },
+                ticks: { color: '#f8fafc' }
+            },
+            x: { ticks: { color: '#f8fafc' } }
+        }
+    }
+});
+
+new Chart(document.getElementById('categoryAvgChart'), {
+    type: 'bar',
+    data: {
+        labels: topLabels,
+        datasets: [{
+            label: 'Average Score',
+            data: topScores,
+            backgroundColor: barColors,
+            borderRadius: 6
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                beginAtZero: true,
+                title: { display: true, text: 'Average Score', color: '#f8fafc' },
+                ticks: { color: '#f8fafc' }
+            },
+            y: {
+                ticks: {
+                    color: '#f8fafc',
+                    font: { size: 13 }
+                }
+            }
+        },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return `${context.label}: ${context.raw.toFixed(2)}`;
+                    }
+                }
             }
         }
     }
 });
 /*]]>*/
 </script>
+
 </body>
 </html>
-
-

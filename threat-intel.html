@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Intelligence Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00e1ff;
+            --primary-hover: #00c2dd;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border: #333;
+            --highlight: #ffeb3b;
+            --danger: #ff5e5e;
+            --success: #4caf50;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 1.5rem 0 0;
+            color: var(--primary);
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .intro {
+            margin: 1.5rem auto;
+            width: 90%;
+            max-width: 1200px;
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            background-color: var(--card-bg);
+            padding: 1.25rem;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .intro strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .intro a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .intro a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            margin: 0 auto;
+            width: 90%;
+            max-width: 1200px;
+            padding-bottom: 2rem;
+        }
+
+        .search-box {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box input {
+            padding: 0.75rem 1rem;
+            flex-grow: 1;
+            max-width: 400px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            font-size: 0.9375rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 225, 255, 0.2);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        thead {
+            background-color: #222;
+            color: var(--primary);
+            cursor: pointer;
+            position: sticky;
+            top: 0;
+        }
+
+        th, td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            font-size: 0.9375rem;
+        }
+
+        th {
+            font-weight: 600;
+            user-select: none;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background-color: #2a2a2a;
+        }
+
+        th.sorted {
+            background-color: #333;
+            color: #ffffff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #1a1a1a;
+        }
+
+        tr:hover {
+            background-color: #252525;
+        }
+
+        .na {
+            color: var(--danger);
+            font-style: italic;
+        }
+
+        .highlight {
+            background-color: var(--highlight);
+            color: #000;
+            font-weight: bold;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 10% auto;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            color: var(--text-main);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .close {
+            color: var(--danger);
+            float: right;
+            font-size: 1.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close:hover {
+            color: #ff3a3a;
+        }
+
+        .legend-section p {
+            margin: 0.75rem 0;
+            line-height: 1.6;
+        }
+
+        .legend-section h3 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .legend-button {
+            background-color: var(--primary);
+            color: #000;
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        #sortToast {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary);
+            color: #000;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            display: none;
+            z-index: 50;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: toastFadeIn 0.3s ease;
+        }
+
+        @keyframes toastFadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 1.75rem;
+            }
+            
+            .search-box {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box input {
+                max-width: 100%;
+            }
+            
+            .legend-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Loading state */
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<h2>Recent CVE Threat Intelligence</h2>
+
+<div class="intro">
+    <p>This page displays a live feed of recent <strong>Common Vulnerabilities and Exposures (CVEs)</strong> collected from the public API provided by <a href="https://cve.circl.lu" target="_blank">CIRCL CVE Search</a>.</p>
+    <p>These entries are sourced from the <strong>National Vulnerability Database (NVD)</strong> and trusted Red Hat advisories, ensuring reliable and up-to-date information.</p>
+</div>
+
+<div class="container">
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search CVEs by keyword, ID, or score..." onkeyup="filterTableHighlightSafe()">
+        <button class="legend-button" onclick="document.getElementById('legendModal').style.display='block'" aria-label="View legend">
+            <i class="fas fa-info-circle"></i> View Legend
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table id="cveTable" data-sort-dir="asc">
+            <thead>
+            <tr>
+                <th onclick="sortTable(0, 'ID')">ID <span id="icon-0"></span></th>
+                <th onclick="sortTable(1, 'Summary')">Summary <span id="icon-1"></span></th>
+                <th onclick="sortTable(2, 'Published')">Published <span id="icon-2"></span></th>
+                <th onclick="sortTable(3, 'Modified')">Modified <span id="icon-3"></span></th>
+                <th onclick="sortTable(4, 'Base Score')">Base Score <span id="icon-4"></span></th>
+                <th onclick="sortTable(5, 'CWE')">CWE <span id="icon-5"></span></th>
+                <th onclick="sortTable(6, 'Source')">Source <span id="icon-6"></span></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cve : ${cves}">
+                <td><a th:href="${cve.advisoryUrl}" th:text="${cve.displayId}" target="_blank" th:title="'View advisory for ' + cve.displayId"></a></td>
+                <td><span th:if="${#strings.isEmpty(cve.summary)}" class="na">n/a</span>
+                    <span th:unless="${#strings.isEmpty(cve.summary)}" th:text="${cve.summary}"></span></td>
+                <td><span class="published" th:data-raw="${cve.published}"><span class="loading"></span></span></td>
+                <td><span class="modified" th:data-raw="${cve.modifiedDate}"><span class="loading"></span></span></td>
+                <td th:text="${cve.baseScore} ?: 'n/a'"></td>
+                <td th:text="${cve.cwe} ?: 'n/a'"></td>
+                <td th:text="${cve.advisoryUrl.contains('redhat.com') ? 'Red Hat' : 'NVD'}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="sortToast"></div>
+
+<!-- Modal -->
+<div id="legendModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('legendModal').style.display='none'" aria-label="Close legend">&times;</span>
+        <div class="legend-section">
+            <h3><i class="fas fa-book"></i> Threat Intelligence Legend</h3>
+            <p><strong><i class="fas fa-id-card"></i> CVE ID</strong> – A link to the official advisory (NVD or Red Hat).</p>
+            <p><strong><i class="fas fa-align-left"></i> Summary</strong> – Description of the vulnerability.</p>
+            <p><strong><i class="fas fa-calendar-plus"></i> Published</strong> – Date and time of initial release (Dublin time).</p>
+            <p><strong><i class="fas fa-calendar-check"></i> Modified</strong> – Last updated timestamp (Dublin time).</p>
+            <p><strong><i class="fas fa-shield-alt"></i> Base Score</strong> – CVSS severity score (0–10).</p>
+            <p><strong><i class="fas fa-bug"></i> CWE</strong> – Common Weakness Enumeration type.</p>
+            <p><strong><i class="fas fa-database"></i> Source</strong> – Indicates the origin (Red Hat or NVD).</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function sortTable(colIndex, label) {
+        const table = document.getElementById("cveTable");
+        const tbody = table.tBodies[0];
+        const rows = Array.from(tbody.rows);
+        const isNumeric = colIndex === 4;
+        const direction = table.getAttribute("data-sort-dir") === "asc" ? "desc" : "asc";
+        table.setAttribute("data-sort-dir", direction);
+
+        rows.sort((a, b) => {
+            let valA = a.cells[colIndex].innerText.trim().toLowerCase();
+            let valB = b.cells[colIndex].innerText.trim().toLowerCase();
+            
+            if (isNumeric) {
+                valA = parseFloat(valA) || 0;
+                valB = parseFloat(valB) || 0;
+                return direction === "asc" ? valA - valB : valB - valA;
+            }
+            
+            return direction === "asc" 
+                ? valA.localeCompare(valB) 
+                : valB.localeCompare(valA);
+        });
+
+        // Clear existing rows
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+        }
+
+        // Append sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+
+        // Update UI indicators
+        document.querySelectorAll("th").forEach((th, i) => {
+            th.classList.remove("sorted");
+            const icon = document.getElementById("icon-" + i);
+            if (icon) icon.innerHTML = "";
+        });
+
+        const icon = document.getElementById("icon-" + colIndex);
+        icon.innerHTML = direction === "asc" ? " <i class='fas fa-arrow-up'></i>" : " <i class='fas fa-arrow-down'></i>";
+        document.querySelectorAll("th")[colIndex].classList.add("sorted");
+
+        // Show toast notification
+        const toast = document.getElementById("sortToast");
+        toast.innerHTML = `<i class="fas fa-sort-amount-${direction === 'asc' ? 'up' : 'down'}"></i> Sorted by ${label} (${direction})`;
+        toast.style.display = "block";
+        setTimeout(() => { toast.style.display = "none"; }, 2500);
+    }
+
+    function highlightTextSafely(element, keyword) {
+        keyword = keyword.toLowerCase();
+        const walk = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+        let node;
+        const nodes = [];
+        
+        // First collect all text nodes
+        while ((node = walk.nextNode())) {
+            nodes.push(node);
+        }
+        
+        // Then process them
+        nodes.forEach(node => {
+            const parent = node.parentNode;
+            if (parent.classList.contains('highlight')) return;
+            
+            const text = node.nodeValue;
+            const lower = text.toLowerCase();
+            
+            if (keyword && lower.includes(keyword)) {
+                const span = document.createElement('span');
+                span.innerHTML = text.replace(new RegExp(`(${escapeRegExp(keyword)})`, 'gi'), 
+                    '<span class="highlight">$1</span>');
+                parent.replaceChild(span, node);
+            }
+        });
+    }
+
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function filterTableHighlightSafe() {
+        const input = document.getElementById("searchInput").value.toLowerCase();
+        const rows = document.querySelectorAll("#cveTable tbody tr");
+
+        rows.forEach(row => {
+            const rowText = row.innerText.toLowerCase();
+            row.style.display = input === "" || rowText.includes(input) ? "" : "none";
+            
+            if (input) {
+                Array.from(row.cells).forEach(cell => {
+                    // Save original text if not already saved
+                    if (!cell.hasAttribute('data-original')) {
+                        cell.setAttribute('data-original', cell.innerHTML);
+                    }
+                    
+                    // Reset to original content
+                    cell.innerHTML = cell.getAttribute('data-original');
+                    
+                    // Apply highlighting
+                    highlightTextSafely(cell, input);
+                });
+            }
+        });
+    }
+
+    function convertToDublinTime(selector) {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+            const raw = el.getAttribute("data-raw");
+            if (raw && raw.includes("T")) {
+                try {
+                    const utc = new Date(raw);
+                    const formatted = new Intl.DateTimeFormat("en-IE", {
+                        timeZone: "Europe/Dublin",
+                        year: "numeric", 
+                        month: "short", 
+                        day: "numeric",
+                        hour: "2-digit", 
+                        minute: "2-digit",
+                        hour12: false
+                    }).format(utc);
+                    el.textContent = formatted;
+                } catch (e) {
+                    console.error("Date formatting error:", e);
+                    el.textContent = "n/a";
+                }
+            } else {
+                el.textContent = "n/a";
+            }
+        });
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        convertToDublinTime(".published");
+        convertToDublinTime(".modified");
+        
+        // Add click handler for modal close
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('legendModal');
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+        
+        // Add keyboard support for search
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    this.value = '';
+                    filterTableHighlightSafe();
+                }
+            });
+            
+            // Focus search input on page load
+            searchInput.focus();
+        }
+    });
+</script>
+</body>
+</html>
