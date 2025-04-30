@@ -1,7 +1,5 @@
 package com.example.controller;
 
-import com.example.model.User;
-import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,48 +9,53 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.model.User;
+import com.example.service.UserService;
+
 @Controller
 @RequestMapping("/profile")
 public class ProfileController {
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @GetMapping
-    public String viewProfile(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User user = userService.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+	@GetMapping
+	public String viewProfile(Model model) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
+		User user = userService.findByUsername(username)
+				.orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
-        model.addAttribute("user", user);
-        return "profile";
-    }
+		model.addAttribute("user", user);
+		return "profile"; // profile.html
+	}
 
-    @GetMapping("/edit")
-    public String editProfile(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User user = userService.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+	@GetMapping("/edit")
+	public String editProfile(Model model) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
+		User user = userService.findByUsername(username)
+				.orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
-        model.addAttribute("user", user);
-        return "editProfile"; // Corresponds to editProfile.html
-    }
+		model.addAttribute("user", user);
+		return "editProfile"; // editProfile.html
+	}
 
-    @PostMapping("/edit")
-    public String updateProfile(User updatedUser, Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User currentUser = userService.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+	@PostMapping("/edit")
+	public String updateProfile(User updatedUser) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
+		User currentUser = userService.findByUsername(username)
+				.orElseThrow(() -> new RuntimeException("User not found with username: " + username));
 
-        // Update user details
-        currentUser.setPassword(updatedUser.getPassword()); // Assuming password can be updated
-        userService.updateUser(currentUser.getId(), currentUser);
+		// Update editable fields
+		currentUser.setFullName(updatedUser.getFullName());
+		currentUser.setEmail(updatedUser.getEmail());
+		currentUser.setPhoneNumber(updatedUser.getPhoneNumber());
+		currentUser.setAddress(updatedUser.getAddress());
 
-        model.addAttribute("user", currentUser);
-        model.addAttribute("successMessage", "Profile updated successfully!");
-        return "profile";
-    }
+		userService.save(currentUser);
+
+		return "profile-success"; // Redirect to success page after saving
+	}
 }

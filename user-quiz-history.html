@@ -1,33 +1,51 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Your Quiz History</title>
+    <title>Cyber Security Quiz History</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --cyber-blue: #00f0ff;
+            --cyber-purple: #6e00ff;
+            --cyber-dark: #0a0a12;
+            --cyber-dark-secondary: #1a1a2e;
+            --cyber-gray: #2d2d44;
+            --cyber-light: #e2f1f8;
+            --cyber-alert: #ff3e3e;
+            --cyber-success: #00ff88;
+            --cyber-warning: #ffcc00;
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to right, #0f172a, #1e293b);
-            color: #f8fafc;
+            font-family: 'Ubuntu Mono', monospace;
+            background-color: var(--cyber-dark);
+            color: var(--cyber-light);
             margin: 0;
             padding: 40px 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(110, 0, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.1) 0%, transparent 20%);
         }
 
         h1 {
             text-align: center;
             font-size: 2.6rem;
-            color: #3b82f6;
+            color: var(--cyber-blue);
             margin-bottom: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
         }
 
         .history-wrapper {
             max-width: 1100px;
             margin: 0 auto;
-            background: rgba(30, 41, 59, 0.75);
+            background: var(--cyber-dark-secondary);
             padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            border: 1px solid var(--cyber-gray);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
         }
 
         .filter-bar {
@@ -36,15 +54,22 @@
             align-items: center;
             margin-bottom: 16px;
             flex-wrap: wrap;
+            gap: 15px;
         }
 
         select {
-            background-color: #1e293b;
-            color: #f8fafc;
-            border: 1px solid #475569;
+            background-color: var(--cyber-dark-secondary);
+            color: var(--cyber-light);
+            border: 1px solid var(--cyber-gray);
             padding: 8px 12px;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 0.9rem;
+            font-family: 'Ubuntu Mono', monospace;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--cyber-blue);
         }
 
         .sort-hint {
@@ -57,21 +82,42 @@
             width: 100%;
             border-collapse: collapse;
             overflow: hidden;
-            border-radius: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--cyber-gray);
         }
 
         th, td {
             padding: 16px;
             text-align: center;
+            border-bottom: 1px solid var(--cyber-gray);
         }
 
         th {
-            background-color: #3b82f6;
-            color: white;
+            background-color: var(--cyber-dark-secondary);
+            color: var(--cyber-blue);
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             user-select: none;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+
+        th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, var(--cyber-blue), var(--cyber-purple));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        th:hover::after {
+            transform: scaleX(1);
         }
 
         tr {
@@ -84,49 +130,58 @@
         }
 
         td {
-            border-bottom: 1px solid #334155;
             font-size: 0.95rem;
         }
 
         .badge {
             font-size: 0.75rem;
             padding: 3px 8px;
-            border-radius: 6px;
-            color: white;
+            border-radius: 4px;
+            color: var(--cyber-dark);
             font-weight: bold;
+            font-family: 'Share Tech Mono', monospace;
         }
 
         .badge-low {
-            background-color: #ef4444;
+            background-color: var(--cyber-alert);
         }
 
         .badge-mid {
-            background-color: #f59e0b;
+            background-color: var(--cyber-warning);
         }
 
         .badge-high {
-            background-color: #10b981;
+            background-color: var(--cyber-success);
         }
 
         .link-btn {
-            background-color: #3b82f6;
-            color: white;
+            background: linear-gradient(135deg, var(--cyber-blue), var(--cyber-purple));
+            color: var(--cyber-dark);
             padding: 6px 14px;
-            border-radius: 6px;
+            border-radius: 4px;
             text-decoration: none;
             font-weight: bold;
             font-size: 0.9rem;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.3s ease;
+            border: none;
         }
 
         .link-btn:hover {
-            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 240, 255, 0.3);
+            color: white;
         }
 
         .no-results {
             text-align: center;
             margin-top: 40px;
             font-size: 1.2rem;
-            color: #cbd5e1;
+            color: var(--cyber-light);
+            padding: 20px;
+            background: var(--cyber-dark-secondary);
+            border-radius: 8px;
+            border: 1px dashed var(--cyber-gray);
         }
 
         .back-link {
@@ -136,18 +191,21 @@
 
         .back-link a {
             text-decoration: none;
-            color: #3b82f6;
+            color: var(--cyber-blue);
             font-weight: bold;
             font-size: 1.1rem;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.3s ease;
         }
 
         .back-link a:hover {
-            text-decoration: underline;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
         }
 
         .sort-indicator {
             font-size: 0.75rem;
             margin-left: 6px;
+            color: var(--cyber-light);
         }
 
         @media (max-width: 768px) {
@@ -160,6 +218,11 @@
                 font-size: 2rem;
             }
 
+            .filter-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
             select {
                 width: 100%;
             }
@@ -169,32 +232,32 @@
 <body>
 
 <div class="back-link">
-    <a href="/user/performance">⬅ Back to My Performance</a>
+    <a href="/user/performance">⬅ RETURN TO PERFORMANCE DASHBOARD</a>
 </div>
 
-<h1>Your Quiz History</h1>
+<h1>SECURITY ASSESSMENT HISTORY</h1>
 
 <div class="history-wrapper" th:if="${results != null and !results.isEmpty()}">
     <div class="filter-bar">
         <select id="scoreFilter" onchange="filterRows()">
-            <option value="all">Show All</option>
-            <option value="low">Low Score (0–4)</option>
-            <option value="mid">Medium Score (5–7)</option>
-            <option value="high">High Score (8–14)</option>
-            <option value="perfect">Perfect Score (15)</option>
+            <option value="all">SHOW ALL RESULTS</option>
+            <option value="low">VULNERABLE (0–4)</option>
+            <option value="mid">MODERATE (5–7)</option>
+            <option value="high">SECURE (8–14)</option>
+            <option value="perfect">FULLY HARDENED (15)</option>
         </select>
-        <div class="sort-hint">Tip: Click on column headers to sort by Category, Role, Score, or Completed At.</div>
+        <div class="sort-hint">CLICK COLUMN HEADERS TO SORT RESULTS</div>
     </div>
 
     <table id="historyTable">
         <thead>
         <tr>
-            <th onclick="sortTable(0)">Category <span class="sort-indicator" id="sort0"></span></th>
-            <th onclick="sortTable(1)">Role <span class="sort-indicator" id="sort1"></span></th>
-            <th onclick="sortTable(2)">Score <span class="sort-indicator" id="sort2"></span></th>
-            <th>Total Questions</th>
-            <th onclick="sortTable(4)">Completed At <span class="sort-indicator" id="sort4"></span></th>
-            <th>Review</th>
+            <th onclick="sortTable(0)">SECURITY DOMAIN <span class="sort-indicator" id="sort0"></span></th>
+            <th onclick="sortTable(1)">ROLE <span class="sort-indicator" id="sort1"></span></th>
+            <th onclick="sortTable(2)">SECURITY SCORE <span class="sort-indicator" id="sort2"></span></th>
+            <th>TOTAL TESTS</th>
+            <th onclick="sortTable(4)">SCAN DATE <span class="sort-indicator" id="sort4"></span></th>
+            <th>DETAILS</th>
         </tr>
         </thead>
         <tbody>
@@ -205,14 +268,14 @@
             <td th:text="${result.role}">Role</td>
             <td>
                 <span th:text="${result.totalScore}">0</span>
-                <span class="badge badge-low" th:if="${result.totalScore < 5}">Needs Work</span>
-                <span class="badge badge-mid" th:if="${result.totalScore >= 5 and result.totalScore < 8}">Good</span>
-                <span class="badge badge-high" th:if="${result.totalScore >= 8}">Excellent</span>
+                <span class="badge badge-low" th:if="${result.totalScore < 5}">VULNERABLE</span>
+                <span class="badge badge-mid" th:if="${result.totalScore >= 5 and result.totalScore < 8}">MODERATE</span>
+                <span class="badge badge-high" th:if="${result.totalScore >= 8}">SECURE</span>
             </td>
             <td th:text="${result.totalQuestions}">0</td>
             <td th:text="${#temporals.format(result.completedAt, 'yyyy-MM-dd HH:mm')}">Date</td>
             <td>
-                <a th:href="@{/user/quiz/{id}/answers(id=${result.id})}" class="link-btn">View Answers</a>
+                <a th:href="@{/user/quiz/{id}/answers(id=${result.id})}" class="link-btn">VIEW REPORT</a>
             </td>
         </tr>
         </tbody>
@@ -220,7 +283,8 @@
 </div>
 
 <div class="no-results" th:if="${results == null or results.isEmpty()}">
-    You haven't completed any quizzes yet.
+    <p>NO SECURITY SCANS DETECTED</p>
+    <p>COMPLETE ASSESSMENTS TO GENERATE RESULTS</p>
 </div>
 
 <script>
@@ -272,4 +336,3 @@
 
 </body>
 </html>
-
