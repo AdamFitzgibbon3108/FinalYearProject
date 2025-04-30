@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Security Reports | Secure Portal</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --cyber-teal: #00f0ff;
+            --cyber-dark: #0a0a12;
+            --cyber-red: #ff2d75;
+            --cyber-yellow: #ffcc00;
+            --cyber-light: #e0e0e0;
+            --cyber-purple: #8a2be2;
+            --cyber-green: #00ff88;
+        }
+
+        body {
+            background-color: var(--cyber-dark);
+            color: var(--cyber-light);
+            font-family: 'Courier New', monospace, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0, 240, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 45, 117, 0.05) 0%, transparent 50%);
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--cyber-teal);
+            font-size: 2.5rem;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+            font-weight: 700;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        h1::after {
+            content: "";
+            display: block;
+            width: 150px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyber-teal), var(--cyber-purple));
+            margin: 10px auto;
+            border-radius: 3px;
+        }
+
+        .report-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(138, 43, 226, 0.15));
+            border: 1px solid var(--cyber-teal);
+            padding: 15px 30px;
+            border-radius: 6px;
+            color: var(--cyber-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            min-width: 250px;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-button::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(0, 240, 255, 0) 0%,
+                rgba(0, 240, 255, 0) 30%,
+                rgba(0, 240, 255, 0.3) 50%,
+                rgba(0, 240, 255, 0) 70%,
+                rgba(0, 240, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            transition: all 0.7s;
+        }
+
+        .action-button:hover {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(138, 43, 226, 0.25));
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .action-button:hover::before {
+            left: 100%;
+        }
+
+        .action-button i {
+            font-size: 1.2em;
+        }
+
+        .report-card {
+            background: rgba(26, 26, 46, 0.9);
+            padding: 25px;
+            width: 90%;
+            max-width: 900px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+            margin-bottom: 25px;
+            border-left: 4px solid var(--cyber-teal);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                135deg,
+                rgba(0, 240, 255, 0.05) 0%,
+                rgba(0, 240, 255, 0) 50%,
+                rgba(255, 45, 117, 0.05) 100%
+            );
+            pointer-events: none;
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
+        }
+
+        .report-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--cyber-teal);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .report-title::before {
+            content: "🔒";
+            font-size: 1.2em;
+        }
+
+        .report-description {
+            font-size: 1rem;
+            color: var(--cyber-light);
+            line-height: 1.6;
+        }
+
+        .back-link {
+            margin-top: 30px;
+            color: var(--cyber-teal);
+            text-align: center;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 1px solid transparent;
+        }
+
+        .back-link:hover {
+            color: var(--cyber-red);
+            border-color: var(--cyber-red);
+            background: rgba(255, 45, 117, 0.1);
+        }
+
+        .terminal-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 240, 255, 0.03),
+                rgba(0, 240, 255, 0.03) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            z-index: -1;
+        }
+
+        .cyber-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 240, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+        }
+
+        /* Download confirmation popup */
+        .download-confirm {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 18, 0.95);
+            border: 2px solid var(--cyber-green);
+            border-radius: 10px;
+            padding: 25px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+            z-index: 1000;
+            display: none;
+            animation: cyberGlow 2s infinite alternate;
+        }
+
+        @keyframes cyberGlow {
+            0% { box-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
+            100% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.6), 0 0 40px rgba(138, 43, 226, 0.3); }
+        }
+
+        .download-confirm.show {
+            display: block;
+        }
+
+        .confirm-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            color: var(--cyber-green);
+        }
+
+        .confirm-header i {
+            font-size: 2rem;
+        }
+
+        .confirm-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .confirm-body {
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .confirm-file {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(0, 240, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        .confirm-file i {
+            color: var(--cyber-teal);
+            font-size: 1.5rem;
+        }
+
+        .file-info {
+            flex-grow: 1;
+        }
+
+        .file-name {
+            font-weight: bold;
+            color: var(--cyber-teal);
+        }
+
+        .file-path {
+            font-size: 0.9rem;
+            color: var(--cyber-light);
+            opacity: 0.8;
+        }
+
+        .confirm-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .confirm-btn {
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .confirm-close {
+            background: rgba(255, 45, 117, 0.2);
+            border: 1px solid var(--cyber-red);
+            color: var(--cyber-light);
+        }
+
+        .confirm-close:hover {
+            background: rgba(255, 45, 117, 0.4);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-effect"></div>
+    <div class="overlay" id="overlay"></div>
+
+    <div class="download-confirm" id="downloadConfirm">
+        <div class="confirm-header">
+            <i class="fas fa-shield-alt"></i>
+            <h3 class="confirm-title">DOWNLOAD VERIFIED</h3>
+        </div>
+        <div class="confirm-body">
+            <p>File downloaded. </p>
+            <div class="confirm-file">
+                <i class="fas fa-file-download"></i>
+                <div class="file-info">
+                    <div class="file-name" id="confirmFileName">performance_report.pdf</div>
+                    <div class="file-path">Saved to: <span id="confirmFilePath">Downloads/</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="confirm-actions">
+            <button class="confirm-btn confirm-close" onclick="closeDownloadConfirm()">
+                <i class="fas fa-times"></i> CLOSE
+            </button>
+        </div>
+    </div>
+
+    <h1>SECURITY REPORTS DASHBOARD</h1>
+
+    <div class="report-container">
+        <div class="button-group">
+            <a href="#" class="action-button cyber-pulse" onclick="downloadReport('performance')">
+                <i class="fas fa-file-download"></i> Download Performance Overview
+            </a>
+            <a href="#" class="action-button cyber-pulse" onclick="downloadReport('quizzes')">
+                <i class="fas fa-file-download"></i> Download Recent Quizzes
+            </a>
+        </div>
+
+        <div th:each="report : ${reports}" class="report-card">
+            <div class="report-title" th:text="${report.title}">SECURITY AUDIT REPORT</div>
+            <div class="report-description" th:text="${report.description}">
+                Comprehensive analysis of system vulnerabilities and threat assessment. 
+                This document contains sensitive information - handle with care.
+            </div>
+        </div>
+
+        <a th:href="@{/dashboard}" class="back-link">
+            <i class="fas fa-arrow-left"></i> RETURN TO DASHBOARD
+        </a>
+    </div>
+
+    <script>
+        function downloadReport(type) {
+            let fileName, filePath;
+            
+            if (type === 'performance') {
+                fileName = 'performance_report.pdf';
+                filePath = 'Downloads/performance_report_' + new Date().toISOString().slice(0,10) + '.pdf';
+                window.location.href = '/reports/performance';
+            } else {
+                fileName = 'security_quizzes.csv';
+                filePath = 'Downloads/quiz_results_' + new Date().toISOString().slice(0,10) + '.csv';
+                window.location.href = '/reports/recent-quizzes';
+            }
+            
+            // Show confirmation after a short delay (to allow download to initiate)
+            setTimeout(() => {
+                showDownloadConfirm(fileName, filePath);
+            }, 1000);
+        }
+
+        function showDownloadConfirm(fileName, filePath) {
+            document.getElementById('confirmFileName').textContent = fileName;
+            document.getElementById('confirmFilePath').textContent = filePath;
+            document.getElementById('downloadConfirm').classList.add('show');
+            document.getElementById('overlay').classList.add('show');
+        }
+
+        function closeDownloadConfirm() {
+            document.getElementById('downloadConfirm').classList.remove('show');
+            document.getElementById('overlay').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

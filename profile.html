@@ -1,195 +1,479 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>User Profile | ThreatLens</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>My Profile | Secure Portal</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
     <style>
-        /* General styles */
-        body, html {
+        :root {
+            --cyber-teal: #00f0ff;
+            --cyber-dark: #0a0a12;
+            --cyber-purple: #6e44ff;
+            --cyber-red: #ff2d75;
+            --cyber-gray: #1a1a2e;
+            --cyber-light: #e0e0e0;
+        }
+        
+        body {
+            background-color: var(--cyber-dark);
+            color: var(--cyber-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            font-family: 'Roboto', sans-serif;
-            background: radial-gradient(ellipse at center, #141e30, #243b55), url('/images/cybersecurity-grid.png');
-            background-size: cover, contain;
-            background-blend-mode: overlay;
-            color: #ffffff;
+            overflow-x: hidden;
         }
-
-        .container {
-            width: 80%;
-            max-width: 1200px;
-            margin: 2rem auto;
-            background: rgba(20, 30, 48, 0.9);
-            padding: 2rem 3rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        
+        /* New animated background elements */
+        .background-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
         }
-
+        
+        .grid-line {
+            position: absolute;
+            background: rgba(0, 240, 255, 0.03);
+        }
+        
+        .grid-line.horizontal {
+            width: 100%;
+            height: 1px;
+            left: 0;
+            animation: moveHorizontal 40s linear infinite;
+        }
+        
+        .grid-line.vertical {
+            width: 1px;
+            height: 100%;
+            top: 0;
+            animation: moveVertical 60s linear infinite;
+        }
+        
+        @keyframes moveHorizontal {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        
+        @keyframes moveVertical {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.15;
+            animation: float 25s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(50px, 50px) rotate(5deg); }
+            50% { transform: translate(0, 100px) rotate(0deg); }
+            75% { transform: translate(-50px, 50px) rotate(-5deg); }
+        }
+        
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            animation: scan 8s linear infinite;
+            z-index: 0;
+            display: none; /* Can be enabled for a CRT effect */
+        }
+        
+        @keyframes scan {
+            0% { top: -10px; }
+            100% { top: 100%; }
+        }
+        
+        .binary-rain {
+            position: absolute;
+            color: rgba(0, 240, 255, 0.3);
+            font-family: monospace;
+            font-size: 14px;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            user-select: none;
+            animation: rain linear infinite;
+        }
+        
+        @keyframes rain {
+            to { transform: translateY(100vh); }
+        }
+        
         h1 {
             text-align: center;
+            margin-top: 30px;
+            color: var(--cyber-teal);
             font-size: 2.5rem;
-            color: #58a6ff;
-            margin-bottom: 1rem;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+            position: relative;
+            padding-bottom: 15px;
         }
-
-        h2 {
-            font-size: 1.8rem;
-            color: #58a6ff;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
+        
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--cyber-teal), transparent);
         }
-
-        .profile-section {
+        
+        .profile-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 200px);
+            padding: 20px;
+            position: relative;
+        }
+        
+        .profile-card {
+            background: rgba(26, 26, 46, 0.8);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            z-index: 1;
+        }
+        
+        .profile-card::before {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--cyber-teal), var(--cyber-purple), var(--cyber-red));
+            z-index: -1;
+            border-radius: 12px;
+            opacity: 0.3;
+            animation: gradientBorder 8s ease infinite;
+            background-size: 200% 200%;
+        }
+        
+        @keyframes gradientBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .profile-header {
             display: flex;
             justify-content: space-between;
-            gap: 2rem;
-            margin-bottom: 2rem;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+            padding-bottom: 15px;
         }
-
+        
+        .profile-title {
+            font-size: 1.8rem;
+            color: var(--cyber-teal);
+            margin: 0;
+        }
+        
+        .status-badge {
+            background-color: rgba(0, 240, 255, 0.1);
+            color: var(--cyber-teal);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: 1px solid var(--cyber-teal);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 240, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+        }
+        
         .profile-details {
-            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
-
-        .profile-details p {
-            font-size: 1.2rem;
-            margin: 0.5rem 0;
+        
+        .detail-item {
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
         }
-
-        .profile-details label {
-            font-weight: bold;
-            color: #a0aec0;
+        
+        .detail-item:hover {
+            transform: translateY(-3px);
         }
-
-        .profile-details span {
-            color: #ffffff;
+        
+        .detail-label {
+            display: block;
+            color: var(--cyber-teal);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-
-        .profile-actions {
-            text-align: center;
+        
+        .detail-value {
+            font-size: 1.1rem;
+            padding: 10px 15px;
+            background: rgba(10, 10, 18, 0.5);
+            border-radius: 6px;
+            border-left: 3px solid var(--cyber-teal);
+            word-break: break-word;
+            transition: all 0.3s ease;
         }
-
-        .button {
-            display: inline-block;
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #58a6ff, #1e90ff);
+        
+        .detail-value:hover {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+        
+        .detail-value.inactive {
+            border-left-color: var(--cyber-red);
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            background: rgba(0, 194, 221, 0.1);
             color: white;
+            padding: 12px 25px;
             text-decoration: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: background 0.3s ease, transform 0.2s ease;
-            margin: 10px 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid var(--cyber-teal);
+            position: relative;
+            overflow: hidden;
         }
-
-        .button:hover {
-            background: linear-gradient(135deg, #1e90ff, #58a6ff);
+        
+        .btn:hover {
+            background: rgba(0, 240, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(88, 166, 255, 0.4);
         }
-
-        hr {
-            border: 0;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.2);
-            margin: 2rem 0;
-        }
-
-        .recent-activity {
-            margin-top: 2rem;
-        }
-
-        table {
+        
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
             width: 100%;
-            border-collapse: collapse;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.4), transparent);
+            transition: 0.5s;
         }
-
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            color: #d0d7de;
+        
+        .btn:hover::before {
+            left: 100%;
         }
-
-        th {
-            background: rgba(255, 255, 255, 0.1);
-            font-size: 1rem;
+        
+        .btn-secondary {
+            background: rgba(110, 68, 255, 0.1);
+            border-color: var(--cyber-purple);
         }
-
-        tr:nth-child(even) {
-            background: rgba(255, 255, 255, 0.05);
+        
+        .btn-secondary:hover {
+            background: rgba(110, 68, 255, 0.2);
+            box-shadow: 0 0 15px rgba(110, 68, 255, 0.3);
         }
-
-        tr:hover {
-            background: rgba(88, 166, 255, 0.1);
+        
+        .security-notice {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(255, 45, 117, 0.1);
+            border: 1px solid var(--cyber-red);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            animation: shake 0.5s ease-in-out infinite alternate;
         }
-
-        .no-activity {
-            text-align: center;
+        
+        @keyframes shake {
+            0% { transform: translateX(-2px); }
+            100% { transform: translateX(2px); }
+        }
+        
+        .security-notice::before {
+            content: "⚠️";
+            margin-right: 10px;
             font-size: 1.2rem;
-            color: #a0aec0;
-            margin-top: 1rem;
         }
-
-        .logout {
-            text-align: center;
-            margin-top: 2rem;
+        
+        @media (max-width: 768px) {
+            .profile-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-card {
+                padding: 25px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>User Profile</h1>
 
-        <!-- Profile Details -->
-        <div class="profile-section">
-            <div class="profile-details">
-                <p>
-                    <label>Username:</label>
-                    <span th:text="${user.username}"></span>
-                </p>
-                <p>
-                    <label>Role:</label>
-                    <span th:text="${user.role}"></span>
-                </p>
-            </div>
+<!-- background elements -->
+<div class="background-elements">
+    <!-- Grid lines -->
+    <div class="grid-line horizontal" style="top: 10%;"></div>
+    <div class="grid-line horizontal" style="top: 30%;"></div>
+    <div class="grid-line horizontal" style="top: 50%;"></div>
+    <div class="grid-line horizontal" style="top: 70%;"></div>
+    <div class="grid-line horizontal" style="top: 90%;"></div>
+    
+    <div class="grid-line vertical" style="left: 10%;"></div>
+    <div class="grid-line vertical" style="left: 30%;"></div>
+    <div class="grid-line vertical" style="left: 50%;"></div>
+    <div class="grid-line vertical" style="left: 70%;"></div>
+    <div class="grid-line vertical" style="left: 90%;"></div>
+    
+    <!-- Floating shapes -->
+    <div class="floating-shape" style="width: 300px; height: 300px; background: var(--cyber-purple); top: 10%; left: 10%; animation-delay: 0s;"></div>
+    <div class="floating-shape" style="width: 200px; height: 200px; background: var(--cyber-teal); top: 60%; left: 70%; animation-delay: 5s;"></div>
+    <div class="floating-shape" style="width: 250px; height: 250px; background: var(--cyber-red); top: 30%; left: 80%; animation-delay: 10s;"></div>
+    
+    <!-- Binary rain -->
+    <div class="binary-rain" style="left: 5%; animation-duration: 20s;">10101010101010101010</div>
+    <div class="binary-rain" style="left: 15%; animation-duration: 25s; animation-delay: 2s;">11001100110011001100</div>
+    <div class="binary-rain" style="left: 85%; animation-duration: 22s; animation-delay: 1s;">11110000111100001111</div>
+    <div class="binary-rain" style="left: 95%; animation-duration: 18s; animation-delay: 3s;">10100101101001011010</div>
+</div>
 
-            <!-- Action Buttons -->
-            <div class="profile-actions">
-                <a th:href="@{/profile/edit}" class="button">Edit Profile</a>
-                <a th:href="@{/dashboard}" class="button">Back to Dashboard</a>
-            </div>
-        </div>
 
-        <hr/>
+<div class="scanline"></div>
 
-        <!-- User Activity Section -->
-        <div class="recent-activity">
-            <h2>Recent Activity</h2>
-            <table th:if="${user.responses.size() > 0}">
-                <thead>
-                    <tr>
-                        <th>Activity</th>
-                        <th>Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="response : ${user.responses}">
-                        <td th:text="${response.question.questionText ?: 'N/A'}"></td>
-                        <td th:text="${#dates.format(response.timestamp, 'dd-MM-yyyy HH:mm:ss') ?: 'N/A'}"></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="no-activity" th:if="${user.responses.size() == 0}">
-                No recent activity found.
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="profile-header">
+            <h2 class="profile-title">USER PROFILE</h2>
+            <div class="status-badge" th:text="${user.active} ? 'ACTIVE ACCOUNT' : 'ACCOUNT LOCKED'">
+                ACTIVE ACCOUNT
             </div>
         </div>
-
-        <hr/>
-
-        <!-- Logout Option -->
-        <div class="logout">
-            <a th:href="@{/logout}" class="button">Logout</a>
+        
+        <div class="profile-details">
+            <div class="detail-item">
+                <span class="detail-label">Username</span>
+                <div class="detail-value" th:text="${user.username}">Username</div>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">Full Name</span>
+                <div class="detail-value" th:text="${user.fullName}">Full Name</div>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">Email Address</span>
+                <div class="detail-value" th:text="${user.email}">Email</div>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">Phone Number</span>
+                <div class="detail-value" th:text="${user.phoneNumber}">Phone Number</div>
+            </div>
+            
+            <div class="detail-item" style="grid-column: span 2;">
+                <span class="detail-label">Physical Address</span>
+                <div class="detail-value" th:text="${user.address}">Address</div>
+            </div>
+            
+            <div class="detail-item">
+                <span class="detail-label">Account Status</span>
+                <div class="detail-value" th:classappend="${user.active} ? '' : 'inactive'" 
+                     th:text="${user.active} ? 'Verified & Active' : 'Inactive/Locked'">
+                    Verified & Active
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="security-notice">
+            For security reasons, never share your credentials with anyone. Our team will never ask for your password.
+        </div>
+        
+        <div class="button-group">
+            <a th:href="@{/profile/edit}" class="btn">Edit Profile</a>
+            <a th:href="@{/dashboard}" class="btn btn-secondary">Back to Dashboard</a>
         </div>
     </div>
+</div>
+
+<script>
+    // Add some dynamic binary rain elements
+    document.addEventListener('DOMContentLoaded', function() {
+        const background = document.querySelector('.background-elements');
+        const binaryChars = ['0', '1'];
+        
+        // Create more binary rain columns
+        for (let i = 0; i < 5; i++) {
+            const leftPos = 20 + (Math.random() * 60);
+            const duration = 15 + (Math.random() * 15);
+            const delay = Math.random() * 5;
+            
+            // Generate random binary string
+            let binaryString = '';
+            for (let j = 0; j < 20; j++) {
+                binaryString += binaryChars[Math.floor(Math.random() * binaryChars.length)];
+            }
+            
+            const rain = document.createElement('div');
+            rain.className = 'binary-rain';
+            rain.style.left = `${leftPos}%`;
+            rain.style.animationDuration = `${duration}s`;
+            rain.style.animationDelay = `${delay}s`;
+            rain.textContent = binaryString;
+            
+            background.appendChild(rain);
+        }
+        
+        // Add some floating particles
+        for (let i = 0; i < 5; i++) {
+            const size = 5 + (Math.random() * 10);
+            const top = Math.random() * 100;
+            const left = Math.random() * 100;
+            const color = `rgb(${Math.floor(Math.random() * 50)}, ${Math.floor(200 + Math.random() * 55)}, ${Math.floor(200 + Math.random() * 55)})`;
+            const duration = 20 + (Math.random() * 20);
+            const delay = Math.random() * 10;
+            
+            const particle = document.createElement('div');
+            particle.className = 'floating-shape';
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.top = `${top}%`;
+            particle.style.left = `${left}%`;
+            particle.style.background = color;
+            particle.style.animationDuration = `${duration}s`;
+            particle.style.animationDelay = `${delay}s`;
+            particle.style.opacity = '0.5';
+            particle.style.filter = 'blur(1px)';
+            
+            background.appendChild(particle);
+        }
+    });
+</script>
+
 </body>
 </html>

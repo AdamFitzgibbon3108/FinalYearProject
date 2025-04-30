@@ -169,7 +169,7 @@
                     <th onclick="sortTable(2)">Score <span class="sort-indicator" id="sort2"></span></th>
                     <th>Total Questions</th>
                     <th onclick="sortTable(4)">Completed At <span class="sort-indicator" id="sort4"></span></th>
-                    <th>Review</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -185,7 +185,7 @@
                     <td th:text="${result.totalQuestions}">0</td>
                     <td th:text="${#temporals.format(result.completedAt, 'yyyy-MM-dd HH:mm')}">Date</td>
                     <td>
-                        <a th:href="@{/admin/user/{userId}/quiz/{quizId}/answers(userId=${user.id}, quizId=${result.id})}" class="link-btn">View Answers</a>
+                        <a th:href="@{/admin/user/{userId}/quiz/{quizId}/answers(userId=${user.id}, quizId=${result.id})}" </a>
                     </td>
                 </tr>
             </tbody>

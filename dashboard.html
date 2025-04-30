@@ -4,239 +4,422 @@
     <meta charset="UTF-8">
     <title>ThreatLens Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Roboto', sans-serif;
-            background: #0f172a;
-            color: #f1f5f9;
-            overflow-x: hidden;
-        }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --cyber-blue: #00d1ff;
+        --cyber-green: #00ff9d;
+        --cyber-purple: #bd00ff;
+        --dark: #0f172a;
+        --darker: #020617;
+        --light: #f1f5f9;
+        --gray: #94a3b8;
+    }
 
-        header {
-            background-color: #1e293b;
-            padding: 1.5rem;
-            text-align: center;
-            border-bottom: 2px solid #3b82f6;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            animation: fadeInDown 0.8s ease-in-out;
-        }
+    body {
+        margin: 0;
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: var(--light);
+        overflow-x: hidden;
+    }
 
-        header h1 {
-            margin: 0;
-            font-size: 2.6rem;
-            color: #3b82f6;
-        }
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(88, 166, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(88, 166, 255, 0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0.5;
+    }
 
-        header p {
-            margin-top: 0.4rem;
-            color: #cbd5e1;
-            font-size: 1rem;
-        }
+    header {
+        background-color: rgba(30, 41, 59, 0.9);
+        padding: 1.5rem;
+        text-align: center;
+        border-bottom: 2px solid var(--primary);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        animation: fadeInDown 0.8s ease-in-out;
+        position: relative;
+        overflow: hidden;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
+    header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--cyber-green), var(--cyber-blue), var(--cyber-purple));
+    }
 
-        .welcome {
-            text-align: center;
-            margin-bottom: 2rem;
-            animation: fadeIn 1s ease-in;
-        }
+    header h1 {
+        margin: 0;
+        font-size: 2.6rem;
+        color: var(--primary);
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 1px;
+        text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    }
 
-        .welcome p {
-            font-size: 1.2rem;
-        }
+    header h1 i {
+        margin-right: 15px;
+        color: var(--cyber-green);
+    }
 
-        .main-cta {
-            background: linear-gradient(to right, #3b82f6, #2563eb);
-            padding: 2rem;
-            border-radius: 16px;
-            text-align: center;
-            margin-bottom: 3rem;
-            box-shadow: 0 10px 24px rgba(59, 130, 246, 0.3);
-            animation: fadeInUp 0.9s ease;
-        }
+    header p {
+        margin-top: 0.4rem;
+        color: var(--gray);
+        font-size: 1rem;
+    }
 
-        .main-cta h2 {
-            color: white;
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
+    .container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
 
-        .main-cta p {
-            font-size: 1.1rem;
-            color: #e0f2fe;
-        }
+    .welcome {
+        text-align: center;
+        margin-bottom: 2rem;
+        animation: fadeIn 1s ease-in;
+    }
 
-        .main-cta a button {
-            background-color: white;
-            color: #1e3a8a;
-            font-weight: 600;
-            font-size: 1.05rem;
-            border: none;
-            border-radius: 8px;
-            padding: 0.8rem 1.6rem;
-            margin-top: 1rem;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+    .welcome p {
+        font-size: 1.2rem;
+    }
 
-        .main-cta a button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(255, 255, 255, 0.2);
-        }
+    .welcome span {
+        color: var(--cyber-green);
+        font-weight: 600;
+    }
 
+    .main-cta {
+        background: linear-gradient(to right, var(--primary), var(--primary-dark));
+        padding: 2.5rem;
+        border-radius: 16px;
+        text-align: center;
+        margin-bottom: 3rem;
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        animation: fadeInUp 0.9s ease;
+        border: 1px solid rgba(88, 166, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .main-cta:hover {
+        box-shadow: 0 12px 35px rgba(59, 130, 246, 0.5);
+    }
+
+    .main-cta h2 {
+        color: white;
+        font-size: 2rem;
+        margin-bottom: 1rem; /* Increased from 0.5rem */
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 1px;
+    }
+
+    .main-cta p {
+        font-size: 1.1rem;
+        color: #e0f2fe;
+        margin-bottom: 1.5rem; /* Added margin */
+    }
+
+    .main-cta a button {
+        background-color: white;
+        color: #1e3a8a;
+        font-weight: 700;
+        font-size: 1.05rem;
+        border: none;
+        border-radius: 8px;
+        padding: 0.8rem 1.6rem;
+        margin-top: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .main-cta a button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 1.6rem;
+        margin-bottom: 4rem;
+        animation: fadeIn 1.2s ease-in-out;
+    }
+
+    .card {
+        background: rgba(30, 41, 59, 0.8);
+        padding: 2rem;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(88, 166, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+        background: rgba(30, 41, 59, 0.9);
+    }
+
+    .card i {
+        font-size: 2.5rem;
+        color: var(--cyber-blue);
+        margin-bottom: 1.5rem; /* Increased from 1rem */
+    }
+
+    .card h3 {
+        margin-top: 0;
+        margin-bottom: 1.20rem; /* Added margin */
+        font-size: 1.0rem; 
+        color: var(--cyber-green);
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 0.5px;
+        flex-grow: 0;
+        line-height: 1.4; /* Better line spacing */
+        text-align: center; /* Ensures alignment */
+        word-break: break-word; /* Allows wrapping on long words */
+
+        
+    }
+
+    .card p {
+        font-size: 1rem;
+        color: var(--gray);
+        margin: 0 0 2rem 0; /* Increased bottom margin */
+        flex-grow: 1;
+        line-height: 1.6; /* Better readability */
+    }
+
+    .card button {
+        background: linear-gradient(to right, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        padding: 0.9rem 1.4rem; /* Slightly taller */
+        font-size: 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Orbitron', sans-serif;
+        letter-spacing: 1px;
+        width: 100%;
+        margin-top: auto;
+    }
+
+    .card button:hover {
+        background: linear-gradient(to right, var(--primary-dark), var(--primary));
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .logout {
+        text-align: center;
+        margin-top: 6rem; /* Increased from 2rem */
+        margin-bottom: 2rem; /* Added bottom margin */
+    }
+
+    .logout a {
+        color: var(--cyber-blue);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s;
+        display: inline-flex;
+        align-items: center;
+        font-size: 1.1rem; /* Slightly larger */
+    }
+
+    .logout a:hover {
+        color: var(--cyber-green);
+        text-decoration: none;
+    }
+
+    .logout a i {
+        margin-right: 8px;
+    }
+
+    /* Symmetrical grid for 5 cards */
+    @media (min-width: 1200px) {
         .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1.6rem;
-            margin-bottom: 4rem;
-            animation: fadeIn 1.2s ease-in-out;
+            grid-template-columns: repeat(5, 1fr);
         }
+    }
 
-        .card {
-            background: #1e293b;
-            padding: 2rem;
-            border-radius: 14px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+    @media (max-width: 1199px) and (min-width: 900px) {
+        .grid {
+            grid-template-columns: repeat(3, 1fr);
         }
-
-        .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+        
+        .grid .card:nth-child(4),
+        .grid .card:nth-child(5) {
+            grid-column: span 1.5;
         }
+    }
 
-        .card i {
-            font-size: 2.5rem;
-            color: #3b82f6;
-            margin-bottom: 1rem;
+    @media (max-width: 899px) and (min-width: 600px) {
+        .grid {
+            grid-template-columns: repeat(2, 1fr);
         }
+        
+        .grid .card:last-child {
+            grid-column: span 2;
+            max-width: 50%;
+            margin: 0 auto;
+        }
+    }
 
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+        header h1 {
+            font-size: 2rem;
+        }
+        
+        .main-cta {
+            padding: 1.8rem;
+        }
+        
+        .main-cta h2 {
+            font-size: 1.6rem;
+        }
+        
+        .grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .grid .card:last-child {
+            grid-column: span 1;
+            max-width: 100%;
+        }
+        
         .card h3 {
-            margin-top: 0;
-            font-size: 1.25rem;
-            color: #60a5fa;
+            font-size: 1.3rem;
+            margin-bottom: 1.2rem;
         }
-
-        .card p {
-            font-size: 1rem;
-            color: #cbd5e1;
-            margin: 1rem 0 1.5rem;
-        }
-
-        .card button {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 0.7rem 1.2rem;
-            font-size: 1rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .card button:hover {
-            background-color: #2563eb;
-        }
-
+        
         .logout {
-            text-align: center;
-            margin-top: 2rem;
+            margin-top: 3rem;
         }
-
-        .logout a {
-            color: #60a5fa;
-            text-decoration: none;
-        }
-
-        .logout a:hover {
-            text-decoration: underline;
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
 <header>
-    <h1>ThreatLens Dashboard</h1>
+    <h1><i class="fas fa-shield-alt"></i> ThreatLens Dashboard</h1>
     <p>Explore your cybersecurity posture and stay ahead of risks.</p>
 </header>
 
 <div class="container">
     <div class="welcome">
-        <p>Welcome back, <span th:text="${username}">User</span> 👋</p>
-        <p>Let’s make your security smarter today.</p>
+        <p>Welcome back, <span th:text="${username}">User</span> <i class="fas fa-terminal"></i></p>
+        <p>Let's make your security smarter today.</p>
     </div>
 
     <div class="main-cta">
-        <h2>Take a New Security Questionnaire</h2>
-        <p>Assess your knowledge in current threat domains tailored to your role.</p>
-        <a th:href="@{/survey/page}"><button>Begin Questionnaire</button></a>
+        <h2>TAKE A NEW SECURITY ASSESSMENT</h2>
+        <p>Evaluate your threat awareness across critical security domains</p>
+        <a th:href="@{/survey/page}"><button><i class="fas fa-lock-open"></i> BEGIN ASSESSMENT</button></a>
     </div>
 
     <div class="grid">
+        <!-- Card 1 -->
         <div class="card">
-            <i class="ph ph-user"></i>
-            <h3>Manage Profile</h3>
-            <p>Update your account, password, and preferences.</p>
-            <a th:href="@{/editprofile}"><button>Profile Settings</button></a>
+            <i class="ph ph-user-shield"></i>
+            <h3>SECURITY PROFILE</h3>
+            <p>Configure your account and edit your profile settings</p>
+            <a th:href="@{/profile}"><button><i class="fas fa-user-cog"></i> PROFILE SETTINGS</button></a>
         </div>
 
+        <!-- Card 2 -->
         <div class="card">
-            <i class="ph ph-chart-line"></i>
-            <h3>Performance Summary</h3>
-            <p>Track your best scores and quiz history.</p>
-            <a th:href="@{/user/performance}"><button>My Performance</button></a>
+            <i class="ph ph-chart-line-up"></i>
+            <h3>THREAT PERFORMANCE</h3>
+            <p>Analyze your assessment results and progress trends</p>
+            <a th:href="@{/user/performance}"><button><i class="fas fa-chart-bar"></i> VIEW ANALYTICS</button></a>
         </div>
 
+        <!-- Card 3 (Centered) -->
         <div class="card">
             <i class="ph ph-graduation-cap"></i>
-            <h3>Security Training</h3>
-            <p>Sharpen your knowledge with guided programs.</p>
-            <a href="/training"><button>Launch Training</button></a>
+            <h3>TRAINING MODULES</h3>
+            <p>Enhance your skills with targeted security resources</p>
+            <a href="/training/all"><button><i class="fas fa-book-open"></i> START TRAINING</button></a>
         </div>
 
+        <!-- Card 4 -->
         <div class="card">
-            <i class="ph ph-bell"></i>
-            <h3>Threat Intelligence</h3>
-            <p>Stay updated with the latest vulnerabilities.</p>
-            <a href="/threat-alerts"><button>Threat Alerts Dashboard</button></a>
+            <i class="ph ph-bug"></i>
+            <h3>THREAT INTELLIGENCE</h3>
+            <p>Access real-time vulnerability reports and alerts</p>
+            <a href="/threat-alerts"><button><i class="fas fa-bell"></i> VIEW ALERTS</button></a>
         </div>
 
+        <!-- Card 5 -->
         <div class="card">
-            <i class="ph ph-activity"></i>
-            <h3>Reports & Trends</h3>
-            <p>Analyze your strengths and learning gaps.</p>
-            <a href="/dashboard/reports"><button>View Reports</button></a>
+            <i class="ph ph-file-text"></i>
+            <h3>SECURITY REPORTS</h3>
+            <p>Download detailed reports of your security posture</p>
+            <a th:href="@{/reports}"><button><i class="fas fa-file-alt"></i> GENERATE REPORTS</button></a>
         </div>
     </div>
 
     <div class="logout">
-        <p><a href="/logout">Logout</a></p>
+        <p><a href="/logout"><i class="fas fa-sign-out-alt"></i> SECURE LOGOUT</a></p>
     </div>
 </div>
+
+<script>
+    // Add subtle hover effects to all cards
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-8px)';
+            card.style.boxShadow = '0 12px 28px rgba(0, 0, 0, 0.4)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+            card.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.3)';
+        });
+    });
+</script>
 </body>
 </html>
-
-
-

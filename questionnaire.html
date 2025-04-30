@@ -3,20 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tech Questionnaire</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Security Assessment | ThreatLens</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #58a6ff;
+            --primary-dark: #1e90ff;
+            --cyber-green: #00ff9d;
+            --cyber-blue: #00d1ff;
+            --cyber-purple: #bd00ff;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f1f5f9;
+            --gray: #94a3b8;
+        }
+
         body, html {
             margin: 0;
             padding: 0;
             height: 100vh;
             font-family: 'Roboto', sans-serif;
-            background: radial-gradient(ellipse at center, #141e30, #243b55), url('/images/cybersecurity-grid.png');
-            background-size: cover, contain;
+            background: radial-gradient(ellipse at center, var(--darker), var(--dark)), 
+                        url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+            background-size: cover;
             background-blend-mode: overlay;
-            color: #ffffff;
+            color: var(--light);
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(88, 166, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(88, 166, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .cyber-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .cyber-pulse::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--cyber-blue), transparent 70%);
+            top: -150px;
+            right: -150px;
+            animation: pulse 8s infinite alternate;
+        }
+
+        .cyber-pulse::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--cyber-purple), transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            animation: pulse 6s infinite alternate-reverse;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            100% { transform: scale(1.2); opacity: 0.1; }
         }
 
         .app-title {
@@ -25,28 +92,52 @@
             left: 20px;
             font-size: 2rem;
             font-weight: 700;
-            color: #58a6ff;
+            color: var(--primary);
             text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+        }
+
+        .app-title i {
+            margin-right: 10px;
+            color: var(--cyber-green);
         }
 
         .container {
             width: 90%;
             max-width: 960px;
             margin: auto;
-            background: rgba(20, 30, 48, 0.9);
-            padding: 2rem;
+            background: rgba(20, 30, 48, 0.95);
+            padding: 2.5rem;
             border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
             text-align: center;
             max-height: 80vh;
             overflow-y: auto;
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            position: relative;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--cyber-green), var(--cyber-blue), var(--cyber-purple));
         }
 
         h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            color: #58a6ff;
+            color: var(--primary);
             margin-bottom: 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
         }
 
         ul {
@@ -57,14 +148,24 @@
         li {
             margin-bottom: 2rem;
             text-align: left;
-            padding: 1rem;
+            padding: 1.5rem;
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(88, 166, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        li:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            background: rgba(30, 41, 59, 0.8);
         }
 
         strong {
             font-size: 1.2rem;
-            color: #ffffff;
+            color: var(--light);
+            display: block;
+            margin-bottom: 1rem;
         }
 
         label {
@@ -72,55 +173,164 @@
             align-items: center;
             gap: 1rem;
             font-size: 1rem;
-            color: #cbd5e0;
+            color: var(--gray);
             cursor: pointer;
+            padding: 0.8rem;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        label:hover {
+            background: rgba(88, 166, 255, 0.1);
         }
 
         input[type="radio"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
             margin-right: 0.5rem;
-            accent-color: #58a6ff;
+            position: relative;
+            cursor: pointer;
+        }
+
+        input[type="radio"]:checked {
+            background-color: var(--primary);
+        }
+
+        input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
         }
 
         button {
             width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #58a6ff, #1e90ff);
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
             border-radius: 10px;
-            color: #ffffff;
+            color: white;
             font-size: 1.2rem;
             font-weight: 700;
             cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
+            transition: all 0.3s ease;
             margin-top: 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 6px 15px rgba(88, 166, 255, 0.3);
+            position: relative;
+            overflow: hidden;
         }
 
         button:hover {
-            background: linear-gradient(135deg, #1e90ff, #58a6ff);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(88, 166, 255, 0.4);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(88, 166, 255, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(30deg);
+            transition: all 0.3s;
+        }
+
+        button:hover::after {
+            left: 100%;
         }
 
         .scrollable {
             overflow-y: auto;
             max-height: calc(80vh - 200px);
+            padding-right: 10px;
+        }
+
+        .scrollable::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scrollable::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 10px;
+        }
+
+        .scrollable::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
         }
 
         .option-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
+        }
+
+        /* Terminal effect */
+        .terminal-line {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-family: 'Courier New', monospace;
+            color: var(--cyber-green);
+            font-size: 0.9rem;
+            opacity: 0.7;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid var(--cyber-green);
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            from, to { border-color: transparent; }
+            50% { border-color: var(--cyber-green); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            li {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-<a href="/" class="app-title">ThreatLens</a>
+    <!-- Cyber grid background -->
+    <div class="cyber-grid"></div>
+    
+    <!-- Cyber pulse effect -->
+    <div class="cyber-pulse"></div>
+
+<a href="/" class="app-title"><i class="fas fa-shield-alt"></i>ThreatLens</a>
 
 <div class="container">
-    <h1>Tech Questionnaire</h1>
+    <h1>SECURITY ASSESSMENT</h1>
 
     <form th:action="@{/questions/submit}" method="post">
-        <!-- Hidden fields -->
         <input type="hidden" name="selectedRole" th:value="${selectedRole}" />
         <input type="hidden" name="selectedCategory" th:value="${selectedCategory}" />
 
@@ -131,7 +341,6 @@
                         <strong th:text="${questionStat.index + 1} + '. ' + ${question.text}"></strong>
                     </div>
 
-                    <!-- TRUE/FALSE -->
                     <div th:if="${question.questionType?.name() == 'TRUE_FALSE'}">
                         <div class="option-container">
                             <label>
@@ -145,7 +354,6 @@
                         </div>
                     </div>
 
-                    <!-- MULTIPLE CHOICE -->
                     <div th:if="${question.questionType?.name() == 'MULTIPLE_CHOICE'}">
                         <div th:each="option : ${#strings.arraySplit(question.options, ',')}" class="option-container">
                             <label>
@@ -158,9 +366,34 @@
             </ul>
         </div>
 
-        <button type="submit">Submit Responses</button>
+        <button type="submit"><i class="fas fa-lock"></i> SUBMIT RESPONSES</button>
     </form>
 </div>
+
+<!-- Cyber terminal effect -->
+<div class="terminal-line" id="terminal"></div>
+
+<script>
+    // Terminal effect
+    const terminalText = "> Security assessment initialized... > Answer all questions to complete evaluation... > Threat analysis pending...";
+    let i = 0;
+    const terminal = document.getElementById('terminal');
+    
+    function typeTerminal() {
+        if (i < terminalText.length) {
+            terminal.innerHTML += terminalText.charAt(i);
+            i++;
+            setTimeout(typeTerminal, Math.random() * 50 + 20);
+        } else {
+            setTimeout(() => {
+                terminal.innerHTML = ">";
+                i = 0;
+                typeTerminal();
+            }, 5000);
+        }
+    }
+    
+    setTimeout(typeTerminal, 1000);
+</script>
 </body>
 </html>
-

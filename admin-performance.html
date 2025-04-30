@@ -1,23 +1,54 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Admin - User Performance</title>
+    <title>Admin Dashboard - User Performance Analytics</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --admin-blue: #1a56db;
+            --admin-blue-dark: #1e40af;
+            --admin-blue-light: #3b82f6;
+            --admin-bg: #0f172a;
+            --admin-panel: #1e293b;
+            --admin-text: #e2e8f0;
+            --admin-accent: #38bdf8;
+            --admin-warning: #f59e0b;
+            --admin-danger: #ef4444;
+            --admin-success: #10b981;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f172a;
-            color: #e2e8f0;
+            background-color: var(--admin-bg);
+            color: var(--admin-text);
             margin: 0;
             padding: 40px;
         }
 
         h1 {
-            color: #38bdf8;
+            color: var(--admin-accent);
             margin-bottom: 30px;
-            text-shadow: 1px 1px #0ea5e9;
+            border-bottom: 2px solid var(--admin-blue-dark);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1 i {
+            font-size: 1.2em;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
         .controls {
@@ -25,26 +56,34 @@
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
+            background: var(--admin-panel);
+            padding: 15px;
+            border-radius: 8px;
+            align-items: center;
         }
 
         .controls label {
             font-weight: bold;
+            color: var(--admin-accent);
         }
 
-        select, input[type="number"] {
-            padding: 8px;
-            border: 1px solid #334155;
+        select, input[type="text"] {
+            padding: 8px 12px;
+            border: 1px solid var(--admin-blue-dark);
             border-radius: 6px;
-            background-color: #1e293b;
-            color: #f8fafc;
+            background-color: var(--admin-panel);
+            color: var(--admin-text);
+            min-width: 180px;
         }
 
         .table-wrapper {
             overflow-x: auto;
-            background: #1e293b;
+            background: var(--admin-panel);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border: 1px solid var(--admin-blue-dark);
         }
 
         table {
@@ -56,58 +95,133 @@
         th, td {
             padding: 14px 18px;
             text-align: center;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid var(--admin-blue-dark);
         }
 
         th {
-            background-color: #0f172a;
-            color: #38bdf8;
+            background-color: var(--admin-blue-dark);
+            color: white;
             cursor: pointer;
+            position: relative;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        th:hover {
+            background-color: var(--admin-blue);
+        }
+
+        th.sort-asc::after {
+            content: " ↑";
+            font-size: 0.9em;
+        }
+
+        th.sort-desc::after {
+            content: " ↓";
+            font-size: 0.9em;
         }
 
         tr:nth-child(even) {
-            background-color: #1e293b;
+            background-color: rgba(30, 41, 59, 0.5);
         }
 
         tr:hover {
-            background-color: #334155;
+            background-color: var(--admin-blue-dark);
         }
 
         a {
-            color: #60a5fa;
+            color: var(--admin-blue-light);
             text-decoration: none;
             font-weight: 500;
+            transition: color 0.2s;
         }
 
         a:hover {
+            color: var(--admin-accent);
             text-decoration: underline;
         }
 
         .back-link {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             margin-top: 30px;
             font-weight: bold;
-            color: #38bdf8;
+            color: var(--admin-blue-light);
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: var(--admin-panel);
+            transition: all 0.2s;
+        }
+
+        .back-link:hover {
+            background: var(--admin-blue-dark);
+            text-decoration: none;
         }
 
         .badge {
-            background-color: #10b981;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 8px;
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
             font-size: 12px;
-            margin-left: 6px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .badge-top {
+            background-color: var(--admin-success);
+            color: white;
+        }
+
+        .badge-medium {
+            background-color: var(--admin-warning);
+            color: black;
+        }
+
+        .badge-low {
+            background-color: var(--admin-danger);
+            color: white;
         }
 
         .chart-section {
             margin-top: 40px;
-            background: #1e293b;
+            background: var(--admin-panel);
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--admin-blue-dark);
+        }
+
+        .chart-header {
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            color: var(--admin-accent);
+            font-size: 1.2em;
+            margin: 0;
+        }
+
+        .view-btn {
+            background: var(--admin-blue);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.9em;
+        }
+
+        .view-btn:hover {
+            background: var(--admin-blue-light);
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+
             th, td {
                 font-size: 14px;
                 padding: 10px;
@@ -116,21 +230,41 @@
             h1 {
                 font-size: 20px;
             }
+
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Cybersecurity - User Performance Overview</h1>
+    <div class="admin-header">
+        <h1>
+            <i class="fas fa-user-shield"></i>
+            User Performance Analytics
+        </h1>
+        <div>
+            <a href="/admin/dashboard" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Admin Dashboard
+            </a>
+        </div>
+    </div>
 
     <div class="controls">
         <div>
-            <label for="tierFilter">Performance Tier:</label>
+            <label for="tierFilter"><i class="fas fa-filter"></i> Performance Tier:</label>
             <select id="tierFilter" onchange="filterTableByTier()">
-                <option value="">All</option>
+                <option value="">All Users</option>
                 <option value="top">Top Performers (≥ 8)</option>
                 <option value="medium">Medium (5-7.9)</option>
                 <option value="low">Low (< 5)</option>
             </select>
+        </div>
+        <div>
+            <label for="searchInput"><i class="fas fa-search"></i> Search:</label>
+            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search users...">
         </div>
     </div>
 
@@ -138,10 +272,10 @@
         <table id="performanceTable">
             <thead>
                 <tr>
-                    <th onclick="sortTable(0)">Username</th>
-                    <th onclick="sortTable(1)">Total Quizzes</th>
-                    <th onclick="sortTable(2)">Average Score</th>
-                    <th>View History</th>
+                    <th onclick="sortTable(0)">Username <i class="fas fa-sort"></i></th>
+                    <th onclick="sortTable(1)">Quizzes Taken <i class="fas fa-sort"></i></th>
+                    <th onclick="sortTable(2)">Average Score <i class="fas fa-sort"></i></th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -149,12 +283,22 @@
                     th:data-score="${userPerf.averageScore}">
                     <td>
                         <span th:text="${userPerf.username}">Username</span>
-                        <span class="badge" th:if="${userPerf.averageScore >= 8}">Top Performer</span>
+                        <span class="badge badge-top" th:if="${userPerf.averageScore >= 8}">
+                            <i class="fas fa-trophy"></i> Top
+                        </span>
+                        <span class="badge badge-medium" th:if="${userPerf.averageScore >= 5 && userPerf.averageScore < 8}">
+                            <i class="fas fa-chart-line"></i> Medium
+                        </span>
+                        <span class="badge badge-low" th:if="${userPerf.averageScore < 5 && userPerf.averageScore > 0}">
+                            <i class="fas fa-exclamation-triangle"></i> Needs Review
+                        </span>
                     </td>
                     <td th:text="${userPerf.totalQuizzes}">0</td>
                     <td th:text="${#numbers.formatDecimal(userPerf.averageScore, 1, 2)}">0.0</td>
                     <td>
-                        <a th:href="@{'/admin/performance/' + ${userPerf.userId}}">View</a>
+                        <a th:href="@{'/admin/performance/' + ${userPerf.userId}}" class="view-btn">
+                            <i class="fas fa-eye"></i> Details
+                        </a>
                     </td>
                 </tr>
             </tbody>
@@ -162,25 +306,137 @@
     </div>
 
     <div class="chart-section">
+        <div class="chart-header">
+            <h2 class="chart-title"><i class="fas fa-chart-bar"></i> Performance Distribution</h2>
+        </div>
         <canvas id="performanceChart" height="100"></canvas>
     </div>
 
-    <a href="/admin/dashboard" class="back-link">⬅ Back to Admin Dashboard</a>
-
     <script>
-        function sortTable(colIndex) {
-            const table = document.getElementById("performanceTable");
-            const rows = Array.from(table.rows).slice(1);
-            let asc = table.dataset.sortAsc !== 'true';
+        let performanceChart;
+        let currentSortColumn = -1;
+        let currentSortDirection = 1; // 1 for asc, -1 for desc
 
-            rows.sort((a, b) => {
-                const cellA = a.cells[colIndex].innerText;
-                const cellB = b.cells[colIndex].innerText;
-                return asc ? cellA.localeCompare(cellB, undefined, {numeric: true}) : cellB.localeCompare(cellA, undefined, {numeric: true});
+        document.addEventListener("DOMContentLoaded", function() {
+            initializeChart();
+            initializeTableSort();
+        });
+
+        function initializeChart() {
+            const labels = [];
+            const scores = [];
+
+            document.querySelectorAll("#performanceTable tbody tr").forEach(row => {
+                labels.push(row.cells[0].innerText.replace(/★|↑|↓/g, '').trim());
+                scores.push(parseFloat(row.cells[2].innerText.trim()));
             });
 
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            performanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Score',
+                        data: scores,
+                        backgroundColor: function(context) {
+                            const value = context.dataset.data[context.dataIndex];
+                            if (value >= 8) return '#10b981';
+                            if (value >= 5) return '#f59e0b';
+                            return '#ef4444';
+                        },
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Score: ${context.raw.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: {
+                                color: '#f8fafc',
+                                callback: function(value) {
+                                    return value % 1 === 0 ? value : '';
+                                }
+                            },
+                            grid: {
+                                color: '#334155'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#f8fafc',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeTableSort() {
+            const headers = document.querySelectorAll('#performanceTable th');
+            headers.forEach((header, index) => {
+                header.addEventListener('click', () => sortTable(index));
+            });
+        }
+
+        function sortTable(colIndex) {
+            const table = document.getElementById("performanceTable");
+            const headers = table.getElementsByTagName("th");
+            const rows = Array.from(table.rows).slice(1);
+            
+            // Clear previous sort indicators
+            for (let i = 0; i < headers.length; i++) {
+                headers[i].classList.remove('sort-asc', 'sort-desc');
+            }
+            
+            // If clicking the same column, reverse direction
+            if (currentSortColumn === colIndex) {
+                currentSortDirection *= -1;
+            } else {
+                currentSortColumn = colIndex;
+                currentSortDirection = 1;
+            }
+            
+            // Set visual indicator
+            headers[colIndex].classList.add(currentSortDirection === 1 ? 'sort-asc' : 'sort-desc');
+            
+            rows.sort((a, b) => {
+                let cellA, cellB;
+                
+                // For numeric columns (quizzes taken, average score)
+                if (colIndex === 1 || colIndex === 2) {
+                    cellA = parseFloat(a.cells[colIndex].innerText);
+                    cellB = parseFloat(b.cells[colIndex].innerText);
+                    return (cellA - cellB) * currentSortDirection;
+                } 
+                // For text columns (username)
+                else {
+                    cellA = a.cells[colIndex].innerText.toLowerCase();
+                    cellB = b.cells[colIndex].innerText.toLowerCase();
+                    return cellA.localeCompare(cellB) * currentSortDirection;
+                }
+            });
+            
+            // Rebuild table
             rows.forEach(row => table.tBodies[0].appendChild(row));
-            table.dataset.sortAsc = asc;
         }
 
         function filterTableByTier() {
@@ -197,57 +453,46 @@
 
                 row.style.display = show ? '' : 'none';
             });
+            
+            // Update chart with visible data
+            updateChartData();
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const labels = [];
-            const scores = [];
+        function searchTable() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById("performanceTable");
+            const rows = table.getElementsByTagName("tr");
 
-            document.querySelectorAll("#performanceTable tbody tr").forEach(row => {
-                labels.push(row.cells[0].innerText.trim());
-                scores.push(parseFloat(row.cells[2].innerText.trim()));
-            });
-
-            new Chart(document.getElementById('performanceChart'), {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Average Score',
-                        data: scores,
-                        backgroundColor: 'rgba(56, 189, 248, 0.7)',
-                        borderRadius: 8,
-                        borderSkipped: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 10,
-                            ticks: {
-                                color: '#f8fafc'
-                            },
-                            grid: {
-                                color: '#334155'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#f8fafc'
-                            },
-                            grid: {
-                                color: '#334155'
-                            }
-                        }
+            for (let i = 1; i < rows.length; i++) {
+                const cell = rows[i].getElementsByTagName("td")[0];
+                if (cell) {
+                    const txtValue = cell.textContent || cell.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
                     }
                 }
-            });
-        });
+            }
+            
+            // Update chart with visible data
+            updateChartData();
+        }
+
+        function updateChartData() {
+            const visibleRows = Array.from(document.querySelectorAll("#performanceTable tbody tr"))
+                .filter(row => row.style.display !== 'none');
+            
+            const labels = visibleRows.map(row => 
+                row.cells[0].innerText.replace(/★|↑|↓/g, '').trim());
+            const scores = visibleRows.map(row => 
+                parseFloat(row.cells[2].innerText.trim()));
+            
+            performanceChart.data.labels = labels;
+            performanceChart.data.datasets[0].data = scores;
+            performanceChart.update();
+        }
     </script>
 </body>
 </html>

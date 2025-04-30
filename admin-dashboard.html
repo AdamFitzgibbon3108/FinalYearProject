@@ -3,322 +3,728 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | ThreatLens</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <title>Security Admin Console | ThreatLens</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        :root {
+            --admin-blue: #1a73e8;
+            --admin-dark: #0d1117;
+            --admin-darker: #090c10;
+            --admin-light: #f8f9fa;
+            --admin-border: #30363d;
+            --admin-accent: #58a6ff;
+            --admin-danger: #f85149;
+            --admin-warning: #d29922;
+            --admin-success: #2ea043;
+            --admin-card: #161b22;
+        }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(to right, #0f172a, #1e293b);
-            color: white;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
-        .container {
-            display: flex;
-            width: 100%;
+        body {
+            background-color: var(--admin-dark);
+            color: var(--admin-light);
             min-height: 100vh;
+            display: flex;
+            background-image: 
+                linear-gradient(to bottom, var(--admin-darker), var(--admin-dark));
         }
 
-        .sidebar {
-            width: 300px;
-            background: rgba(51, 65, 85, 0.85);
-            padding: 30px;
-            border-radius: 0 15px 15px 0;
-            backdrop-filter: blur(10px);
-            box-shadow: 5px 0 12px rgba(0, 0, 0, 0.4);
-            text-align: center;
+        /* Admin Sidebar */
+        .admin-sidebar {
+            width: 280px;
+            background-color: var(--admin-darker);
+            border-right: 1px solid var(--admin-border);
+            padding: 2rem 1.5rem;
+            position: relative;
+            z-index: 10;
         }
 
-        .sidebar h2 {
-            color: #58a6ff;
+        .admin-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--admin-border);
+        }
+
+        .admin-brand i {
+            font-size: 1.8rem;
+            color: var(--admin-accent);
+        }
+
+        .admin-brand h2 {
+            font-size: 1.4rem;
             font-weight: 600;
-            margin-bottom: 25px;
-            font-size: 22px;
+            color: var(--admin-light);
         }
 
-        .sidebar ul {
+        .admin-nav ul {
             list-style: none;
-            padding: 0;
         }
 
-        .sidebar ul li {
-            margin-bottom: 15px;
+        .admin-nav li {
+            margin-bottom: 0.8rem;
         }
 
-        .sidebar ul li a {
+        .admin-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1rem;
+            color: var(--admin-light);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .admin-nav a:hover {
+            background-color: rgba(88, 166, 255, 0.2);
+            color: var(--admin-accent);
+        }
+
+        .admin-nav a.active {
+            background-color: rgba(88, 166, 255, 0.3);
+            color: var(--admin-accent);
+            font-weight: 600;
+        }
+
+        .admin-nav a i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .admin-logout {
+            position: absolute;
+            bottom: 2rem;
+            left: 1.5rem;
+            right: 1.5rem;
+        }
+
+        .admin-logout a {
+            display: block;
+            text-align: center;
+            padding: 0.8rem;
+            background-color: rgba(248, 81, 73, 0.2);
+            color: var(--admin-danger);
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        .admin-logout a:hover {
+            background-color: rgba(248, 81, 73, 0.3);
+        }
+
+        /* Admin Main Content */
+        .admin-main {
+            flex: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--admin-border);
+        }
+
+        .admin-title h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--admin-light);
+        }
+
+        .admin-title p {
+            color: var(--admin-accent);
+            font-size: 0.95rem;
+            margin-top: 0.3rem;
+        }
+
+        .admin-user {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: bold;
-            background: rgba(37, 99, 235, 0.85);
-            padding: 12px;
-            border-radius: 10px;
-            justify-content: center;
-            transition: all 0.3s ease-in-out;
-            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+            background-color: var(--admin-card);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--admin-border);
         }
 
-        .sidebar ul li a:hover {
-            background: #1d4ed8;
+        .admin-user i {
+            color: var(--admin-accent);
+        }
+
+        .admin-user span {
+            font-weight: 500;
+        }
+
+        /* Stats Cards */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background-color: var(--admin-card);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--admin-border);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
             transform: translateY(-3px);
+            border-color: var(--admin-accent);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .logout {
-            background: rgba(255, 0, 0, 0.8) !important;
-        }
-
-        .logout:hover {
-            background: darkred !important;
-        }
-
-        .dashboard {
-            flex: 1;
-            padding: 40px;
+        .stat-header {
             display: flex;
-            flex-direction: column;
             align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
         }
 
-        .dashboard-header {
-            text-align: center;
-            margin-bottom: 30px;
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background-color: rgba(88, 166, 255, 0.2);
+            color: var(--admin-accent);
         }
 
-        .dashboard-header h1 {
-            font-size: 28px;
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #8b949e;
+        }
+
+        .stat-link {
+            display: inline-block;
+            margin-top: 0.8rem;
+            color: var(--admin-accent);
+            font-size: 0.85rem;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .stat-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Chart Section */
+        .chart-container {
+            background-color: var(--admin-card);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--admin-border);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
             font-weight: 600;
-            text-transform: uppercase;
+            color: var(--admin-light);
         }
 
-        .stats-container {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
+        .chart-title i {
+            color: var(--admin-accent);
+            margin-right: 0.5rem;
         }
 
-        .stats-card {
-            background: rgba(71, 85, 105, 0.9);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            width: 220px;
-            height: 150px;
-            box-shadow: 5px 5px 12px rgba(0, 0, 0, 0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            transition: transform 0.2s ease;
+        .chart-total {
+            font-size: 0.9rem;
+            color: #8b949e;
+            font-weight: 500;
         }
 
-        .stats-card:hover {
-            transform: translateY(-4px);
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
         }
+        
+        
 
-        .stats-card i {
-            font-size: 28px;
-            color: #58a6ff;
-            margin-bottom: 8px;
-        }
-
-        .stats-card h3 {
-            margin: 0;
-            font-size: 16px;
-            color: #58a6ff;
-        }
-
-        .stats-card p {
-            font-size: 22px;
-            font-weight: bold;
-            margin-top: 5px;
-        }
-
-        .chart-section {
-            margin-bottom: 30px;
-            width: 100%;
-            max-width: 600px;
-            background: linear-gradient(to bottom, rgba(30, 41, 59, 0.9), rgba(30, 41, 59, 0.8));
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 5px 5px 12px rgba(0, 0, 0, 0.4);
-            text-align: center;
-        }
-
-        .chart-section h3 {
-            color: #58a6ff;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-
-        .total-label {
-            font-size: 16px;
-            margin-top: 10px;
-            color: #cbd5e1;
-        }
-
+        /* Activity Log */
         .activity-log {
-            background: rgba(51, 65, 85, 0.9);
-            padding: 20px;
-            border-radius: 15px;
-            width: 100%;
+            background-color: var(--admin-card);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--admin-border);
             max-width: 600px;
-            text-align: center;
-            box-shadow: 5px 5px 12px rgba(0, 0, 0, 0.4);
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .activity-log h3 {
-            color: #58a6ff;
-            font-size: 18px;
-        }
-
-        .activity-log ul {
-            list-style: none;
-            padding: 0;
-            margin-top: 10px;
-        }
-
-        .activity-log ul li {
-            background: rgba(71, 85, 105, 0.9);
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 10px;
-            font-size: 14px;
+        .activity-header {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
         }
 
-        .activity-log ul li i {
-            margin-right: 8px;
-            color: #58a6ff;
+        .activity-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--admin-light);
         }
+
+        .activity-title i {
+            color: var(--admin-accent);
+            margin-right: 0.5rem;
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--admin-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item i {
+            color: var(--admin-accent);
+        }
+        
+        .table-container {
+    background-color: var(--admin-card);
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid var(--admin-border);
+    margin-bottom: 2.5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--admin-light);
+}
+
+th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+th {
+    color: var(--admin-accent);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+}
+
+.category-tag {
+    background-color: var(--admin-accent);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 100;
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: var(--admin-card);
+    border-radius: 8px;
+    border: 1px solid var(--admin-border);
+    width: 80%;
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+.modal-content h2 {
+    color: var(--admin-accent);
+    margin-bottom: 1.5rem;
+}
+
+.modal-content table {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.modal-content button {
+    background-color: var(--admin-accent);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.modal-content button:hover {
+    background-color: var(--admin-blue);
+}
+        
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .admin-sidebar {
+                width: 100%;
+                padding: 1.5rem;
+            }
+            
+            .admin-nav ul {
+                display: flex;
+                gap: 0.5rem;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+            
+            .admin-nav li {
+                margin-bottom: 0;
+            }
+            
+            .admin-nav a {
+                white-space: nowrap;
+            }
+            
+            .admin-logout {
+                position: static;
+                margin-top: 1.5rem;
+            }
+            
+            .admin-main {
+                padding: 1.5rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 1rem;
+            }
+        } 
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="sidebar">
-        <h2>ThreatLens</h2>
-        <ul>
-            <li><a href="/admin/questions"><i class="fas fa-question-circle"></i> Manage Questions</a></li>
-            <li><a href="/admin/performance"><i class="fas fa-chart-line"></i> View User Performance</a></li>
-            <li><a href="/admin/ban"><i class="fas fa-user-slash"></i> Ban/Unban Users</a></li>
-            <li><a href="/logout" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-        </ul>
+    <!-- Admin Sidebar -->
+    <div class="admin-sidebar">
+        <div class="admin-brand">
+            <i class="fas fa-shield-alt"></i>
+            <h2>ThreatLens Admin</h2>
+        </div>
+        <nav class="admin-nav">
+            <ul>
+                <li><a href="/admin/dashboard" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="/admin/questions"><i class="fas fa-question-circle"></i> Manage Questions</a></li>
+                <li><a href="/admin/performance"><i class="fas fa-chart-line"></i> User Performance</a></li>
+                
+            </ul>
+        </nav>
+        <div class="admin-logout">
+            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
     </div>
 
-    <div class="dashboard">
-        <div class="dashboard-header">
-            <h1>Welcome, <span th:text="${adminName}">Admin</span>!</h1>
-            <p>You have full access to manage the platform.</p>
+    <!-- Admin Main Content -->
+    <div class="admin-main">
+        <header class="admin-header">
+            <div class="admin-title">
+                <h1>Security Administration Console</h1>
+                <p> Full system access</p>
+            </div>
+            <div class="admin-user">
+                <i class="fas fa-user-shield"></i>
+                <span th:text="${adminName}">Administrator</span>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="admin-stats">
+            <!-- Total Users -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-label">Total Users</h3>
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="stat-value" th:text="${totalUsers}">100</div>
+                <a href="javascript:void(0)" onclick="openAllUsersModal()" class="stat-link">View all users <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <!-- Active Users -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-label">Active Users</h3>
+                    <div class="stat-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                </div>
+                <div class="stat-value" th:text="${activeUsers}">80</div>
+                <a href="javascript:void(0)" onclick="openActiveUsersModal()" class="stat-link">View active <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <!-- Recent Assessments -->
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-label">Recent Assessments</h3>
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                </div>
+                <div class="stat-value">87</div>
+                <a href="/admin/performance" class="stat-link">View analytics <i class="fas fa-arrow-right"></i></a>
+            </div>
         </div>
 
-        <div class="stats-container">
-            <div class="stats-card">
-                <i class="fas fa-user"></i>
-                <h3>Total Users</h3>
-                <p th:text="${totalUsers}">100</p>
+        <!-- Chart Section: Role Distribution -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Questionnaires Taken per Role</h3>
+                <div class="chart-total">Total: <span id="totalTaken">0</span></div>
             </div>
-            <div class="stats-card">
-                <i class="fas fa-user-check"></i>
-                <h3>Active Users</h3>
-                <p th:text="${activeUsers}">80</p>
-            </div>
-            <div class="stats-card">
-                <i class="fas fa-user-clock"></i>
-                <h3>Pending Approvals</h3>
-                <p th:text="${pendingUsers}">5</p>
-            </div>
-            <div class="stats-card">
-                <i class="fas fa-chart-bar"></i>
-                <h3>User Performance</h3>
-                <a href="/admin/performance">View Details</a>
+            <div class="chart-wrapper">
+                <canvas id="roleChart"></canvas>
             </div>
         </div>
 
-        <div class="chart-section">
-            <h3><i class="fas fa-chart-pie"></i> Questionnaires Taken per Role</h3>
-            <canvas id="roleChart" width="400" height="300"></canvas>
-            <div id="totalTaken" class="total-label">Total Questionnaires: <span>—</span></div>
-        </div>
+   <!-- Table Section: Best Category Per User -->
+<div class="table-container">
+    <div class="chart-header">
+        <h3 class="chart-title"><i class="fas fa-user-tag"></i> Best Performing Category per User</h3>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th><i class="fas fa-user"></i> Username</th>
+                <th><i class="fas fa-layer-group"></i> Best Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="entry : ${bestCategoryPerUser}">
+                <td th:text="${entry.key}"></td>
+                <td><span class="category-tag" th:text="${entry.value}"></span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
-        <div class="activity-log">
-            <h3><i class="fas fa-history"></i> Recent Activity</h3>
-            <ul>
-                <li th:each="log : ${activityLogs}">
-                    <i class="fas fa-bell"></i>
-                    <span th:text="${log}">Admin updated a questionnaire</span>
-                </li>
-            </ul>
-        </div>
+<!-- All Users Modal -->
+<div id="allUsersModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>All Users</h2>
+        <table id="allUsersTable">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamically loaded -->
+            </tbody>
+        </table>
+        <button onclick="closeModal('allUsersModal')">Close</button>
     </div>
 </div>
 
-<script>
-    fetch('/admin/api/questionnaires-taken-per-role')
-        .then(res => res.json())
-        .then(data => {
-            const ctx = document.getElementById('roleChart');
-            const values = [
-                data.General || 0,
-                data.Developer || 0,
-                data.Analyst || 0,
-                data.Manager || 0
-            ];
-            const total = values.reduce((sum, val) => sum + val, 0);
-            document.getElementById('totalTaken').querySelector('span').textContent = total;
+<!-- Active Users Modal -->
+<div id="activeUsersModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Active Users</h2>
+        <table id="activeUsersTable">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamically loaded -->
+            </tbody>
+        </table>
+        <button onclick="closeModal('activeUsersModal')">Close</button>
+    </div>
+</div>
 
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['General', 'Developer', 'Analyst', 'Manager'],
-                    datasets: [{
-                        label: 'Questionnaires Taken',
-                        data: values,
-                        backgroundColor: ['#3b82f6', '#10b981', '#facc15', '#f87171'],
-                        borderColor: '#1e293b',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: 'white',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.parsed;
-                                    return `${label}: ${value} taken`;
+
+
+    <!-- Scripts -->
+    <script>
+        // Role Distribution Chart
+        fetch('/admin/api/questionnaires-taken-per-role')
+            .then(res => res.json())
+            .then(data => {
+                const ctx = document.getElementById('roleChart');
+                const values = [
+                    data.General || 0,
+                    data.Developer || 0,
+                    data.Analyst || 0,
+                    data.Manager || 0
+                ];
+                const total = values.reduce((sum, val) => sum + val, 0);
+                document.getElementById('totalTaken').textContent = total;
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['General', 'Developer', 'Analyst', 'Manager'],
+                        datasets: [{
+                            data: values,
+                            backgroundColor: ['#3b82f6', '#10b981', '#facc15', '#f87171'],
+                            borderColor: '#1e293b',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: 'white', font: { size: 14, weight: 'bold' } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.label}: ${context.raw} taken`;
+                                    }
                                 }
                             }
                         }
                     }
-                }
+                });
             });
+
+        // Modal Functions
+        function openAllUsersModal() {
+            fetch('/admin/api/users')
+                .then(response => response.json())
+                .then(users => {
+                    const tbody = document.getElementById('allUsersTable').querySelector('tbody');
+                    tbody.innerHTML = '';
+                   users.forEach(username => {
+                const row = `<tr>
+                <td>${username}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+                });
+                    document.getElementById('allUsersModal').style.display = 'block';
+                });
+        }
+
+        function openActiveUsersModal() {
+            fetch('/admin/api/users/active')
+                .then(response => response.json())
+                .then(users => {
+                    const tbody = document.getElementById('activeUsersTable').querySelector('tbody');
+                    tbody.innerHTML = '';
+                    users.forEach(username => {
+    const row = `<tr>
+        <td>${username}</td>
+
+    </tr>`;
+    tbody.innerHTML += row;
+});
+
+                    document.getElementById('activeUsersModal').style.display = 'block';
+                });
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+    </script>
+
+    <script th:inline="javascript">
+        const bestData = [[${bestCategoryPerUser}]];
+        const userLabels = Object.keys(bestData);
+        const categoryLabels = Object.values(bestData);
+
+        const ctxBest = document.getElementById('bestCategoryChart');
+
+        new Chart(ctxBest, {
+            type: 'bar',
+            data: {
+                labels: userLabels,
+                datasets: [{
+                    label: 'Best Category',
+                    data: categoryLabels.map(() => 1),
+                    backgroundColor: '#3b82f6',
+                    borderColor: '#1e293b',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { display: false },
+                    y: { ticks: { color: 'white', font: { weight: 'bold' } } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Best Category: ' + categoryLabels[context.dataIndex];
+                            }
+                        }
+                    }
+                }
+            }
         });
-</script>
+    </script>
 </body>
 </html>
-
-
-
-

@@ -3,188 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Survey</title>
+    <title>Security Assessment</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #58a6ff;
+            --primary-dark: #1e90ff;
+            --dark-bg: #0d1520;
+            --card-bg: rgba(20, 30, 48, 0.95);
+            --text-light: #e2e8f0;
+            --cyber-green: #00ff9d;
+            --cyber-purple: #bd00ff;
+        }
+
         body, html {
             margin: 0;
             padding: 0;
             height: 100vh;
-            font-family: Arial, sans-serif;
-            background: radial-gradient(circle at center, #141e30, #243b55), url('/images/cybersecurity-grid.png');
+            font-family: 'Roboto', sans-serif;
+            background: radial-gradient(ellipse at center, var(--dark-bg), #243b55), url('/images/cybersecurity-grid.png');
             background-size: cover, contain;
             background-blend-mode: overlay;
-            color: #ffffff;
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        .cyber-corner {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-width: 3px;
+            border-style: solid;
+            opacity: 0.6;
+        }
+
+        .corner-tl {
+            top: 15px;
+            left: 15px;
+            border-image: linear-gradient(135deg, var(--cyber-green), transparent 70%) 1;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-tr {
+            top: 15px;
+            right: 15px;
+            border-image: linear-gradient(-135deg, var(--cyber-purple), transparent 70%) 1;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                rgba(0, 255, 157, 0) 0%, 
+                rgba(0, 255, 157, 0.03) 50%, 
+                rgba(0, 255, 157, 0) 100%);
+            background-size: 100% 6px;
+            pointer-events: none;
+            animation: scan 7s linear infinite;
+            z-index: 9999;
+            opacity: 0.2;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
         }
 
         .header {
-            background: rgba(20, 30, 48, 0.95);
-            padding: 1.5rem;
+            background: rgba(20, 30, 48, 0.9);
+            padding: 1.8rem;
             text-align: center;
-            border-bottom: 2px solid #58a6ff;
+            border-bottom: 2px solid var(--primary);
+            position: relative;
+            z-index: 10;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 2.5rem;
-            color: #58a6ff;
+            font-size: 2.6rem;
+            color: var(--primary);
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(88, 166, 255, 0.4);
         }
 
         .container-box {
             max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: rgba(20, 30, 48, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            margin: 2.5rem auto;
+            padding: 2.5rem;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(88, 166, 255, 0.15);
+            backdrop-filter: blur(4px);
+        }
+
+        .container-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyber-green), var(--cyber-purple));
+        }
+
+        .question-container {
+            margin-bottom: 1.8rem;
+            padding: 1.2rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
         }
 
         .label-text {
-            font-size: 1.2rem;
-            color: #cbd5e0;
+            font-size: 1.1rem;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 0.8rem;
+            display: block;
         }
 
         select {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid #58a6ff;
-            color: #ffffff;
-            padding: 0.8rem;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--primary);
+            color: var(--text-light);
+            padding: 0.9rem;
             width: 100%;
-            border-radius: 5px;
-            margin-top: 0.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2358a6ff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            background-size: 1.2rem;
+            font-family: 'Share Tech Mono', monospace;
         }
 
         select:focus {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(30, 41, 59, 0.9);
             outline: none;
+            border-color: var(--cyber-green);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
         }
 
-        .recommendation-box {
-            background: rgba(88, 166, 255, 0.2);
+        select option {
+            background: #1f2b3a;
+            color: var(--text-light);
             padding: 10px;
-            border-left: 4px solid #58a6ff;
-            text-align: center;
-            font-weight: bold;
-            display: none;
         }
 
         .btn-custom {
-            padding: 0.8rem 1.2rem;
-            background: linear-gradient(135deg, #58a6ff, #1e90ff);
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
             border-radius: 8px;
             color: #ffffff;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-            display: block;
+            transition: all 0.3s ease;
             width: 100%;
-            text-align: center;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(88, 166, 255, 0.3);
         }
 
         .btn-custom:hover {
-            background: linear-gradient(135deg, #1e90ff, #58a6ff);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(88, 166, 255, 0.4);
+            box-shadow: 0 8px 20px rgba(88, 166, 255, 0.5);
+        }
+
+        .btn-custom::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right, 
+                rgba(255, 255, 255, 0) 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            transition: all 0.5s ease;
+        }
+
+        .btn-custom:hover::after {
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(30deg) translate(-30%, -30%); }
+            100% { transform: rotate(30deg) translate(30%, 30%); }
         }
 
         .loading-indicator {
             display: none;
             text-align: center;
             font-size: 1rem;
-            color: #cbd5e0;
+            color: var(--text-light);
+            margin-top: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .recommendation-box {
+            background: linear-gradient(135deg, #1e3a8a, var(--primary-dark));
+            padding: 1.2rem;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.5);
+            margin-top: 2rem;
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            font-family: 'Share Tech Mono', monospace;
+            display: none;
+        }
+
+        .recommendation-box h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.2rem;
+            color: var(--text-light);
+        }
+
+        #recommendationText {
+            color: var(--cyber-green);
+            font-weight: 700;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container-box {
+                padding: 1.5rem;
+                margin: 1.5rem auto;
+                width: 90%;
+            }
+            
+            .question-container {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="cyber-corner corner-tl"></div>
+    <div class="cyber-corner corner-tr"></div>
+    <div class="scanline"></div>
+
     <div class="header">
-        <h1>Security Survey</h1>
+        <h1>SECURITY ASSESSMENT</h1>
     </div>
 
     <div class="container-box">
         <form id="surveyForm">
             <div id="surveyContainer" class="mt-4">
-                <!-- ✅ Thymeleaf Loop to Render Questions with Dropdowns -->
-                <div th:each="question : ${questions}" class="mb-3">
+                <div th:each="question : ${questions}" class="question-container">
                     <label class="label-text" th:text="${question.questionText}"></label>
-                    <select class="form-control survey-select" th:id="'question-' + ${question.id}">
-                        <option value="">-- Select an option --</option>
+                    <select class="survey-select" th:id="'question-' + ${question.id}">
+                        <option value="" disabled selected>-- SELECT RESPONSE --</option>
                         <option th:each="option : ${question.options}" th:value="${option.id}" th:text="${option.optionValue}"></option>
                     </select>
                 </div>
             </div>
 
-            <button type="button" id="submitSurvey" class="btn-custom mt-3">Submit Survey</button>
-            <p id="loadingIndicator" class="loading-indicator">Submitting survey, please wait...</p>
+            <button type="button" id="submitSurvey" class="btn-custom">
+                <i class="fas fa-paper-plane"></i> SUBMIT ASSESSMENT
+            </button>
+            <p id="loadingIndicator" class="loading-indicator">
+                <i class="fas fa-spinner fa-spin"></i> ANALYZING RESPONSES...
+            </p>
         </form>
+
+        <div class="recommendation-box" id="recommendationContainer">
+            <h4>RECOMMENDED SECURITY CATEGORIES:</h4>
+            <p id="recommendationText"></p>
+        </div>
     </div>
 
-<div class="container-box recommendation-box text-center" id="recommendationContainer" style="display: none;">
-    <h4>Recommended Security Categories:</h4>
-    <p id="recommendationText" class="alert alert-info"></p>
-</div>
-...
+    <script>
+        document.getElementById("submitSurvey").addEventListener("click", function() {
+            const responses = [];
+            let allAnswered = true;
 
-<script>
-    document.getElementById("submitSurvey").addEventListener("click", function () {
-        const responses = [];
-        let allAnswered = true;
+            document.querySelectorAll(".survey-select").forEach(select => {
+                const questionId = select.id.split("-")[1];
+                const selectedOptionId = select.value;
 
-        document.querySelectorAll(".survey-select").forEach(select => {
-            const questionId = select.id.split("-")[1];
-            const selectedOptionId = select.value.trim();
+                if (!selectedOptionId) {
+                    allAnswered = false;
+                    select.style.borderColor = "#e53e3e";
+                } else {
+                    select.style.borderColor = "#58a6ff";
+                    responses.push({
+                        surveyQuestion: { id: questionId },
+                        selectedOption: { id: selectedOptionId }
+                    });
+                }
+            });
 
-            if (!selectedOptionId) {
-                allAnswered = false;
+            if (!allAnswered) {
+                alert("PLEASE COMPLETE ALL QUESTIONS BEFORE SUBMITTING");
+                return;
             }
 
-            responses.push({
-                surveyQuestion: { id: questionId },
-                selectedOption: { id: selectedOptionId }
+            document.getElementById("loadingIndicator").style.display = "block";
+            document.getElementById("submitSurvey").disabled = true;
+
+            fetch(`/survey/submit`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(responses)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Network response was not ok");
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById("loadingIndicator").style.display = "none";
+                document.getElementById("submitSurvey").disabled = false;
+
+                if (data.recommendedCategories && data.recommendedCategories.length > 0) {
+                    document.getElementById("recommendationContainer").style.display = "block";
+                    document.getElementById("recommendationText").textContent = 
+                        data.recommendedCategories.join(", ");
+                    
+                    localStorage.setItem("securityRecommendations", JSON.stringify(data.recommendedCategories));
+                    
+                    setTimeout(() => {
+                        window.location.href = "/questionnaire/selection";
+                    }, 3000);
+                } else {
+                    document.getElementById("recommendationContainer").style.display = "block";
+                    document.getElementById("recommendationText").textContent = "NO RECOMMENDATIONS AVAILABLE";
+                }
+            })
+            .catch(error => {
+                console.error("SUBMISSION ERROR:", error);
+                document.getElementById("loadingIndicator").style.display = "none";
+                document.getElementById("submitSurvey").disabled = false;
+                document.getElementById("recommendationContainer").style.display = "block";
+                document.getElementById("recommendationText").textContent = "SUBMISSION FAILED - PLEASE TRY AGAIN";
             });
         });
-
-        if (!allAnswered) {
-            alert("⚠️ Please select an answer for all questions before submitting.");
-            return;
-        }
-
-        document.getElementById("loadingIndicator").style.display = "block";
-
-        fetch(`/survey/submit`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(responses)
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById("loadingIndicator").style.display = "none";
-
-            if (data.recommendedCategories) {
-                document.getElementById("recommendationContainer").style.display = "block";
-                document.getElementById("recommendationText").textContent = data.recommendedCategories.join(", ");
-
-                // ✅ Store for next page if needed
-                localStorage.setItem("recommendedCategories", JSON.stringify(data.recommendedCategories));
-            } else {
-                document.getElementById("recommendationText").textContent = "No recommendation available";
-            }
-
-            setTimeout(() => {
-                window.location.href = "/questionnaire/selection";
-            }, 5000);
-        })
-        .catch(error => {
-            document.getElementById("loadingIndicator").style.display = "none";
-            document.getElementById("recommendationContainer").style.display = "block";
-            document.getElementById("recommendationText").textContent = "Error submitting survey.";
-            console.error("❌ Error submitting survey:", error);
-        });
-    });
-
-    //  REMOVED auto-show of stored recommendation on page load
-</script>
+    </script>
 </body>
 </html>

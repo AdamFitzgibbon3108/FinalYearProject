@@ -1,202 +1,237 @@
 package com.example.service;
 
-import com.example.model.Question;
-import com.example.model.Questionnaire;
-import com.example.model.Role;
-import com.example.model.User;
-import com.example.repository.QuestionRepository;
-import com.example.repository.QuestionnaireRepository;
-import com.example.repository.RoleRepository;
-import com.example.repository.UserRepository;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
+import com.example.model.Question;
+import com.example.model.Questionnaire;
+import com.example.model.Role;
+import com.example.model.SecurityControl;
+import com.example.model.User;
+import com.example.repository.QuestionRepository;
+import com.example.repository.QuestionnaireRepository;
+import com.example.repository.QuizResultRepository;
+import com.example.repository.RoleRepository;
+import com.example.repository.SecurityControlRepository;
+import com.example.repository.UserRepository;
 
 @Service
 public class AdminService {
 
-    @Autowired
-    private QuestionRepository questionRepository;
+	@Autowired
+	private QuizResultRepository quizResultRepository;
 
-    @Autowired
-    private QuestionnaireRepository questionnaireRepository;
+	@Autowired
+	private QuestionRepository questionRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+	@Autowired
+	private QuestionnaireRepository questionnaireRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-    //  Get all questions
-    public List<Question> getAllQuestions() {
-        return questionRepository.findAll();
-    }
+	@Autowired
+	private RoleRepository roleRepository;
 
-    //  Get all questionnaires
-    public List<Questionnaire> getAllQuestionnaires() {
-        return questionnaireRepository.findAll();
-    }
+	@Autowired
+	private SecurityControlRepository securityControlRepository;
 
-    //  Get a specific questionnaire by ID
-    public Questionnaire getQuestionnaireById(Long questionnaireId) {
-        return questionnaireRepository.findById(questionnaireId)
-                .orElseThrow(() -> new RuntimeException("Questionnaire not found with ID: " + questionnaireId));
-    }
+	// Get all questions
+	public List<Question> getAllQuestions() {
+		return questionRepository.findAll();
+	}
 
-    //  Create a new questionnaire and assign the creator
-    @Transactional
-    public Questionnaire createQuestionnaire(String title, String description, String adminUsername) {
-        User adminUser = userRepository.findByUsername(adminUsername)
-                .orElseThrow(() -> new RuntimeException("Admin user not found"));
+	// Get all questionnaires
+	public List<Questionnaire> getAllQuestionnaires() {
+		return questionnaireRepository.findAll();
+	}
 
-        if (!adminUser.hasRole("ADMIN")) {
-            throw new RuntimeException("User is not an admin.");
-        }
+	// Get a specific questionnaire by ID
+	public Questionnaire getQuestionnaireById(Long questionnaireId) {
+		return questionnaireRepository.findById(questionnaireId)
+				.orElseThrow(() -> new RuntimeException("Questionnaire not found with ID: " + questionnaireId));
+	}
 
-        Questionnaire questionnaire = new Questionnaire(title, description, adminUser, null);
-        return questionnaireRepository.save(questionnaire);
-    }
+	// Create a new questionnaire
+	@Transactional
+	public Questionnaire createQuestionnaire(String title, String description, String adminUsername) {
+		User adminUser = userRepository.findByUsername(adminUsername)
+				.orElseThrow(() -> new RuntimeException("Admin user not found"));
 
-    //  Assign questions to a questionnaire
-    @Transactional
-    public Questionnaire assignQuestionsToQuestionnaire(Long questionnaireId, List<Long> questionIds) {
-        Questionnaire questionnaire = getQuestionnaireById(questionnaireId);
-        List<Question> selectedQuestions = questionRepository.findAllById(questionIds);
-        questionnaire.getQuestions().addAll(selectedQuestions);
-        return questionnaireRepository.save(questionnaire);
-    }
+		if (!adminUser.hasRole("ADMIN")) {
+			throw new RuntimeException("User is not an admin.");
+		}
 
-    //  Remove questions from a questionnaire
-    @Transactional
-    public Questionnaire removeQuestionsFromQuestionnaire(Long questionnaireId, List<Long> questionIds) {
-        Questionnaire questionnaire = getQuestionnaireById(questionnaireId);
-        questionnaire.getQuestions().removeIf(q -> questionIds.contains(q.getId()));
-        return questionnaireRepository.save(questionnaire);
-    }
+		Questionnaire questionnaire = new Questionnaire(title, description, adminUser, null);
+		return questionnaireRepository.save(questionnaire);
+	}
 
-    //  Delete a questionnaire
-    @Transactional
-    public void deleteQuestionnaire(Long questionnaireId) {
-        if (questionnaireRepository.existsById(questionnaireId)) {
-            questionnaireRepository.deleteById(questionnaireId);
-        } else {
-            throw new RuntimeException("Questionnaire not found with ID: " + questionnaireId);
-        }
-    }
+	// Assign questions to a questionnaire
+	@Transactional
+	public Questionnaire assignQuestionsToQuestionnaire(Long questionnaireId, List<Long> questionIds) {
+		Questionnaire questionnaire = getQuestionnaireById(questionnaireId);
+		List<Question> selectedQuestions = questionRepository.findAllById(questionIds);
+		questionnaire.getQuestions().addAll(selectedQuestions);
+		return questionnaireRepository.save(questionnaire);
+	}
 
-    //  Get all users
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+	// Remove questions from a questionnaire
+	@Transactional
+	public Questionnaire removeQuestionsFromQuestionnaire(Long questionnaireId, List<Long> questionIds) {
+		Questionnaire questionnaire = getQuestionnaireById(questionnaireId);
+		questionnaire.getQuestions().removeIf(q -> questionIds.contains(q.getId()));
+		return questionnaireRepository.save(questionnaire);
+	}
 
-    //  Assign a role to a user
-    @Transactional
-    public void assignRoleToUser(Long userId, String roleName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+	// Delete a questionnaire
+	@Transactional
+	public void deleteQuestionnaire(Long questionnaireId) {
+		if (questionnaireRepository.existsById(questionnaireId)) {
+			questionnaireRepository.deleteById(questionnaireId);
+		} else {
+			throw new RuntimeException("Questionnaire not found with ID: " + questionnaireId);
+		}
+	}
 
-        Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+	// Get all users
+	public List<User> getAllUsers() {
+		return userRepository.findAll();
+	}
 
-        if (!user.getRoles().contains(role)) {
-            user.addRole(role);
-            userRepository.save(user);
-        }
-    }
+	// Assign a role to a user
+	@Transactional
+	public void assignRoleToUser(Long userId, String roleName) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
-    //  Remove a role from a user
-    @Transactional
-    public void removeRoleFromUser(Long userId, String roleName) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+		Role role = roleRepository.findByName(roleName)
+				.orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
 
-        user.getRoles().removeIf(role -> role.getName().equals(roleName));
-        userRepository.save(user);
-    }
+		if (!user.getRoles().contains(role)) {
+			user.addRole(role);
+			userRepository.save(user);
+		}
+	}
 
-    //  Update user details (Removed setEmail method)
-    @Transactional
-    public User updateUser(Long userId, Map<String, Object> updates) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+	// Remove a role from a user
+	@Transactional
+	public void removeRoleFromUser(Long userId, String roleName) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+		user.getRoles().removeIf(role -> role.getName().equals(roleName));
+		userRepository.save(user);
+	}
 
-        if (updates.containsKey("username")) {
-            String newUsername = (String) updates.get("username");
-            if (newUsername != null && !newUsername.isEmpty()) {
-                user.setUsername(newUsername);
-            }
-        }
+	// Update user details
+	@Transactional
+	public User updateUser(Long userId, Map<String, Object> updates) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (updates.containsKey("active")) {
-            user.setActive((Boolean) updates.get("active"));
-        }
+		if (updates.containsKey("username")) {
+			String newUsername = (String) updates.get("username");
+			if (newUsername != null && !newUsername.isEmpty()) {
+				user.setUsername(newUsername);
+			}
+		}
 
-        return userRepository.save(user);
-    }
+		if (updates.containsKey("active")) {
+			user.setActive((Boolean) updates.get("active"));
+		}
 
+		if (updates.containsKey("fullName")) {
+			user.setFullName((String) updates.get("fullName"));
+		}
 
-    //  Delete a user
-    @Transactional
-    public void deleteUser(Long userId) {
-        if (userRepository.existsById(userId)) {
-            userRepository.deleteById(userId);
-        } else {
-            throw new RuntimeException("User not found with ID: " + userId);
-        }
-    }
+		if (updates.containsKey("email")) {
+			user.setEmail((String) updates.get("email"));
+		}
 
-    //  Get total number of users
-    public long getTotalUsers() {
-        return userRepository.count();
-    }
+		if (updates.containsKey("phoneNumber")) {
+			user.setPhoneNumber((String) updates.get("phoneNumber"));
+		}
 
-    //  Get number of active users
-    public long getActiveUsers() {
-        return userRepository.countActiveUsers(); // Ensure this method exists in UserRepository
-    }
+		if (updates.containsKey("address")) {
+			user.setAddress((String) updates.get("address"));
+		}
 
-    //  Get number of pending user approvals
-    public long getPendingApprovals() {
-        return userRepository.countPendingUsers(); // Ensure this method exists in UserRepository
-    }
+		return userRepository.save(user);
+	}
 
-    // Get statistics for admin dashboard
-    public AdminDashboardStats getAdminDashboardStats() {
-        return new AdminDashboardStats(
-                getTotalUsers(),
-                getActiveUsers(),
-                getPendingApprovals()
-        );
-    }
+	// Delete a user
+	@Transactional
+	public void deleteUser(Long userId) {
+		if (userRepository.existsById(userId)) {
+			userRepository.deleteById(userId);
+		} else {
+			throw new RuntimeException("User not found with ID: " + userId);
+		}
+	}
 
-    //  Inner class for admin dashboard statistics
-    public static class AdminDashboardStats {
-        private final long totalUsers;
-        private final long activeUsers;
-        private final long pendingApprovals;
+	// Get total number of users
+	public long getTotalUsers() {
+		return userRepository.count();
+	}
 
-        public AdminDashboardStats(long totalUsers, long activeUsers, long pendingApprovals) {
-            this.totalUsers = totalUsers;
-            this.activeUsers = activeUsers;
-            this.pendingApprovals = pendingApprovals;
-        }
+	// Get number of active users
+	public long getActiveUsers() {
+		return userRepository.countByActiveTrue();
+	}
 
-        public long getTotalUsers() {
-            return totalUsers;
-        }
+	// Admin dashboard statistics
+	public AdminDashboardStats getAdminDashboardStats() {
+		return new AdminDashboardStats(getTotalUsers(), getActiveUsers());
+	}
 
-        public long getActiveUsers() {
-            return activeUsers;
-        }
+	// Best performing category per user
+	public Map<String, String> getBestCategoryPerUser() {
+		List<Object[]> rawData = quizResultRepository.getAverageScoresPerUserPerCategory();
+		Map<String, Map.Entry<String, Double>> userBestMap = new HashMap<>();
 
-        public long getPendingApprovals() {
-            return pendingApprovals;
-        }
-    }
+		for (Object[] row : rawData) {
+			String username = (String) row[0];
+			String category = (String) row[1];
+			Double avgScore = ((Number) row[2]).doubleValue();
+
+			if (!userBestMap.containsKey(username) || avgScore > userBestMap.get(username).getValue()) {
+				userBestMap.put(username, Map.entry(category, avgScore));
+			}
+		}
+
+		return userBestMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getKey()));
+	}
+
+	// Add this to AdminService
+	public List<String> getAllCategories() {
+		return securityControlRepository.findAll().stream().filter(control -> control.getCategoryGroup() != null)
+				.map(SecurityControl::getName).collect(Collectors.toList());
+	}
+
+	// Fetch all valid SecurityControl categories for dropdown
+	public List<SecurityControl> getAllSecurityControls() {
+		return securityControlRepository.findAll().stream().filter(control -> control.getCategoryGroup() != null)
+				.collect(Collectors.toList());
+	}
+
+	// Inner class for admin statistics
+	public static class AdminDashboardStats {
+		private final long totalUsers;
+		private final long activeUsers;
+
+		public AdminDashboardStats(long totalUsers, long activeUsers) {
+			this.totalUsers = totalUsers;
+			this.activeUsers = activeUsers;
+		}
+
+		public long getTotalUsers() {
+			return totalUsers;
+		}
+
+		public long getActiveUsers() {
+			return activeUsers;
+		}
+	}
 }
-
-
-

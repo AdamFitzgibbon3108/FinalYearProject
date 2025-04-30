@@ -4,58 +4,175 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register | ThreatLens</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --primary: #58a6ff;
+            --primary-dark: #1e90ff;
+            --secondary: #ff6b6b;
+            --dark-bg: #0d1520;
+            --darker-bg: #0a101a;
+            --card-bg: rgba(20, 30, 48, 0.9);
+            --text-light: #cbd5e0;
+            --text-lighter: #e2e8f0;
+            --cyber-green: #00ff9d;
+            --cyber-purple: #bd00ff;
+        }
+
         body, html {
             margin: 0;
             padding: 0;
             font-family: 'Roboto', sans-serif;
-            background: radial-gradient(ellipse at center, #141e30, #243b55), url('/images/cybersecurity-grid.png');
+            background: radial-gradient(ellipse at center, var(--darker-bg), var(--dark-bg)), url('/images/cybersecurity-grid.png');
             background-size: cover, contain;
             background-blend-mode: overlay;
-            color: #ffffff;
+            color: var(--text-light);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Cyber Decorative Elements */
+        .cyber-corner {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-width: 4px;
+            border-style: solid;
+            opacity: 0.7;
+        }
+
+        .corner-tl {
+            top: 20px;
+            left: 20px;
+            border-image: linear-gradient(135deg, var(--cyber-green), transparent 70%) 1;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-tr {
+            top: 20px;
+            right: 20px;
+            border-image: linear-gradient(-135deg, var(--cyber-purple), transparent 70%) 1;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner-bl {
+            bottom: 20px;
+            left: 20px;
+            border-image: linear-gradient(45deg, var(--cyber-green), transparent 70%) 1;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner-br {
+            bottom: 20px;
+            right: 20px;
+            border-image: linear-gradient(-45deg, var(--cyber-purple), transparent 70%) 1;
+            border-left: none;
+            border-top: none;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                rgba(0, 255, 157, 0) 0%, 
+                rgba(0, 255, 157, 0.03) 50%, 
+                rgba(0, 255, 157, 0) 100%);
+            background-size: 100% 8px;
+            pointer-events: none;
+            animation: scan 8s linear infinite;
+            z-index: 9999;
+            opacity: 0.3;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
         }
 
         .app-title {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 2rem;
+            top: 30px;
+            left: 30px;
+            font-size: 2.2rem;
             font-weight: 700;
-            color: #58a6ff;
+            color: var(--primary);
             text-decoration: none;
+            font-family: 'Share Tech Mono', monospace;
+            text-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+            z-index: 10;
+        }
+
+        .app-title::before {
+            content: ">";
+            margin-right: 10px;
+            color: var(--cyber-green);
         }
 
         .container {
             width: 70%;
             max-width: 900px;
-            margin: 2rem auto;
-            background: rgba(20, 30, 48, 0.9);
+            margin: 3rem auto;
+            background: var(--card-bg);
             padding: 2.5rem 3rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
             text-align: left;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(88, 166, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyber-green), var(--cyber-purple));
         }
 
         h2 {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             font-weight: 700;
             font-size: 2.8rem;
-            color: #58a6ff;
+            color: var(--primary);
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        h2::after {
+            content: "";
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyber-green), var(--cyber-purple));
+            margin: 10px auto;
         }
 
         p.subtitle {
             margin-top: -1rem;
             margin-bottom: 2rem;
             font-size: 1.2rem;
-            color: #a0aec0;
+            color: var(--text-light);
             font-weight: 500;
             text-align: center;
         }
 
         .form-group {
             margin-bottom: 1.5rem;
+            position: relative;
         }
 
         label {
@@ -63,44 +180,133 @@
             font-size: 1rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
-            color: #cbd5e0;
+            color: var(--text-lighter);
         }
 
         input[type="text"], input[type="password"] {
             width: 100%;
             padding: 1rem;
             border: 1px solid #3b4961;
-            border-radius: 10px;
+            border-radius: 5px;
             font-size: 1rem;
-            background-color: #1e293b;
-            color: #ffffff;
+            background-color: rgba(30, 41, 59, 0.7);
+            color: var(--text-lighter);
             transition: all 0.3s ease;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 1px;
         }
 
         input[type="text"]:focus, input[type="password"]:focus {
             outline: none;
-            border-color: #58a6ff;
-            box-shadow: 0 0 10px rgba(88, 166, 255, 0.6);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(88, 166, 255, 0.4);
+            background-color: rgba(30, 41, 59, 0.9);
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+            height: 5px;
+            background-color: #2d3748;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .strength-meter {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #e53e3e, #f6ad55, #68d391, #38a169);
+            transition: width 0.3s ease;
+        }
+
+        .password-requirements {
+            margin-top: 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 5px;
+            padding: 1rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .password-requirements h4 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            color: var(--text-lighter);
+            font-size: 0.9rem;
+        }
+
+        .password-requirements ul {
+            padding-left: 1.2rem;
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        .password-requirements li {
+            margin-bottom: 0.3rem;
+            position: relative;
+            list-style-type: none;
+        }
+
+        .password-requirements li::before {
+            content: "■";
+            color: #e53e3e;
+            position: absolute;
+            left: -1rem;
+            font-size: 0.6rem;
+            top: 0.3rem;
+        }
+
+        .password-requirements li.valid::before {
+            color: var(--cyber-green);
         }
 
         button {
             width: 100%;
             padding: 1rem;
-            background: linear-gradient(135deg, #58a6ff, #1e90ff);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
-            border-radius: 10px;
+            border-radius: 5px;
             color: #ffffff;
             font-size: 1.2rem;
             font-weight: 700;
             cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
+            transition: all 0.3s ease;
             margin-top: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right, 
+                rgba(255, 255, 255, 0) 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            transition: all 0.5s ease;
         }
 
         button:hover {
-            background: linear-gradient(135deg, #1e90ff, #58a6ff);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(88, 166, 255, 0.4);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            box-shadow: 0 5px 20px rgba(88, 166, 255, 0.6);
+        }
+
+        button:hover::before {
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(30deg) translate(-30%, -30%); }
+            100% { transform: rotate(30deg) translate(30%, 30%); }
         }
 
         .form-row {
@@ -116,78 +322,229 @@
             text-align: center;
             margin-top: 2rem;
             font-size: 1rem;
-            color: #a0aec0;
+            color: var(--text-light);
         }
 
         .footer a {
-            color: #58a6ff;
+            color: var(--primary);
             text-decoration: none;
             font-weight: 500;
+            transition: all 0.3s ease;
         }
 
         .footer a:hover {
-            text-decoration: underline;
+            color: var(--cyber-green);
+            text-decoration: none;
         }
 
         .error, .success {
             margin-top: 1rem;
             padding: 1rem;
-            border-radius: 8px;
+            border-radius: 5px;
             font-size: 1rem;
             font-weight: 500;
+            border-left: 4px solid;
         }
 
         .error {
-            background-color: rgba(221, 82, 82, 0.2);
+            background-color: rgba(229, 62, 62, 0.1);
             color: #e53e3e;
+            border-left-color: #e53e3e;
         }
 
         .success {
-            background-color: rgba(72, 187, 120, 0.2);
+            background-color: rgba(56, 161, 105, 0.1);
             color: #38a169;
+            border-left-color: #38a169;
+        }
+
+        .cyber-widget {
+            position: absolute;
+            right: -150px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 120px;
+            background: rgba(20, 30, 48, 0.7);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+            border-radius: 5px;
+            padding: 1rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--cyber-green);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.1);
+            z-index: 0;
+        }
+
+        .cyber-widget::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--cyber-green), transparent);
+        }
+
+        .cyber-widget h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .cyber-widget p {
+            margin: 0.3rem 0;
+            font-size: 0.7rem;
+        }
+
+        .cyber-widget .status {
+            color: var(--cyber-green);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .cyber-widget {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 1.5rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Cyber Decorative Elements -->
+    <div class="cyber-corner corner-tl"></div>
+    <div class="cyber-corner corner-tr"></div>
+    <div class="cyber-corner corner-bl"></div>
+    <div class="cyber-corner corner-br"></div>
+    <div class="scanline"></div>
+
     <!-- App Title -->
     <a href="/" class="app-title">ThreatLens</a>
 
+    <!-- Cyber Widget -->
+    <div class="cyber-widget">
+        <h3>SYSTEM STATUS</h3>
+        <p>SECURE REGISTRATION: <span class="status">ACTIVE</span></p>
+        <p>ENCRYPTION: <span class="status">ENABLED</span></p>
+        <p>FIREWALL: <span class="status">ENABLED</span></p>
+        <p>THREAT LEVEL: <span class="status">LOW</span></p>
+    </div>
+
     <div class="container">
-        <h2>Create Your Account</h2>
+        <h2>CREATE YOUR ACCOUNT</h2>
+        <p class="subtitle">Join our secure network of cybersecurity professionals</p>
+        
         <form th:action="@{/register}" method="post">
             <div class="form-row">
                 <div class="form-col">
                     <div class="form-group">
-                        <label for="username">Username:</label>
+                        <label for="username"><i class="fas fa-user"></i> USERNAME:</label>
                         <input type="text" id="username" name="username" required placeholder="Enter your username">
                     </div>
                 </div>
                 <div class="form-col">
                     <div class="form-group">
-                        <label for="password">Password:</label>
-                        <input type="password" id="password" name="password" required placeholder="Enter your password">
+                        <label for="password"><i class="fas fa-lock"></i> PASSWORD:</label>
+                        <input type="password" id="password" name="password" required placeholder="Enter your password" oninput="checkPasswordStrength(this.value)">
+                        <div class="password-strength">
+                            <div class="strength-meter" id="strengthMeter"></div>
+                        </div>
+                        <div class="password-requirements">
+                            <h4>PASSWORD REQUIREMENTS:</h4>
+                            <ul>
+                                <li id="length">Minimum 8 characters</li>
+                                <li id="uppercase">At least one uppercase letter</li>
+                                <li id="number">At least one number</li>
+                                <li id="special">At least one special character</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Hidden Role Field (Always Register as USER) -->
+            
             <input type="hidden" name="role" value="USER">
 
-            <button type="submit">Register</button>
+            <button type="submit">
+                <i class="fas fa-user-plus"></i> REGISTER NOW
+            </button>
             
             <div th:if="${error}" class="error">
-                <p th:text="${error}"></p>
+                <p><i class="fas fa-exclamation-triangle"></i> <span th:text="${error}"></span></p>
             </div>
             <div th:if="${success}" class="success">
-                <p th:text="${success}"></p>
+                <p><i class="fas fa-check-circle"></i> <span th:text="${success}"></span></p>
             </div>
         </form>
         <div class="footer">
-            <p>Already have an account? <a href="/login">Login here</a></p>
+            <p>Already have an account? <a href="/login"><i class="fas fa-sign-in-alt"></i> LOGIN HERE</a></p>
         </div>
     </div>
+
+    <script>
+        function checkPasswordStrength(password) {
+            const meter = document.getElementById('strengthMeter');
+            const requirements = {
+                length: document.getElementById('length'),
+                uppercase: document.getElementById('uppercase'),
+                number: document.getElementById('number'),
+                special: document.getElementById('special')
+            };
+            
+            let strength = 0;
+            const tests = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[^A-Za-z0-9]/.test(password)
+            };
+            
+            // Update requirements display
+            for (const [key, met] of Object.entries(tests)) {
+                if (met) {
+                    requirements[key].classList.add('valid');
+                    strength += 25;
+                } else {
+                    requirements[key].classList.remove('valid');
+                }
+            }
+            
+            // Update strength meter
+            meter.style.width = strength + '%';
+            
+            // Update meter color based on strength
+            if (strength < 50) {
+                meter.style.background = '#e53e3e';
+            } else if (strength < 75) {
+                meter.style.background = '#f6ad55';
+            } else if (strength < 100) {
+                meter.style.background = '#68d391';
+            } else {
+                meter.style.background = '#38a169';
+            }
+        }
+    </script>
 </body>
 </html>
-
 
 

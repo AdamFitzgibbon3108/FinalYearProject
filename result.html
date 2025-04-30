@@ -3,26 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Results</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Security Assessment Results | ThreatLens</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --cyber-green: #00ff9d;
+            --cyber-blue: #00d1ff;
+            --cyber-purple: #bd00ff;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --success: #4ade80;
+            --error: #f87171;
+        }
+
         body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at center, var(--darker), var(--dark)), 
+                        url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+            background-size: cover;
+            background-blend-mode: overlay;
+            color: var(--light);
+            font-family: 'Roboto', sans-serif;
             padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(88, 166, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(88, 166, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .cyber-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .cyber-pulse::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--cyber-blue), transparent 70%);
+            top: -150px;
+            right: -150px;
+            animation: pulse 8s infinite alternate;
+        }
+
+        .cyber-pulse::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--cyber-purple), transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            animation: pulse 6s infinite alternate-reverse;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            100% { transform: scale(1.2); opacity: 0.1; }
         }
 
         .card {
-            background-color: #1e293b;
-            border: 1px solid #334155;
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(88, 166, 255, 0.3);
             border-radius: 16px;
-            padding: 30px;
-            max-width: 700px;
+            padding: 40px;
+            max-width: 800px;
             margin: 0 auto;
             text-align: center;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
             animation: fadeSlideUp 0.7s ease-out;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--cyber-green), var(--cyber-blue), var(--cyber-purple));
         }
 
         @keyframes fadeSlideUp {
@@ -31,35 +114,53 @@
         }
 
         h1 {
-            color: #38bdf8;
-            font-size: 2.6rem;
+            color: var(--primary);
+            font-size: 2.8rem;
             margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
         }
 
         .info-text {
             font-size: 1.2rem;
             font-weight: 600;
-            margin-top: 10px;
-            color: #e2e8f0;
+            margin: 15px 0;
+            color: var(--light);
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .info-text strong {
+            color: var(--cyber-blue);
         }
 
         .grid {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 1.2rem;
-            margin-top: 30px;
+            gap: 30px;
+            margin: 40px 0;
         }
 
         .widget {
-            background: #0ea5e9;
-            color: #fff;
+            background: rgba(14, 165, 233, 0.15);
+            color: var(--light);
             border-radius: 12px;
-            padding: 22px;
-            width: 240px;
+            padding: 25px;
+            width: 260px;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(88, 166, 255, 0.2);
+            transition: all 0.3s ease;
             animation: popIn 0.6s ease-in-out;
+        }
+
+        .widget:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
         }
 
         @keyframes popIn {
@@ -68,16 +169,19 @@
         }
 
         .widget h5 {
-            font-size: 1.1rem;
-            margin-bottom: 12px;
-            color: #e0f2fe;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--cyber-blue);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
         }
 
         .widget p {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             font-weight: bold;
             margin: 0;
             animation: bounceIn 0.4s ease-out;
+            font-family: 'Orbitron', sans-serif;
         }
 
         @keyframes bounceIn {
@@ -86,124 +190,242 @@
             100% { transform: scale(1); }
         }
 
-        .widget .passed { color: #4ade80; }
-        .widget .failed { color: #f87171; }
+        .widget .passed { 
+            color: var(--success);
+            text-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
+        }
+        .widget .failed { 
+            color: var(--error);
+            text-shadow: 0 0 8px rgba(248, 113, 113, 0.4);
+        }
 
         .subtext {
-            color: #cbd5e1;
+            color: var(--gray);
             margin-top: 30px;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             animation: fadeSlideUp 0.6s ease-in-out;
+            text-align: left;
+        }
+
+        .highlight {
+            background: rgba(29, 78, 216, 0.3);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 25px 0 15px;
+            font-weight: bold;
+            color: var(--cyber-green);
+            border-left: 4px solid var(--cyber-green);
+            text-align: left;
+        }
+
+        .resource-list {
+            margin: 20px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .resource-list li {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(51, 65, 85, 0.5);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .resource-list li:hover {
+            background: rgba(51, 65, 85, 0.7);
+            transform: translateX(5px);
+        }
+
+        .resource-list a {
+            color: var(--cyber-blue);
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .resource-list a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        .resource-list small {
+            color: var(--gray);
+            font-size: 0.9rem;
+            word-break: break-all;
         }
 
         .btn-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
+            gap: 20px;
+            margin-top: 40px;
         }
 
         .btn-custom {
-            background-color: #3b82f6;
-            color: #fff;
-            padding: 12px 26px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--light);
+            padding: 14px 28px;
             border-radius: 10px;
             font-weight: bold;
             text-decoration: none;
-            transition: all 0.25s ease-in-out;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-custom:hover {
-            background-color: #2563eb;
-            transform: scale(1.05);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+            color: white;
         }
 
-        .resource-list {
-            margin-top: 10px;
-            padding-left: 0;
-            list-style: none;
+        .btn-custom i {
+            font-size: 1.1rem;
         }
 
-        .resource-list li {
-            margin: 10px 0;
-            padding: 10px;
-            background: #334155;
-            border-radius: 8px;
+        /* Terminal effect */
+        .terminal-line {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-family: 'Courier New', monospace;
+            color: var(--cyber-green);
+            font-size: 0.9rem;
+            opacity: 0.7;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid var(--cyber-green);
+            animation: blink 1s step-end infinite;
         }
 
-        .resource-list a {
-            color: #60a5fa;
-            text-decoration: underline;
+        @keyframes blink {
+            from, to { border-color: transparent; }
+            50% { border-color: var(--cyber-green); }
         }
 
-        .resource-list a:hover {
-            color: #3b82f6;
-        }
-
-        .highlight {
-            background-color: #1d4ed8;
-            padding: 6px 12px;
-            border-radius: 8px;
-            margin-top: 15px;
-            display: inline-block;
-            font-weight: bold;
+        @media (max-width: 768px) {
+            .card {
+                padding: 30px 20px;
+                width: 95%;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .widget {
+                width: 100%;
+                max-width: 280px;
+            }
+            
+            .btn-custom {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
-<div class="card">
-    <h1>Quiz Results</h1>
+    <!-- Cyber grid background -->
+    <div class="cyber-grid"></div>
+    
+    <!-- Cyber pulse effect -->
+    <div class="cyber-pulse"></div>
 
-    <p class="info-text"><strong>Role:</strong> <span th:text="${role}">General</span></p>
-    <p class="info-text"><strong>Category:</strong> <span th:text="${category}">Secure Coding</span></p>
+<div class="card">
+    <h1><i class="fas fa-shield-alt"></i> SECURITY ASSESSMENT RESULTS</h1>
+
+    <div class="info-text">
+        <p><strong>ROLE:</strong> <span th:text="${role}">General</span></p>
+        <p><strong>CATEGORY:</strong> <span th:text="${category}">Secure Coding</span></p>
+    </div>
 
     <div class="grid">
         <div class="widget">
-            <h5>Your Score</h5>
-            <p th:text="'Your Score: ' + ${score} + ' / ' + ${totalQuestions}">Your Score</p>
+            <h5>SECURITY SCORE</h5>
+            <p th:text="${score} + ' / ' + ${totalQuestions}">0 / 0</p>
         </div>
         <div class="widget">
-            <h5>Status</h5>
+            <h5>ASSESSMENT STATUS</h5>
             <p th:class="${passed} ? 'passed' : 'failed'"
-               th:text="${passed} ? 'Passed' : 'Failed'">Status</p>
+               th:text="${passed} ? 'PASSED' : 'FAILED'">STATUS</p>
         </div>
     </div>
 
-    <div class="subtext mt-4">
+    <div class="subtext">
         <p>
-            <strong>Personalized Recommendation for this Category:</strong>
+            <strong>SECURITY RECOMMENDATION:</strong>
             <span th:if="${recommendations != null and !#strings.isEmpty(recommendations)}"
                   th:text="${recommendations}">General cybersecurity advice.</span>
             <span th:unless="${recommendations != null and !#strings.isEmpty(recommendations)}">
-                No specific recommendation available — keep learning and practicing securely.
+                No specific recommendation available — continue security training.
             </span>
         </p>
 
-        <!-- Category-Specific Learning Resources -->
         <th:block th:if="${resources != null and !resources.isEmpty()}">
-            <p class="highlight">Recommended Resources for <span th:text="${category}">Category</span></p>
-            <p><em>Total Resources Found: <span th:text="${#lists.size(resources)}">0</span></em></p>
+            <div class="highlight">
+                <i class="fas fa-book"></i> RECOMMENDED RESOURCES FOR <span th:text="${category}">CATEGORY</span>
+                <span style="float: right">(<span th:text="${#lists.size(resources)}">0</span>)</span>
+            </div>
             <ul class="resource-list">
                 <li th:each="res : ${resources}">
-                    <a th:href="${res.url}" th:text="${res.title}" target="_blank">Training Link</a><br/>
+                    <a th:href="${res.url}" th:text="${res.title}" target="_blank"><i class="fas fa-external-link-alt"></i> <span th:text="${res.title}"></span></a>
                     <small th:text="${res.url}"></small>
                 </li>
             </ul>
         </th:block>
 
-        <!-- Fallback -->
         <th:block th:if="${resources == null or resources.isEmpty()}">
-            <p><strong>Suggested Training:</strong> Cybersecurity Essentials Program</p>
-            <p><em>[No resources available for this category]</em></p>
+            <div class="highlight">
+                <i class="fas fa-exclamation-triangle"></i> SUGGESTED TRAINING
+            </div>
+            <p>Cybersecurity Essentials Program</p>
+            <p><em>No additional resources available for this category</em></p>
         </th:block>
     </div>
 
     <div class="btn-container">
-        <a class="btn-custom" href="/dashboard">Back to Dashboard</a>
-        <a class="btn-custom" href="/user/performance">View Performance</a>
-        <a class="btn-custom" th:href="@{/result/review(fromResult=true)}">Review My Answers</a>
+        <a class="btn-custom" href="/dashboard"><i class="fas fa-tachometer-alt"></i> DASHBOARD</a>
+        <a class="btn-custom" href="/user/performance"><i class="fas fa-chart-line"></i> PERFORMANCE</a>
+        <a class="btn-custom" th:href="@{/result/review(fromResult=true)}"><i class="fas fa-search"></i> REVIEW ANSWERS</a>
     </div>
 </div>
+
+<!-- Cyber terminal effect -->
+<div class="terminal-line" id="terminal"></div>
+
+<script>
+    // Terminal effect
+    const terminalText = "> Assessment results processed... > Security recommendations generated... > Ready for review...";
+    let i = 0;
+    const terminal = document.getElementById('terminal');
+    
+    function typeTerminal() {
+        if (i < terminalText.length) {
+            terminal.innerHTML += terminalText.charAt(i);
+            i++;
+            setTimeout(typeTerminal, Math.random() * 50 + 20);
+        } else {
+            setTimeout(() => {
+                terminal.innerHTML = ">";
+                i = 0;
+                typeTerminal();
+            }, 5000);
+        }
+    }
+    
+    setTimeout(typeTerminal, 1000);
+</script>
 </body>
 </html>

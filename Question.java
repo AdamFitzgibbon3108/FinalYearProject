@@ -1,108 +1,182 @@
 package com.example.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "questions")
 public class Question {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(name = "citation_url")
-    private String citationUrl;
-    
-    @Column(name = "question_text", nullable = false)
-    private String text;
+	@Column(name = "citation_url")
+	private String citationUrl;
 
-    @Column(name = "question_text", insertable = false, updatable = false) //  Prevents duplicate mapping issues
-    private String questionText;
+	@Column(name = "question_text", nullable = false)
+	private String text;
 
-    @Column(name = "category")
-    private String category;
+	@Column(name = "question_text", insertable = false, updatable = false) // Prevents duplicate mapping issues
+	private String questionText;
 
-    @ManyToOne
-    @JoinColumn(name = "control_category", referencedColumnName = "id")
-    private SecurityControl controlCategory;
+	@Column(name = "category")
+	private String category;
 
-    @Column(name = "framework")
-    private String framework;
+	@ManyToOne
+	@JoinColumn(name = "control_category", referencedColumnName = "id")
+	private SecurityControl controlCategory;
 
-    @Column(name = "difficulty")
-    private String difficulty;
+	@Column(name = "framework")
+	private String framework;
 
-    @Column(name = "score")
-    private Integer score;
+	@Column(name = "difficulty")
+	private String difficulty;
 
-    @Column(name = "role", nullable = false)
-    private String role;
+	@Column(name = "score")
+	private Integer score;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "question_type", nullable = false)
-    private QuestionType questionType; // Enum: TRUE_FALSE, MULTIPLE_CHOICE
+	@Column(name = "role", nullable = false)
+	private String role;
 
-    @Column(name = "correct_answer", nullable = false)
-    private String correctAnswer;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "question_type", nullable = false)
+	private QuestionType questionType; // Enum: TRUE_FALSE, MULTIPLE_CHOICE
 
-    @Column(name = "options")
-    private String options; // Stored as comma-separated values for multiple-choice
+	@Column(name = "correct_answer", nullable = false)
+	private String correctAnswer;
 
-    // Constructors
-    public Question() {}
+	@Column(name = "options")
+	private String options; // Stored as comma-separated values for multiple-choice
 
-    public Question(String text, String category, SecurityControl controlCategory, String framework,
-                    String difficulty, Integer score, String role, QuestionType questionType,
-                    String correctAnswer, String options) {
-        this.text = text;
-        this.category = category;
-        this.controlCategory = controlCategory;
-        this.framework = framework;
-        this.difficulty = difficulty;
-        this.score = score;
-        this.role = role;
-        this.questionType = questionType;
-        this.correctAnswer = correctAnswer;
-        this.options = options;
-    }
+	// Constructors
+	public Question() {
+	}
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+	public Question(String text, String category, SecurityControl controlCategory, String framework, String difficulty,
+			Integer score, String role, QuestionType questionType, String correctAnswer, String options) {
+		this.text = text;
+		this.category = category;
+		this.controlCategory = controlCategory;
+		this.framework = framework;
+		this.difficulty = difficulty;
+		this.score = score;
+		this.role = role;
+		this.questionType = questionType;
+		this.correctAnswer = correctAnswer;
+		this.options = options;
+	}
 
-    public String getText() { return text; }
-    public void setText(String text) { this.text = text; }
+	// Getters and Setters
+	public Long getId() {
+		return id;
+	}
 
-    public String getQuestionText() { return questionText; } // ✅ Read-only
-    public void setQuestionText(String questionText) { this.questionText = questionText; }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+	public String getText() {
+		return text;
+	}
 
-    public SecurityControl getControlCategory() { return controlCategory; }
-    public void setControlCategory(SecurityControl controlCategory) { this.controlCategory = controlCategory; }
+	public void setText(String text) {
+		this.text = text;
+	}
 
-    public String getFramework() { return framework; }
-    public void setFramework(String framework) { this.framework = framework; }
+	public String getQuestionText() {
+		return questionText;
+	} // ✅ Read-only
 
-    public String getDifficulty() { return difficulty; }
-    public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
+	public void setQuestionText(String questionText) {
+		this.questionText = questionText;
+	}
 
-    public Integer getScore() { return score; }
-    public void setScore(Integer score) { this.score = score; }
+	public String getCategory() {
+		return category;
+	}
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+	public void setCategory(String category) {
+		this.category = category;
+	}
 
-    public QuestionType getQuestionType() { return questionType; }
-    public void setQuestionType(QuestionType questionType) { this.questionType = questionType; }
+	public SecurityControl getControlCategory() {
+		return controlCategory;
+	}
 
-    public String getCorrectAnswer() { return correctAnswer; }
-    public void setCorrectAnswer(String correctAnswer) { this.correctAnswer = correctAnswer; }
-    
-    public String getCitationUrl() {return citationUrl;}
-    public void setCitationUrl(String citationUrl) {this.citationUrl = citationUrl;}
-    
-    public String getOptions() { return options; }
-    public void setOptions(String options) { this.options = options; }
+	public void setControlCategory(SecurityControl controlCategory) {
+		this.controlCategory = controlCategory;
+	}
+
+	public String getFramework() {
+		return framework;
+	}
+
+	public void setFramework(String framework) {
+		this.framework = framework;
+	}
+
+	public String getDifficulty() {
+		return difficulty;
+	}
+
+	public void setDifficulty(String difficulty) {
+		this.difficulty = difficulty;
+	}
+
+	public Integer getScore() {
+		return score;
+	}
+
+	public void setScore(Integer score) {
+		this.score = score;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	public QuestionType getQuestionType() {
+		return questionType;
+	}
+
+	public void setQuestionType(QuestionType questionType) {
+		this.questionType = questionType;
+	}
+
+	public String getCorrectAnswer() {
+		return correctAnswer;
+	}
+
+	public void setCorrectAnswer(String correctAnswer) {
+		this.correctAnswer = correctAnswer;
+	}
+
+	public String getCitationUrl() {
+		return citationUrl;
+	}
+
+	public void setCitationUrl(String citationUrl) {
+		this.citationUrl = citationUrl;
+	}
+
+	public String getOptions() {
+		return options;
+	}
+
+	public void setOptions(String options) {
+		this.options = options;
+	}
 }
